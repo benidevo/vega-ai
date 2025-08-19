@@ -447,7 +447,7 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 		c.Header("X-Toast-Type", "info")
 		alerts.TriggerToast(c, "Job already exists in your list", alerts.TypeInfo)
 	}
-	c.Header("HX-Redirect", fmt.Sprintf("/jobs/%d", job.ID))
+	c.Header("HX-Redirect", fmt.Sprintf("/jobs/%d/details", job.ID))
 }
 
 // GetJobDetails handles the HTTP request to retrieve and display details for a specific job.
