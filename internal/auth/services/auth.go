@@ -86,15 +86,7 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 		return "", "", 0, models.ErrInvalidCredentials
 	}
 
-	if user.Password == "" {
-		s.log.Error().
-			Str("event", "login_oauth_account_password_attempt").
-			Str("user_ref", fmt.Sprintf("user_%d", user.ID)).
-			Msg("User password is empty. Account was created using Google authentication")
-		return "", "", 0, models.ErrInvalidCredentials
-	}
-
-	if !verifyPassword(user.Password, password) {
+	if user.Password == "" || !verifyPassword(user.Password, password) {
 		s.log.LogAuthEvent("login_invalid_password", user.ID, false)
 		return "", "", 0, models.ErrInvalidCredentials
 	}

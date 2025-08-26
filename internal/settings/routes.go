@@ -19,6 +19,7 @@ func RegisterRoutes(settingsGroup *gin.RouterGroup, handler *SettingsHandler) {
 	// Account settings
 	settingsGroup.GET("/account", handler.GetAccountSettingsPage)
 	settingsGroup.POST("/account/update", handler.HandleUpdateAccount)
+	settingsGroup.POST("/account/extension-password", handler.HandleUpdateExtensionPassword)
 	settingsGroup.DELETE("/account/delete", handler.DeleteAccount)
 
 	// Experience routes
