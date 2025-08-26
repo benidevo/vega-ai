@@ -87,7 +87,7 @@ func TestTokenTypes(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		accessToken, refreshToken, err := authService.Login(ctx, "testuser", "password123")
+		accessToken, refreshToken, _, err := authService.Login(ctx, "testuser", "password123")
 		require.NoError(t, err)
 		require.NotEmpty(t, accessToken)
 		require.NotEmpty(t, refreshToken)

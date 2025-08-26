@@ -134,7 +134,7 @@ func TestLogin(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		accessToken, refreshToken, err := authService.Login(ctx, "testuser", "password123")
+		accessToken, refreshToken, _, err := authService.Login(ctx, "testuser", "password123")
 
 		require.NoError(t, err)
 		require.NotEmpty(t, accessToken)
@@ -161,13 +161,13 @@ func TestLogin(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		accessToken1, refreshToken1, err1 := authService.Login(ctx, "nonexistent", "password123")
+		accessToken1, refreshToken1, _, err1 := authService.Login(ctx, "nonexistent", "password123")
 		require.Error(t, err1)
 		require.Equal(t, models.ErrInvalidCredentials, err1)
 		require.Empty(t, accessToken1)
 		require.Empty(t, refreshToken1)
 
-		accessToken2, refreshToken2, err2 := authService.Login(ctx, "testuser", "wrongpassword")
+		accessToken2, refreshToken2, _, err2 := authService.Login(ctx, "testuser", "wrongpassword")
 		require.Error(t, err2)
 		require.Equal(t, models.ErrInvalidCredentials, err2)
 		require.Empty(t, accessToken2)
@@ -302,7 +302,7 @@ func TestRefreshAccessToken(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		newAccessToken, err := authService.RefreshAccessToken(ctx, refreshToken)
+		newAccessToken, _, _, err := authService.RefreshAccessToken(ctx, refreshToken)
 
 		require.NoError(t, err)
 		require.NotEmpty(t, newAccessToken)
@@ -322,7 +322,7 @@ func TestRefreshAccessToken(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		newAccessToken, err := authService.RefreshAccessToken(ctx, "invalid.refresh.token")
+		newAccessToken, _, _, err := authService.RefreshAccessToken(ctx, "invalid.refresh.token")
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)
@@ -345,7 +345,7 @@ func TestRefreshAccessToken(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		newAccessToken, err := authService.RefreshAccessToken(ctx, accessToken)
+		newAccessToken, _, _, err := authService.RefreshAccessToken(ctx, accessToken)
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)
@@ -370,7 +370,7 @@ func TestRefreshAccessToken(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		newAccessToken, err := authService.RefreshAccessToken(ctx, refreshToken)
+		newAccessToken, _, _, err := authService.RefreshAccessToken(ctx, refreshToken)
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)
@@ -397,7 +397,7 @@ func TestRefreshAccessToken(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		newAccessToken, err := authService.RefreshAccessToken(ctx, refreshToken)
+		newAccessToken, _, _, err := authService.RefreshAccessToken(ctx, refreshToken)
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)
@@ -498,7 +498,7 @@ func TestLoginEdgeCases(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		accessToken, refreshToken, err := authService.Login(ctx, "oauth@example.com", "anypassword")
+		accessToken, refreshToken, _, err := authService.Login(ctx, "oauth@example.com", "anypassword")
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidCredentials, err)
@@ -518,7 +518,7 @@ func TestLoginEdgeCases(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		accessToken, refreshToken, err := authService.Login(ctx, "testuser", "password123")
+		accessToken, refreshToken, _, err := authService.Login(ctx, "testuser", "password123")
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidCredentials, err)
@@ -682,7 +682,7 @@ func TestRefreshAccessTokenErrorScenarios(t *testing.T) {
 
 		authService := NewAuthService(mockRepo, cfg)
 
-		newAccessToken, err := authService.RefreshAccessToken(ctx, refreshToken)
+		newAccessToken, _, _, err := authService.RefreshAccessToken(ctx, refreshToken)
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)

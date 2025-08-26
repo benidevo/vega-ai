@@ -14,11 +14,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// authService defines the methods AuthHandler needs from the auth service
 type authService interface {
-	Login(ctx context.Context, username, password string) (string, string, error)
+	Login(ctx context.Context, username, password string) (string, string, int64, error)
 	VerifyToken(token string) (*services.Claims, error)
-	RefreshAccessToken(ctx context.Context, refreshToken string) (string, error)
+	RefreshAccessToken(ctx context.Context, refreshToken string) (string, string, int64, error)
 	LogError(err error)
 }
 
@@ -62,7 +61,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, loginErr := h.service.Login(c.Request.Context(), req.Username, req.Password)
+	accessToken, refreshToken, _, loginErr := h.service.Login(c.Request.Context(), req.Username, req.Password)
 	if loginErr != nil {
 		h.service.LogError(loginErr)
 		c.Header("X-Toast-Message", loginErr.Error())
@@ -114,7 +113,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := h.service.RefreshAccessToken(c.Request.Context(), refreshToken)
+	accessToken, _, _, err := h.service.RefreshAccessToken(c.Request.Context(), refreshToken)
 	if err != nil {
 		h.service.LogError(fmt.Errorf("refresh token validation failed: %w", err))
 		h.clearAuthCookies(c)
@@ -161,7 +160,7 @@ func (h *AuthHandler) authMiddleware(c *gin.Context) (*services.Claims, error) {
 	if err != nil || tokenString == "" {
 		refreshToken, refreshErr := c.Cookie("refresh_token")
 		if refreshErr == nil && refreshToken != "" {
-			newAccessToken, refreshErr := h.service.RefreshAccessToken(c.Request.Context(), refreshToken)
+			newAccessToken, _, _, refreshErr := h.service.RefreshAccessToken(c.Request.Context(), refreshToken)
 			if refreshErr == nil {
 				sameSite := parseSameSiteMode(h.cfg.CookieSameSite)
 				c.SetSameSite(sameSite)
@@ -197,7 +196,7 @@ func (h *AuthHandler) authMiddleware(c *gin.Context) (*services.Claims, error) {
 		// Try to refresh with the existing refresh token
 		refreshToken, refreshErr := c.Cookie("refresh_token")
 		if refreshErr == nil && refreshToken != "" {
-			newAccessToken, refreshErr := h.service.RefreshAccessToken(c.Request.Context(), refreshToken)
+			newAccessToken, _, _, refreshErr := h.service.RefreshAccessToken(c.Request.Context(), refreshToken)
 			if refreshErr == nil {
 				sameSite := parseSameSiteMode(h.cfg.CookieSameSite)
 				c.SetSameSite(sameSite)

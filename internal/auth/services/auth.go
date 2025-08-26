@@ -13,7 +13,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Claims represents the JWT claims for authentication, including user ID, username, role, and standard registered claims.
 type Claims struct {
 	UserID    int    `json:"user_id"`
 	Username  string `json:"username"`
@@ -22,19 +21,16 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// AuthService provides authentication and user management functionality
 type AuthService struct {
 	repo   repository.UserRepository
 	config *config.Settings
 	log    *logger.PrivacyLogger
 }
 
-// NewAuthService creates and returns a new AuthService instance using the provided UserRepository and configuration settings.
 func NewAuthService(repo repository.UserRepository, config *config.Settings) *AuthService {
 	return &AuthService{repo: repo, config: config, log: logger.GetPrivacyLogger("auth")}
 }
 
-// LogError logs an authentication error using the service's logger.
 func (s *AuthService) LogError(err error) {
 	s.log.Error().Err(err).Msg("Authentication error")
 }
@@ -71,9 +67,7 @@ func (s *AuthService) Register(ctx context.Context, username, password, role str
 	return user, nil
 }
 
-// Login authenticates a user by verifying the provided username and password.
-// If successful, it generates and returns access and refresh tokens and updates the user's last login timestamp.
-func (s *AuthService) Login(ctx context.Context, username, password string) (string, string, error) {
+func (s *AuthService) Login(ctx context.Context, username, password string) (string, string, int64, error) {
 	user, err := s.repo.FindByUsername(ctx, username)
 	if err != nil {
 		sentinelErr := models.GetSentinelError(err)
@@ -89,7 +83,7 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 				Msg("Error retrieving user during login")
 		}
 
-		return "", "", models.ErrInvalidCredentials
+		return "", "", 0, models.ErrInvalidCredentials
 	}
 
 	if user.Password == "" {
@@ -97,12 +91,12 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 			Str("event", "login_oauth_account_password_attempt").
 			Str("user_ref", fmt.Sprintf("user_%d", user.ID)).
 			Msg("User password is empty. Account was created using Google authentication")
-		return "", "", models.ErrInvalidCredentials
+		return "", "", 0, models.ErrInvalidCredentials
 	}
 
 	if !verifyPassword(user.Password, password) {
 		s.log.LogAuthEvent("login_invalid_password", user.ID, false)
-		return "", "", models.ErrInvalidCredentials
+		return "", "", 0, models.ErrInvalidCredentials
 	}
 
 	accessToken, err := GenerateAccessToken(user, s.config)
@@ -111,7 +105,7 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 			Str("event", "access_token_generation_failed").
 			Str("user_ref", fmt.Sprintf("user_%d", user.ID)).
 			Msg("Failed to generate access token")
-		return "", "", models.ErrInvalidCredentials
+		return "", "", 0, models.ErrInvalidCredentials
 	}
 
 	refreshToken, err := GenerateRefreshToken(user, s.config)
@@ -120,8 +114,9 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 			Str("event", "refresh_token_generation_failed").
 			Str("user_ref", fmt.Sprintf("user_%d", user.ID)).
 			Msg("Failed to generate refresh token")
-		return "", "", models.ErrInvalidCredentials
+		return "", "", 0, models.ErrInvalidCredentials
 	}
+	expiresAt := time.Now().UTC().Add(s.config.AccessTokenExpiry).Unix()
 
 	user.LastLogin = time.Now().UTC()
 	_, err = s.repo.UpdateUser(ctx, user)
@@ -135,20 +130,19 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	}
 
 	s.log.LogAuthEvent("login_success", user.ID, true)
-	return accessToken, refreshToken, nil
+	return accessToken, refreshToken, expiresAt, nil
 }
 
-// RefreshAccessToken validates a refresh token and generates a new access token if valid
-func (s *AuthService) RefreshAccessToken(ctx context.Context, refreshToken string) (string, error) {
+func (s *AuthService) RefreshAccessToken(ctx context.Context, refreshToken string) (string, string, int64, error) {
 	claims, err := s.VerifyToken(refreshToken)
 	if err != nil {
 		s.log.Error().Err(err).Msg("Invalid refresh token")
-		return "", models.ErrInvalidToken
+		return "", "", 0, models.ErrInvalidToken
 	}
 
 	if claims.TokenType != "refresh" {
 		s.log.Error().Msg("Token provided is not a refresh token")
-		return "", models.ErrInvalidToken
+		return "", "", 0, models.ErrInvalidToken
 	}
 
 	user, err := s.repo.FindByID(ctx, claims.UserID)
@@ -159,7 +153,7 @@ func (s *AuthService) RefreshAccessToken(ctx context.Context, refreshToken strin
 			Str("user_ref", fmt.Sprintf("user_%d", claims.UserID)).
 			Str("error_type", sentinelErr.Error()).
 			Msg("Failed to find user for token refresh")
-		return "", models.ErrInvalidToken
+		return "", "", 0, models.ErrInvalidToken
 	}
 
 	if user == nil {
@@ -167,7 +161,7 @@ func (s *AuthService) RefreshAccessToken(ctx context.Context, refreshToken strin
 			Str("event", "token_refresh_user_nil").
 			Str("user_ref", fmt.Sprintf("user_%d", claims.UserID)).
 			Msg("User not found for token refresh")
-		return "", models.ErrInvalidToken
+		return "", "", 0, models.ErrInvalidToken
 	}
 
 	accessToken, err := GenerateAccessToken(user, s.config)
@@ -176,17 +170,25 @@ func (s *AuthService) RefreshAccessToken(ctx context.Context, refreshToken strin
 			Str("event", "token_refresh_failed").
 			Str("user_ref", fmt.Sprintf("user_%d", user.ID)).
 			Msg("Failed to generate new access token")
-		return "", models.ErrTokenCreationFailed
+		return "", "", 0, models.ErrTokenCreationFailed
 	}
+	newRefreshToken, err := GenerateRefreshToken(user, s.config)
+	if err != nil {
+		s.log.Error().Err(err).
+			Str("event", "refresh_token_rotation_failed").
+			Str("user_ref", fmt.Sprintf("user_%d", user.ID)).
+			Msg("Failed to generate new refresh token")
+		newRefreshToken = refreshToken
+	}
+	expiresAt := time.Now().UTC().Add(s.config.AccessTokenExpiry).Unix()
 
 	s.log.Info().
 		Str("event", "token_refreshed").
 		Str("user_ref", fmt.Sprintf("user_%d", user.ID)).
 		Msg("Access token refreshed successfully")
-	return accessToken, nil
+	return accessToken, newRefreshToken, expiresAt, nil
 }
 
-// GetUserByID retrieves a user by their unique ID from the repository.
 func (s *AuthService) GetUserByID(ctx context.Context, userID int) (*models.User, error) {
 	user, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
@@ -205,10 +207,6 @@ func (s *AuthService) GetUserByID(ctx context.Context, userID int) (*models.User
 	return user, nil
 }
 
-// VerifyToken validates a JWT token and extracts its claims.
-//
-// It checks the token's signing method, parses it with the provided claims,
-// and ensures the token is valid.
 func (s *AuthService) VerifyToken(token string) (*Claims, error) {
 	claims := &Claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(jwtToken *jwt.Token) (interface{}, error) {
@@ -232,9 +230,6 @@ func (s *AuthService) VerifyToken(token string) (*Claims, error) {
 	return claims, nil
 }
 
-// ChangePassword updates the password for a user identified by userID.
-//
-// It hashes the new password and updates the user's record in the repository.
 func (s *AuthService) ChangePassword(ctx context.Context, userID int, newPassword string) error {
 	user, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
@@ -278,12 +273,10 @@ func (s *AuthService) ChangePassword(ctx context.Context, userID int, newPasswor
 	return nil
 }
 
-// VerifyPassword checks if the provided password matches the hashed password
 func (s *AuthService) VerifyPassword(hashedPassword, password string) bool {
 	return verifyPassword(hashedPassword, password)
 }
 
-// DeleteAccount deletes a user's account and all associated data
 func (s *AuthService) DeleteAccount(ctx context.Context, userID int) error {
 	s.log.Info().
 		Str("event", "account_deletion_requested").
@@ -306,17 +299,13 @@ func (s *AuthService) DeleteAccount(ctx context.Context, userID int) error {
 	return nil
 }
 
-// TokenType defines the type of JWT token
 type TokenType string
 
 const (
-	// AccessToken is a short-lived token used for authentication
-	AccessToken TokenType = "access"
-	// RefreshToken is a long-lived token used to refresh access tokens
+	AccessToken  TokenType = "access"
 	RefreshToken TokenType = "refresh"
 )
 
-// GenerateToken creates a JWT token for the given user with the specified token type and expiration duration.
 func GenerateToken(user *models.User, cfg *config.Settings, tokenType TokenType, expiry time.Duration) (string, error) {
 	expirationTime := time.Now().UTC().Add(expiry)
 	role := user.Role.String()
@@ -338,12 +327,10 @@ func GenerateToken(user *models.User, cfg *config.Settings, tokenType TokenType,
 	return token.SignedString([]byte(cfg.TokenSecret))
 }
 
-// GenerateAccessToken creates a short-lived access JWT token for the given user.
 func GenerateAccessToken(user *models.User, cfg *config.Settings) (string, error) {
 	return GenerateToken(user, cfg, AccessToken, cfg.AccessTokenExpiry)
 }
 
-// GenerateRefreshToken creates a long-lived refresh JWT token for the given user.
 func GenerateRefreshToken(user *models.User, cfg *config.Settings) (string, error) {
 	return GenerateToken(user, cfg, RefreshToken, cfg.RefreshTokenExpiry)
 }
