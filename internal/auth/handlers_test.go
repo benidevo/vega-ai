@@ -19,14 +19,13 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// mockAuthService implements the authService interface for testing
 type mockAuthService struct {
 	mock.Mock
 }
 
-func (m *mockAuthService) Login(ctx context.Context, username, password string) (string, string, error) {
+func (m *mockAuthService) Login(ctx context.Context, username, password string) (string, string, int64, error) {
 	args := m.Called(ctx, username, password)
-	return args.String(0), args.String(1), args.Error(2)
+	return args.String(0), args.String(1), args.Get(2).(int64), args.Error(3)
 }
 
 func (m *mockAuthService) VerifyToken(token string) (*services.Claims, error) {
@@ -37,9 +36,9 @@ func (m *mockAuthService) VerifyToken(token string) (*services.Claims, error) {
 	return args.Get(0).(*services.Claims), args.Error(1)
 }
 
-func (m *mockAuthService) RefreshAccessToken(ctx context.Context, refreshToken string) (string, error) {
+func (m *mockAuthService) RefreshAccessToken(ctx context.Context, refreshToken string) (string, string, int64, error) {
 	args := m.Called(ctx, refreshToken)
-	return args.String(0), args.Error(1)
+	return args.String(0), args.String(1), args.Get(2).(int64), args.Error(3)
 }
 
 func (m *mockAuthService) LogError(err error) {
@@ -86,7 +85,7 @@ func TestAuthHandler_Login(t *testing.T) {
 			},
 			MockSetup: func() {
 				mockService.On("Login", mock.Anything, "testuser", "password123").
-					Return("access-token", "refresh-token", nil)
+					Return("access-token", "refresh-token", int64(1234567890), nil)
 			},
 			ExpectedStatus: http.StatusOK,
 			ExpectedHeader: map[string]string{
@@ -117,7 +116,7 @@ func TestAuthHandler_Login(t *testing.T) {
 			},
 			MockSetup: func() {
 				mockService.On("Login", mock.Anything, "testuser", "wrongpassword").
-					Return("", "", models.ErrInvalidCredentials)
+					Return("", "", int64(0), models.ErrInvalidCredentials)
 				mockService.On("LogError", models.ErrInvalidCredentials).Return()
 			},
 			ExpectedStatus: http.StatusUnauthorized,
@@ -246,7 +245,7 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 			},
 			MockSetup: func() {
 				mockService.On("RefreshAccessToken", mock.Anything, "valid-refresh-token").
-					Return("new-access-token", nil)
+					Return("new-access-token", "new-refresh-token", int64(1234567890), nil)
 			},
 			ExpectedStatus: http.StatusOK,
 			ExpectedCookie: []testutil.CookieAssertion{
@@ -273,7 +272,7 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 			},
 			MockSetup: func() {
 				mockService.On("RefreshAccessToken", mock.Anything, "invalid-refresh-token").
-					Return("", models.ErrInvalidToken)
+					Return("", "", int64(0), models.ErrInvalidToken)
 				mockService.On("LogError", mock.Anything).Return()
 			},
 			ExpectedStatus: http.StatusUnauthorized,
@@ -305,7 +304,7 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 			},
 			MockSetup: func() {
 				mockService.On("RefreshAccessToken", mock.Anything, "valid-refresh-token").
-					Return("", errors.New("service error"))
+					Return("", "", int64(0), errors.New("service error"))
 				mockService.On("LogError", mock.Anything).Return()
 			},
 			ExpectedStatus: http.StatusUnauthorized,
