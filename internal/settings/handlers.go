@@ -568,12 +568,13 @@ func (h *SettingsHandler) GetAccountSettingsPage(c *gin.Context) {
 		"isCloudMode":    h.service.cfg.IsCloudMode,
 	}
 
-	// For cloud mode, get security settings (Google account info)
+	// For cloud mode, get security settings (Google account info) and check if extension password is set
 	if h.service.cfg.IsCloudMode {
 		security, err := h.service.GetSecuritySettings(c.Request.Context(), username.(string))
 		if err == nil {
 			data["security"] = security
 		}
+		data["hasExtensionPassword"] = user.Password != ""
 	}
 
 	h.renderer.HTML(c, http.StatusOK, "layouts/base.html", data)
@@ -797,6 +798,48 @@ func (h *SettingsHandler) HandleUpdateAccount(c *gin.Context) {
 		alerts.TriggerToast(c, "No changes were made", alerts.TypeInfo)
 		c.Status(http.StatusOK)
 	}
+}
+
+// HandleUpdateExtensionPassword handles updating the browser extension password for cloud users
+func (h *SettingsHandler) HandleUpdateExtensionPassword(c *gin.Context) {
+	if !h.service.cfg.IsCloudMode {
+		alerts.TriggerToast(c, "Extension password is only available in cloud mode", alerts.TypeError)
+		c.Status(http.StatusForbidden)
+		return
+	}
+
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		alerts.TriggerToast(c, "Unauthorized", alerts.TypeError)
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+	userID := userIDValue.(int)
+
+	newPassword := c.PostForm("extension_password")
+	confirmPassword := c.PostForm("confirm_extension_password")
+
+	if newPassword != confirmPassword {
+		alerts.TriggerToast(c, "Passwords do not match", alerts.TypeError)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	if len(newPassword) < 8 || len(newPassword) > 128 {
+		alerts.TriggerToast(c, "Password must be between 8 and 128 characters", alerts.TypeError)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	err := h.service.authService.ChangePassword(c.Request.Context(), userID, newPassword)
+	if err != nil {
+		alerts.TriggerToast(c, "Failed to update extension password", alerts.TypeError)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	alerts.TriggerToast(c, "Browser extension password updated successfully", alerts.TypeSuccess)
+	c.Status(http.StatusOK)
 }
 
 // DeleteAccount handles the account deletion request

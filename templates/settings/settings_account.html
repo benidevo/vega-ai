@@ -1,10 +1,8 @@
 {{define "settings-account-content"}}
 <div class="max-w-6xl mx-auto relative">
 
-  <!-- Alert container for form responses -->
   <div id="form-alert-container" class="mb-4 md:mb-6" hx-swap-oob="true" aria-live="polite"></div>
 
-  <!-- Content container -->
   <div class="relative p-4 md:p-6 bg-slate-800 bg-opacity-70 backdrop-blur-xl rounded-xl shadow-2xl border border-white border-opacity-10">
 
     {{if .isCloudMode}}
@@ -69,13 +67,27 @@
             <label for="current_password" class="block text-sm font-medium text-gray-300">
               Current Password <span class="text-red-500">*</span>
             </label>
-            <input type="password"
-                   id="current_password"
-                   name="current_password"
-                   required
-                   autocomplete="current-password"
-                   placeholder="Enter your current password"
-                   class="w-full px-3 py-2 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+            <div class="relative">
+              <input type="password"
+                     id="current_password"
+                     name="current_password"
+                     required
+                     autocomplete="current-password"
+                     placeholder="Enter your current password"
+                     class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+              <button type="button" 
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                      aria-label="Toggle password visibility"
+                      onclick="togglePasswordFieldVisibility('current_password')">
+                <svg id="show-current-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg id="hide-current-password-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              </button>
+            </div>
             <p class="text-xs text-gray-400 mt-1">Required to make any changes</p>
           </div>
         </div>
@@ -106,30 +118,57 @@
               <label for="new_password" class="block text-sm font-medium text-gray-300">
                 New Password
               </label>
-              <input type="password"
-                     id="new_password"
-                     name="new_password"
-                     autocomplete="new-password"
-                     placeholder="Enter new password"
-                     class="w-full px-3 py-2 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+              <div class="relative">
+                <input type="password"
+                       id="new_password"
+                       name="new_password"
+                       autocomplete="new-password"
+                       placeholder="Enter new password"
+                       class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                <button type="button" 
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                        aria-label="Toggle password visibility"
+                        onclick="togglePasswordFieldVisibility('new_password')">
+                  <svg id="show-new-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <svg id="hide-new-password-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div class="space-y-1">
               <label for="confirm_password" class="block text-sm font-medium text-gray-300">
                 Confirm New Password
               </label>
-              <input type="password"
-                     id="confirm_password"
-                     name="confirm_password"
-                     autocomplete="new-password"
-                     placeholder="Confirm new password"
-                     class="w-full px-3 py-2 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+              <div class="relative">
+                <input type="password"
+                       id="confirm_password"
+                       name="confirm_password"
+                       autocomplete="new-password"
+                       placeholder="Confirm new password"
+                       class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                <button type="button" 
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                        aria-label="Toggle password visibility"
+                        onclick="togglePasswordFieldVisibility('confirm_password')">
+                  <svg id="show-confirm-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <svg id="hide-confirm-password-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <p class="text-xs text-gray-400">Leave blank to keep current password</p>
           </div>
         </div>
 
-        <!-- Submit Button -->
         <div class="flex justify-end pt-4">
           <button type="submit"
                   class="px-6 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-md transition-colors duration-300">
@@ -156,7 +195,118 @@
     {{end}}
 
     {{if .isCloudMode}}
-    <!-- Connected Third-Party Services (Cloud Mode Only) -->
+    <div class="mb-6 pb-6 border-b border-slate-700 border-opacity-50">
+      <h3 class="text-lg md:text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Browser Extension</h3>
+
+      <div class="bg-slate-700 bg-opacity-40 rounded-lg p-4 md:p-6">
+        <div class="mb-4">
+          <p class="text-sm text-gray-300 mb-4">
+            Set a password for authenticating with the Vega AI browser extension. This password is separate from your Google account and is used only for the extension.
+          </p>
+        </div>
+
+        <form id="extension-password-form" 
+              hx-post="/settings/account/extension-password" 
+              hx-target="#form-alert-container" 
+              hx-swap="innerHTML" 
+              hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
+              hx-on::after-request="if(event.detail.successful && event.detail.xhr.responseText.includes('successfully')) { document.getElementById('extension_password').value = ''; document.getElementById('confirm_extension_password').value = ''; }"
+              class="space-y-4">
+          <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
+          
+          <div class="space-y-1">
+            <label for="extension_password" class="block text-sm font-medium text-gray-300">
+              Browser Extension Password
+            </label>
+            <div class="relative">
+              <input type="password"
+                     id="extension_password"
+                     name="extension_password"
+                     required
+                     autocomplete="new-password"
+                     placeholder="Enter password for browser extension"
+                     class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+              <button type="button" 
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                      aria-label="Toggle password visibility"
+                      onclick="toggleExtensionPasswordVisibility('extension_password')">
+                <svg id="show-extension-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg id="hide-extension-password-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Minimum 8 characters</p>
+          </div>
+
+          <div class="space-y-1">
+            <label for="confirm_extension_password" class="block text-sm font-medium text-gray-300">
+              Confirm Password
+            </label>
+            <div class="relative">
+              <input type="password"
+                     id="confirm_extension_password"
+                     name="confirm_extension_password"
+                     required
+                     autocomplete="new-password"
+                     placeholder="Confirm password"
+                     class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+              <button type="button" 
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                      aria-label="Toggle password visibility"
+                      onclick="toggleExtensionPasswordVisibility('confirm_extension_password')">
+                <svg id="show-confirm-extension-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg id="hide-confirm-extension-password-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="submit"
+                    class="px-6 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-md transition-colors duration-300">
+              {{if .hasExtensionPassword}}Update{{else}}Set{{end}} Extension Password
+            </button>
+          </div>
+        </form>
+
+        {{if .hasExtensionPassword}}
+        <div class="mt-4 p-3 bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg">
+          <div class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p class="text-sm text-gray-300">
+                Extension password is set. Use your Google email ({{.user.Username}}) and this password to log into the browser extension.
+              </p>
+            </div>
+          </div>
+        </div>
+        {{else}}
+        <div class="mt-4 p-3 bg-yellow-900 bg-opacity-30 border border-yellow-700 rounded-lg">
+          <div class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p class="text-sm text-gray-300">
+                No browser extension password set. Set a password to use the browser extension.
+              </p>
+            </div>
+          </div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+
     <div class="mb-6 pb-6 border-b border-slate-700 border-opacity-50">
       <h3 class="text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Connected Services</h3>
 
@@ -187,7 +337,6 @@
     {{end}}
 
 
-    <!-- Account Activity Section (All Modes) -->
     <div>
       <h3 class="text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Account Activity</h3>
 
@@ -290,6 +439,54 @@
 </div>
 
 <script>
+function togglePasswordFieldVisibility(fieldId) {
+  const passwordInput = document.getElementById(fieldId);
+  let showIconId, hideIconId;
+  
+  const iconMapping = {
+    'current_password': ['show-current-password-icon', 'hide-current-password-icon'],
+    'new_password': ['show-new-password-icon', 'hide-new-password-icon'],
+    'confirm_password': ['show-confirm-password-icon', 'hide-confirm-password-icon']
+  };
+  
+  if (iconMapping[fieldId]) {
+    [showIconId, hideIconId] = iconMapping[fieldId];
+  }
+  
+  const showIcon = document.getElementById(showIconId);
+  const hideIcon = document.getElementById(hideIconId);
+  
+  if (passwordInput && showIcon && hideIcon) {
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      showIcon.classList.add('hidden');
+      hideIcon.classList.remove('hidden');
+    } else {
+      passwordInput.type = 'password';
+      showIcon.classList.remove('hidden');
+      hideIcon.classList.add('hidden');
+    }
+  }
+}
+
+function toggleExtensionPasswordVisibility(fieldId) {
+  const passwordInput = document.getElementById(fieldId);
+  const showIconId = fieldId === 'extension_password' ? 'show-extension-password-icon' : 'show-confirm-extension-password-icon';
+  const hideIconId = fieldId === 'extension_password' ? 'hide-extension-password-icon' : 'hide-confirm-extension-password-icon';
+  const showIcon = document.getElementById(showIconId);
+  const hideIcon = document.getElementById(hideIconId);
+  
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    showIcon.classList.add('hidden');
+    hideIcon.classList.remove('hidden');
+  } else {
+    passwordInput.type = 'password';
+    showIcon.classList.remove('hidden');
+    hideIcon.classList.add('hidden');
+  }
+}
+
 function showDeleteModal() {
   document.getElementById('deleteAccountModal').classList.remove('hidden');
   document.getElementById('delete_confirmation').focus();
