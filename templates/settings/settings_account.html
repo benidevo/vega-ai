@@ -147,7 +147,7 @@
           <div>
             <h4 class="text-sm font-medium text-blue-300 mb-1">Forgot your password?</h4>
             <p class="text-xs text-gray-300">
-              Restart the application with <code class="bg-slate-700 px-2 py-1 rounded text-xs">RESET_ADMIN_PASSWORD=true ./vega</code> to reset your password.
+              Restart the application with <code class="bg-slate-700 px-2 py-1 rounded text-xs">RESET_ADMIN_PASSWORD=true</code> in your config to reset your password.
             </p>
           </div>
         </div>
@@ -230,7 +230,7 @@
         <p class="text-sm text-gray-300 mb-4">
           Once you delete your account, there is no going back. All your data including jobs, profile information, and settings will be permanently removed.
         </p>
-        <button onclick="showDeleteModal()" 
+        <button onclick="showDeleteModal()"
                 class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors duration-200">
           Delete My Account
         </button>
@@ -243,12 +243,12 @@
 <div id="deleteAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
   <div class="bg-slate-800 rounded-lg p-4 sm:p-6 max-w-md w-full">
     <h3 class="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Confirm Account Deletion</h3>
-    
+
     <div class="mb-3 sm:mb-4">
       <p class="text-sm sm:text-base text-gray-300 mb-2">This action cannot be undone. All your data will be permanently deleted.</p>
       <p class="text-sm sm:text-base text-gray-300 font-medium">Type <span class="text-red-400 font-mono">DELETE</span> to confirm:</p>
     </div>
-    
+
     <div class="space-y-3 sm:space-y-4">
       <div>
         <input type="text"
@@ -256,30 +256,30 @@
                placeholder="Type DELETE to confirm"
                autocomplete="off"
                class="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base rounded-md bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-               _="on input 
-                  if my.value == 'DELETE' then 
-                    add .border-green-500 to me 
+               _="on input
+                  if my.value == 'DELETE' then
+                    add .border-green-500 to me
                     remove @disabled from #delete-btn
                     add .bg-red-600 to #delete-btn
                     remove .bg-gray-500 from #delete-btn
                     add .hover:bg-red-700 to #delete-btn
-                  else 
-                    add .border-slate-600 to me 
+                  else
+                    add .border-slate-600 to me
                     add @disabled to #delete-btn
                     remove .bg-red-600 from #delete-btn
                     add .bg-gray-500 to #delete-btn
                     remove .hover:bg-red-700 from #delete-btn
                   end">
       </div>
-      
+
       <div class="flex gap-2 sm:gap-3 justify-end">
-        <button type="button" onclick="hideDeleteModal()" 
+        <button type="button" onclick="hideDeleteModal()"
                 class="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-slate-600 hover:bg-slate-700 text-white rounded-md transition-colors">
           Cancel
         </button>
         <button id="delete-btn"
                 disabled
-                hx-delete="/settings/account/delete" 
+                hx-delete="/settings/account/delete"
                 hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
                 class="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-gray-500 text-white font-medium rounded-md transition-colors cursor-not-allowed">
           Delete My Account

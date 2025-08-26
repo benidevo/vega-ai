@@ -14,6 +14,10 @@
       <div class="flex flex-col md:flex-row md:justify-end md:items-center gap-3 md:gap-4 mb-4">
         <div class="flex gap-2 w-full md:w-auto">
           <button class="flex-1 md:flex-none px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md transition-colors"
+                  onclick="saveCoverLetterToDocuments()">
+            Save
+          </button>
+          <button class="flex-1 md:flex-none px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md transition-colors"
                   onclick="copyToClipboard('cover-letter-content')">
             Copy
           </button>
@@ -128,42 +132,63 @@
     button.innerText = 'Generating...';
     button.disabled = true;
 
-    try {
-      // Check if jsPDF is available
-      if (typeof window.jspdf === 'undefined') {
-        throw new Error('jsPDF library not loaded. Please check your internet connection and try again.');
-      }
+    // First save the document, then download
+    saveCoverLetterToDocuments(true).then(() => {
+      try {
+        // Check if jsPDF is available
+        if (typeof window.jspdf === 'undefined') {
+          throw new Error('jsPDF library not loaded. Please check your internet connection and try again.');
+        }
 
-      // Check if cover letter content exists
-      const contentElement = document.getElementById('cover-letter-content');
-      if (!contentElement) {
-        throw new Error('Cover letter content not found. Please refresh the page and try again.');
-      }
+        // Check if cover letter content exists
+        const contentElement = document.getElementById('cover-letter-content');
+        if (!contentElement) {
+          throw new Error('Cover letter content not found. Please refresh the page and try again.');
+        }
 
-      generateTextCoverLetterPDF();
+        generateTextCoverLetterPDF();
 
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('Your cover letter has been downloaded successfully!', 'success', 'Download Complete');
-      }
-    } catch (error) {
-      console.error('PDF generation error:', error);
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Your cover letter has been downloaded successfully!', 'success', 'Download Complete');
+        }
+      } catch (error) {
+        console.error('PDF generation error:', error);
 
-      let errorMessage = 'Unable to download your cover letter right now. Please try again in a moment.';
-      if (error.message.includes('jsPDF library')) {
-        errorMessage = 'Download temporarily unavailable. Please refresh the page and try again.';
-      } else if (error.message.includes('Cover letter content not found')) {
-        errorMessage = 'Your cover letter content couldn\'t be found. Please refresh the page and try again.';
-      }
+        let errorMessage = 'Unable to download your cover letter right now. Please try again in a moment.';
+        if (error.message.includes('jsPDF library')) {
+          errorMessage = 'Download temporarily unavailable. Please refresh the page and try again.';
+        } else if (error.message.includes('Cover letter content not found')) {
+          errorMessage = 'Your cover letter content couldn\'t be found. Please refresh the page and try again.';
+        }
 
-      if (typeof window.showNotification === 'function') {
-        window.showNotification(errorMessage, 'error', 'Download Failed');
+        if (typeof window.showNotification === 'function') {
+          window.showNotification(errorMessage, 'error', 'Download Failed');
+        }
+      } finally {
+        // Reset button state
+        isGeneratingPDF = false;
+        button.innerText = originalText;
+        button.disabled = false;
       }
-    } finally {
-      // Reset button state
-      isGeneratingPDF = false;
-      button.innerText = originalText;
-      button.disabled = false;
-    }
+    }).catch(error => {
+      // If save fails, still allow download
+      console.error('Save failed, proceeding with download:', error);
+      try {
+        generateTextCoverLetterPDF();
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Your cover letter has been downloaded successfully!', 'success', 'Download Complete');
+        }
+      } catch (downloadError) {
+        console.error('PDF generation error:', downloadError);
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Unable to download your cover letter. Please try again.', 'error', 'Download Failed');
+        }
+      } finally {
+        isGeneratingPDF = false;
+        button.innerText = originalText;
+        button.disabled = false;
+      }
+    });
   }
 
   window.copyToClipboard = function(elementId) {
@@ -322,7 +347,19 @@
       });
     }
 
-    doc.save('cover-letter.pdf');
+    // Generate filename with company and job title
+    const companyName = '{{.CompanyName}}';
+    const jobTitle = '{{.JobTitle}}';
+
+    let filename = 'cover-letter.pdf';
+    if (companyName && jobTitle) {
+      // Sanitize company name and job title for filename
+      const sanitizedCompany = companyName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-').toLowerCase();
+      const sanitizedTitle = jobTitle.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-').toLowerCase();
+      filename = `${sanitizedCompany}-${sanitizedTitle}-cover-letter.pdf`;
+    }
+
+    doc.save(filename);
   }
 
 
@@ -459,5 +496,129 @@
 
   // Initialize newline support when document loads
   document.addEventListener('DOMContentLoaded', setupCoverLetterNewlineSupport);
+
+  // Function to save the cover letter to documents
+  window.saveCoverLetterToDocuments = function(isFromDownload = false) {
+    return new Promise((resolve, reject) => {
+      const coverLetterContent = document.getElementById('cover-letter-content');
+      const jobID = {{.JobID}};
+
+      if (!jobID) {
+        if (!isFromDownload && typeof window.showNotification === 'function') {
+          window.showNotification('Unable to save: Job ID not found', 'error', 'Save Failed');
+        }
+        reject(new Error('Job ID not found'));
+        return;
+      }
+
+      // Get only the letter body content (not the header)
+      const letterBody = coverLetterContent.querySelector('.whitespace-pre-wrap');
+      const content = letterBody ? (letterBody.innerText || letterBody.textContent || '') : '';
+
+      if (!content.trim()) {
+        if (!isFromDownload && typeof window.showNotification === 'function') {
+          window.showNotification('Cover letter content is empty', 'error', 'Save Failed');
+        }
+        reject(new Error('Cover letter content is empty'));
+        return;
+      }
+
+      // Extract personal info from the header for later use
+      const headerSection = coverLetterContent.querySelector('.mb-6.border-b');
+      let personalInfo = null;
+      if (headerSection) {
+        personalInfo = {
+          firstName: headerSection.querySelector('h2')?.innerText.split(' ')[0] || '',
+          lastName: headerSection.querySelector('h2')?.innerText.split(' ').slice(1).join(' ') || '',
+          title: headerSection.querySelector('p.text-gray-700')?.innerText || '',
+          location: '',
+          email: '',
+          phone: '',
+          linkedin: ''
+        };
+
+        // Extract contact info from the spans
+        const contactSpans = headerSection.querySelectorAll('.text-gray-600 span');
+        contactSpans.forEach(span => {
+          const text = span.innerText.trim();
+          if (text.includes('@')) {
+            personalInfo.email = text;
+          } else if (text.match(/^\+?\d[\d\s-]+$/)) {
+            personalInfo.phone = text;
+          } else if (text.includes('linkedin.com')) {
+            personalInfo.linkedin = text;
+          } else if (!personalInfo.location && text && !text.includes('|')) {
+            personalInfo.location = text;
+          }
+        });
+      }
+
+      // Show loading state only if not from download (download has its own loading state)
+      let saveButton = null;
+      let originalText = '';
+      if (!isFromDownload && event && event.target) {
+        saveButton = event.target;
+        originalText = saveButton.innerText;
+        saveButton.disabled = true;
+        saveButton.innerText = 'Saving...';
+      }
+
+      // Prepare the request data with both content and personalInfo
+      const coverLetterData = {
+        content: content
+      };
+      if (personalInfo) {
+        coverLetterData.personalInfo = personalInfo;
+      }
+
+      const requestData = {
+        jobId: jobID,
+        documentType: 'cover_letter',
+        content: JSON.stringify(coverLetterData)  // Send as JSON string
+      };
+
+      // Get CSRF token
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+      // Send the save request
+      fetch('/documents/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        },
+        body: JSON.stringify(requestData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save document');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!isFromDownload && typeof window.showNotification === 'function') {
+          window.showNotification('Document saved successfully!', 'success', 'Save Complete');
+        }
+        resolve(data);
+      })
+      .catch(error => {
+        console.error('Error saving cover letter:', error);
+        if (!isFromDownload && typeof window.showNotification === 'function') {
+          window.showNotification('Failed to save document. Please try again.', 'error', 'Save Failed');
+        }
+        reject(error);
+      })
+      .finally(() => {
+        // Restore button state
+        if (saveButton) {
+          saveButton.disabled = false;
+          saveButton.innerText = originalText;
+        }
+      });
+    });
+  }
+
+  // This function is no longer needed as we use window.showNotification
+  // which is defined in base.html and properly handles toast notifications
 })();
 </script>

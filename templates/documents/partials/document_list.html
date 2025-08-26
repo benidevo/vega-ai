@@ -1,0 +1,208 @@
+{{define "documents/partials/document_list.html"}}
+{{if .Documents}}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+    {{range .Documents}}
+      {{template "documents/partials/document_card.html" .}}
+    {{end}}
+  </div>
+
+  {{if gt .TotalPages 1}}
+  <div class="mt-8">
+    <nav aria-label="Document pagination" role="navigation" class="flex items-center justify-between">
+      <div class="flex justify-between flex-1 sm:hidden">
+        {{if .HasPrevPage}}
+        <button
+          class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600 transition-colors"
+          hx-get="/documents/partial?tab={{$.ActiveTab}}&page={{.PrevPage}}"
+          hx-target="#documents-content"
+          hx-swap="innerHTML"
+          hx-push-url="/documents?tab={{$.ActiveTab}}&page={{.PrevPage}}"
+          aria-label="Go to previous page">
+          Previous
+        </button>
+        {{else}}
+        <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-slate-800 border border-slate-700 rounded-md cursor-not-allowed">
+          Previous
+        </span>
+        {{end}}
+
+        {{if .HasNextPage}}
+        <button
+          class="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600 transition-colors"
+          hx-get="/documents/partial?tab={{$.ActiveTab}}&page={{.NextPage}}"
+          hx-target="#documents-content"
+          hx-swap="innerHTML"
+          hx-push-url="/documents?tab={{$.ActiveTab}}&page={{.NextPage}}"
+          aria-label="Go to next page">
+          Next
+        </button>
+        {{else}}
+        <span class="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-slate-800 border border-slate-700 rounded-md cursor-not-allowed">
+          Next
+        </span>
+        {{end}}
+      </div>
+
+      <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
+        <div>
+          <nav class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            {{if .HasPrevPage}}
+            <button
+              class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 rounded-l-md hover:bg-slate-600 transition-colors"
+              hx-get="/documents/partial?tab={{$.ActiveTab}}&page={{.PrevPage}}"
+              hx-target="#documents-content"
+              hx-swap="innerHTML"
+              hx-push-url="/documents?tab={{$.ActiveTab}}&page={{.PrevPage}}"
+              aria-label="Previous page">
+              <span class="sr-only">Previous</span>
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            {{else}}
+            <span class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-slate-800 border border-slate-700 rounded-l-md cursor-not-allowed">
+              <span class="sr-only">Previous</span>
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </span>
+            {{end}}
+
+            {{$currentPage := .CurrentPage}}
+            {{$totalPages := .TotalPages}}
+            {{$activeTab := $.ActiveTab}}
+            
+            {{if eq $currentPage 1}}
+              <span class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary">1</span>
+            {{else}}
+              <button
+                class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 hover:bg-slate-600 transition-colors"
+                hx-get="/documents/partial?tab={{$activeTab}}&page=1"
+                hx-target="#documents-content"
+                hx-swap="innerHTML"
+                hx-push-url="/documents?tab={{$activeTab}}&page=1"
+                aria-label="Go to page 1">1</button>
+            {{end}}
+            
+            {{if gt $currentPage 3}}
+              <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-slate-800 border border-slate-700">...</span>
+            {{end}}
+            
+            {{if and (gt $currentPage 2) (lt $currentPage (sub $totalPages 1))}}
+              <button
+                class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 hover:bg-slate-600 transition-colors"
+                hx-get="/documents/partial?tab={{$activeTab}}&page={{sub $currentPage 1}}"
+                hx-target="#documents-content"
+                hx-swap="innerHTML"
+                hx-push-url="/documents?tab={{$activeTab}}&page={{sub $currentPage 1}}"
+                aria-label="Go to page {{sub $currentPage 1}}">{{sub $currentPage 1}}</button>
+            {{end}}
+            
+            {{if and (gt $currentPage 1) (lt $currentPage $totalPages)}}
+              <span class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary">{{$currentPage}}</span>
+            {{end}}
+            
+            {{if and (lt $currentPage (sub $totalPages 1)) (gt $currentPage 1)}}
+              <button
+                class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 hover:bg-slate-600 transition-colors"
+                hx-get="/documents/partial?tab={{$activeTab}}&page={{add $currentPage 1}}"
+                hx-target="#documents-content"
+                hx-swap="innerHTML"
+                hx-push-url="/documents?tab={{$activeTab}}&page={{add $currentPage 1}}"
+                aria-label="Go to page {{add $currentPage 1}}">{{add $currentPage 1}}</button>
+            {{end}}
+            
+            {{if lt $currentPage (sub $totalPages 2)}}
+              <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-slate-800 border border-slate-700">...</span>
+            {{end}}
+            
+            {{if gt $totalPages 1}}
+              {{if eq $currentPage $totalPages}}
+                <span class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-primary">{{$totalPages}}</span>
+              {{else}}
+                <button
+                  class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 hover:bg-slate-600 transition-colors"
+                  hx-get="/documents/partial?tab={{$activeTab}}&page={{$totalPages}}"
+                  hx-target="#documents-content"
+                  hx-swap="innerHTML"
+                  hx-push-url="/documents?tab={{$activeTab}}&page={{$totalPages}}"
+                  aria-label="Go to page {{$totalPages}}">{{$totalPages}}</button>
+              {{end}}
+            {{end}}
+
+            {{if .HasNextPage}}
+            <button
+              class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-300 bg-slate-700 border border-slate-600 rounded-r-md hover:bg-slate-600 transition-colors"
+              hx-get="/documents/partial?tab={{$.ActiveTab}}&page={{.NextPage}}"
+              hx-target="#documents-content"
+              hx-swap="innerHTML"
+              hx-push-url="/documents?tab={{$.ActiveTab}}&page={{.NextPage}}"
+              aria-label="Next page">
+              <span class="sr-only">Next</span>
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            {{else}}
+            <span class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-slate-800 border border-slate-700 rounded-r-md cursor-not-allowed">
+              <span class="sr-only">Next</span>
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+            </span>
+            {{end}}
+          </nav>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="sm:hidden text-center mt-4">
+      <p class="text-sm text-gray-400">
+        Page {{.CurrentPage}} of {{.TotalPages}}
+      </p>
+    </div>
+  </div>
+  {{end}}
+
+{{else}}
+  <div class="text-center py-12">
+    <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-700 rounded-full mb-4">
+      {{if eq .ActiveTab "cover-letters"}}
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+      {{else}}
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      {{end}}
+    </div>
+    
+    <h3 class="text-lg font-medium text-white mb-2">
+      {{if eq .ActiveTab "cover-letters"}}
+        No Cover Letters Saved
+      {{else}}
+        No Resumes Saved
+      {{end}}
+    </h3>
+    
+    <p class="text-gray-400 mb-6 max-w-md mx-auto">
+      {{if eq .ActiveTab "cover-letters"}}
+        Generate cover letters for your job applications and they'll automatically be saved here for future reference.
+      {{else}}
+        Generate tailored resumes for your job applications and they'll automatically be saved here for future reference.
+      {{end}}
+    </p>
+    
+    <div class="flex justify-center gap-3">
+      <a href="/jobs" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary hover:bg-primary-dark text-white text-sm rounded-md transition-colors">
+        Browse Jobs
+      </a>
+      
+      <a href="/jobs/new" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-md transition-colors">
+        Add New Job
+      </a>
+    </div>
+  </div>
+{{end}}
+{{end}}

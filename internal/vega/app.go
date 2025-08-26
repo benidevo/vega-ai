@@ -62,7 +62,6 @@ func loadTemplates(router *gin.Engine) error {
 func New(cfg config.Settings) *App {
 	router := gin.Default()
 
-	// Configure CORS
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = cfg.CORSAllowedOrigins
 	corsConfig.AllowCredentials = cfg.CORSAllowCredentials
@@ -71,11 +70,8 @@ func New(cfg config.Settings) *App {
 
 	router.Use(cors.New(corsConfig))
 
-	// Only load templates in non-test environment
 	if !cfg.IsTest {
-		// Setup template functions
 		router.SetFuncMap(templateFuncMap())
-		// Load all templates including nested directories
 		if err := loadTemplates(router); err != nil {
 			log.Fatal().Err(err).Msg("Failed to load templates")
 		}
@@ -252,6 +248,9 @@ func (a *App) runMigrations() error {
 // templateFuncMap returns a map of custom template functions
 func templateFuncMap() template.FuncMap {
 	return template.FuncMap{
+		"safeHTML": func(s string) template.HTML {
+			return template.HTML(s)
+		},
 		"dict": func(values ...interface{}) (map[string]interface{}, error) {
 			if len(values)%2 != 0 {
 				return nil, nil

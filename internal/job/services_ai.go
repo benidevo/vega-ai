@@ -406,13 +406,11 @@ func (s *JobService) buildProfileSummary(profile *settingsmodels.Profile) string
 }
 
 // calculateTotalExperience calculates the total years of work experience from work history
-// This function properly handles overlapping employment periods
 func (s *JobService) calculateTotalExperience(workExperience []settingsmodels.WorkExperience) float64 {
 	if len(workExperience) == 0 {
 		return 0
 	}
 
-	// Create time periods for each job
 	type TimePeriod struct {
 		Start time.Time
 		End   time.Time
@@ -440,7 +438,6 @@ func (s *JobService) calculateTotalExperience(workExperience []settingsmodels.Wo
 		return 0
 	}
 
-	// Sort periods by start date
 	for i := 0; i < len(periods); i++ {
 		for j := i + 1; j < len(periods); j++ {
 			if periods[i].Start.After(periods[j].Start) {
@@ -456,12 +453,10 @@ func (s *JobService) calculateTotalExperience(workExperience []settingsmodels.Wo
 		period := periods[i]
 
 		if current.End.After(period.Start) || current.End.Equal(period.Start) {
-			// Extend current period to include the overlapping period
 			if period.End.After(current.End) {
 				current.End = period.End
 			}
 		} else {
-			// No overlap, add current period and start new one
 			merged = append(merged, current)
 			current = period
 		}
@@ -600,7 +595,6 @@ func (s *JobService) GenerateCV(ctx context.Context, userID, jobID int) (*models
 	}
 
 	aiRequest := s.buildAIRequest(job, profile)
-	// Set CVText to be the profile summary for CV generation
 	aiRequest.CVText = s.buildProfileSummary(profile)
 
 	aiResult, err := s.aiService.CVGenerator.GenerateCV(ctx, aiRequest, jobID, job.Title)
@@ -631,7 +625,6 @@ func (s *JobService) convertToGeneratedCV(aiResult *aimodels.GeneratedCV, userID
 
 	personalInfo := convertPersonalInfo(aiResult.PersonalInfo)
 
-	// Overwrite AI-generated contact info with actual user data (privacy-safe: not shared with AI)
 	if profile.PhoneNumber != "" {
 		personalInfo.Phone = profile.PhoneNumber
 	}
@@ -723,4 +716,62 @@ func convertCertifications(profileCerts []settingsmodels.Certification) []models
 		}
 	}
 	return certs
+}
+
+func (s *JobService) formatCVAsHTML(cv *models.GeneratedCV) string {
+	var html strings.Builder
+	html.WriteString("<div class='cv-content'>")
+
+	// Personal Info
+	html.WriteString("<section class='personal-info'>")
+	fullName := fmt.Sprintf("%s %s", cv.PersonalInfo.FirstName, cv.PersonalInfo.LastName)
+	html.WriteString(fmt.Sprintf("<h1>%s</h1>", fullName))
+	html.WriteString(fmt.Sprintf("<p>%s | %s</p>", cv.PersonalInfo.Email, cv.PersonalInfo.Phone))
+	html.WriteString("</section>")
+
+	// Skills
+	if len(cv.Skills) > 0 {
+		html.WriteString("<section class='skills'>")
+		html.WriteString("<h2>Skills</h2><p>")
+		html.WriteString(strings.Join(cv.Skills, ", "))
+		html.WriteString("</p></section>")
+	}
+
+	// Work Experience
+	if len(cv.WorkExperience) > 0 {
+		html.WriteString("<section class='experience'><h2>Work Experience</h2>")
+		for _, exp := range cv.WorkExperience {
+			html.WriteString(fmt.Sprintf("<div><h3>%s at %s</h3>", exp.Title, exp.Company))
+			html.WriteString(fmt.Sprintf("<p>%s - %s</p>", exp.StartDate, exp.EndDate))
+			html.WriteString(fmt.Sprintf("<p>%s</p></div>", exp.Description))
+		}
+		html.WriteString("</section>")
+	}
+
+	// Education
+	if len(cv.Education) > 0 {
+		html.WriteString("<section class='education'><h2>Education</h2>")
+		for _, edu := range cv.Education {
+			html.WriteString(fmt.Sprintf("<div><h3>%s</h3>", edu.Degree))
+			html.WriteString(fmt.Sprintf("<p>%s | %s - %s</p></div>", edu.Institution, edu.StartDate, edu.EndDate))
+		}
+		html.WriteString("</section>")
+	}
+
+	// Certifications
+	if len(cv.Certifications) > 0 {
+		html.WriteString("<section class='certifications'><h2>Certifications</h2>")
+		for _, cert := range cv.Certifications {
+			html.WriteString(fmt.Sprintf("<div><h3>%s</h3>", cert.Name))
+			if cert.IssuingOrg != "" {
+				html.WriteString(fmt.Sprintf("<p>%s | %s</p></div>", cert.IssuingOrg, cert.IssueDate))
+			} else {
+				html.WriteString(fmt.Sprintf("<p>%s</p></div>", cert.IssueDate))
+			}
+		}
+		html.WriteString("</section>")
+	}
+
+	html.WriteString("</div>")
+	return html.String()
 }

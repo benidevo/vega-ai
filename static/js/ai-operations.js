@@ -41,7 +41,13 @@ window.handleAIOperationEnd = function(button) {
         const btn = document.getElementById(buttonId);
         const originalState = buttonStates.get(buttonId);
         if (btn && originalState) {
-            btn.innerHTML = originalState.html;
+            // Use textContent instead of innerHTML when possible
+            if (originalState.html && !originalState.html.includes('<')) {
+                btn.textContent = originalState.html;
+            } else {
+                // Only use innerHTML if it contains actual HTML elements
+                btn.innerHTML = originalState.html;
+            }
             btn.disabled = originalState.disabled;
             btn.classList.remove('opacity-75', 'cursor-not-allowed');
             buttonStates.delete(buttonId);

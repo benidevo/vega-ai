@@ -10,6 +10,7 @@ import (
 	"github.com/benidevo/vega/internal/auth"
 	"github.com/benidevo/vega/internal/common/middleware"
 	"github.com/benidevo/vega/internal/common/render"
+	"github.com/benidevo/vega/internal/documents"
 	"github.com/benidevo/vega/internal/home"
 	"github.com/benidevo/vega/internal/job"
 	"github.com/benidevo/vega/internal/pages"
@@ -59,6 +60,9 @@ func SetupRoutes(a *App) {
 
 	homeHandler := home.Setup(a.db, &a.config, a.cache, jobService)
 
+	// Setup document handler
+	documentHandler := documents.Setup(a.db, &a.config, a.cache, a.renderer)
+
 	authGroup := a.router.Group("/auth")
 
 	// Register auth routes
@@ -96,6 +100,10 @@ func SetupRoutes(a *App) {
 	settingsGroup := a.router.Group("/settings")
 	settingsGroup.Use(authHandler.AuthMiddleware())
 	settings.RegisterRoutes(settingsGroup, settingsHandler)
+
+	// Register document routes
+	csrfMiddleware := middleware.CSRF(&a.config)
+	documents.RegisterRoutes(&a.router.RouterGroup, documentHandler, authHandler.AuthMiddleware(), csrfMiddleware)
 
 	authAPIGroup := a.router.Group("/api/auth")
 	authapi.RegisterRoutes(authAPIGroup, authAPIHandler)

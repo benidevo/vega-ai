@@ -326,6 +326,189 @@ func TestSQLiteJobRepository_GetAll(t *testing.T) {
 		require.Len(t, jobs, 1)
 		assert.Equal(t, companyID, jobs[0].Company.ID)
 	})
+
+	t.Run("sort by match_score desc", func(t *testing.T) {
+		now := time.Now()
+
+		rows := sqlmock.NewRows([]string{
+			"j.id", "j.title", "j.description", "j.location", "j.job_type",
+			"j.source_url", "j.required_skills",
+			"j.application_url", "j.company_id", "j.status", "j.match_score",
+			"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+			"c.name", "c.created_at", "c.updated_at",
+		}).AddRow(
+			1, "Senior Engineer", "Senior role", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Go"]`,
+			"https://apply.example.com", 1, int(models.INTERESTED), 95,
+			"High match", now.Add(-48*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		).AddRow(
+			2, "Junior Engineer", "Junior role", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Python"]`,
+			"https://apply.example.com", 1, int(models.INTERESTED), 75,
+			"Good match", now.Add(-24*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		)
+
+		// Expect query with CASE statement for NULL handling
+		mock.ExpectQuery("SELECT.*FROM jobs.*ORDER BY CASE WHEN j.match_score IS NULL THEN 1 ELSE 0 END, j.match_score DESC").
+			WithArgs(testUserID).
+			WillReturnRows(rows)
+
+		filter := models.JobFilter{
+			SortBy:    "match_score",
+			SortOrder: "desc",
+		}
+		jobs, err := repo.GetAll(context.Background(), testUserID, filter)
+
+		require.NoError(t, err)
+		require.Len(t, jobs, 2)
+		assert.Equal(t, 95, *jobs[0].MatchScore)
+		assert.Equal(t, 75, *jobs[1].MatchScore)
+	})
+
+	t.Run("sort by match_score asc", func(t *testing.T) {
+		now := time.Now()
+
+		rows := sqlmock.NewRows([]string{
+			"j.id", "j.title", "j.description", "j.location", "j.job_type",
+			"j.source_url", "j.required_skills",
+			"j.application_url", "j.company_id", "j.status", "j.match_score",
+			"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+			"c.name", "c.created_at", "c.updated_at",
+		}).AddRow(
+			1, "Low Match Job", "Junior role", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Python"]`,
+			"https://apply.example.com", 1, int(models.INTERESTED), 60,
+			"Lower match", now.Add(-24*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		).AddRow(
+			2, "High Match Job", "Senior role", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Go"]`,
+			"https://apply.example.com", 1, int(models.INTERESTED), 90,
+			"Higher match", now.Add(-48*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		)
+
+		mock.ExpectQuery("SELECT.*FROM jobs.*ORDER BY CASE WHEN j.match_score IS NULL THEN 1 ELSE 0 END, j.match_score ASC").
+			WithArgs(testUserID).
+			WillReturnRows(rows)
+
+		filter := models.JobFilter{
+			SortBy:    "match_score",
+			SortOrder: "asc",
+		}
+		jobs, err := repo.GetAll(context.Background(), testUserID, filter)
+
+		require.NoError(t, err)
+		require.Len(t, jobs, 2)
+		assert.Equal(t, 60, *jobs[0].MatchScore, "First job should have lowest match score")
+		assert.Equal(t, 90, *jobs[1].MatchScore, "Second job should have higher match score")
+	})
+
+	t.Run("sort by created_at asc", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{
+			"j.id", "j.title", "j.description", "j.location", "j.job_type",
+			"j.source_url", "j.required_skills",
+			"j.application_url", "j.company_id", "j.status", "j.match_score",
+			"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+			"c.name", "c.created_at", "c.updated_at",
+		})
+
+		mock.ExpectQuery("SELECT.*FROM jobs.*ORDER BY j.created_at ASC").
+			WithArgs(testUserID).
+			WillReturnRows(rows)
+
+		filter := models.JobFilter{
+			SortBy:    "created_at",
+			SortOrder: "asc",
+		}
+		_, err := repo.GetAll(context.Background(), testUserID, filter)
+
+		require.NoError(t, err)
+	})
+
+	t.Run("default sort (updated_at desc)", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{
+			"j.id", "j.title", "j.description", "j.location", "j.job_type",
+			"j.source_url", "j.required_skills",
+			"j.application_url", "j.company_id", "j.status", "j.match_score",
+			"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+			"c.name", "c.created_at", "c.updated_at",
+		})
+
+		mock.ExpectQuery("SELECT.*FROM jobs.*ORDER BY j.updated_at DESC").
+			WithArgs(testUserID).
+			WillReturnRows(rows)
+
+		filter := models.JobFilter{} // No sort specified
+		_, err := repo.GetAll(context.Background(), testUserID, filter)
+
+		require.NoError(t, err)
+	})
+
+	t.Run("sort with NULL match_scores", func(t *testing.T) {
+		now := time.Now()
+
+		rows := sqlmock.NewRows([]string{
+			"j.id", "j.title", "j.description", "j.location", "j.job_type",
+			"j.source_url", "j.required_skills",
+			"j.application_url", "j.company_id", "j.status", "j.match_score",
+			"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+			"c.name", "c.created_at", "c.updated_at",
+		}).AddRow(
+			1, "Matched Job", "Has score", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Go"]`,
+			"https://apply.example.com", 1, int(models.INTERESTED), 85,
+			"Good match", now.Add(-48*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		).AddRow(
+			2, "Unmatched Job", "No score", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Python"]`,
+			"https://apply.example.com", 1, int(models.INTERESTED), nil, // NULL match_score
+			"Not analyzed", now.Add(-24*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		)
+
+		mock.ExpectQuery("SELECT.*FROM jobs.*ORDER BY CASE WHEN j.match_score IS NULL THEN 1 ELSE 0 END, j.match_score DESC").
+			WithArgs(testUserID).
+			WillReturnRows(rows)
+
+		filter := models.JobFilter{
+			SortBy:    "match_score",
+			SortOrder: "desc",
+		}
+		jobs, err := repo.GetAll(context.Background(), testUserID, filter)
+
+		require.NoError(t, err)
+		require.Len(t, jobs, 2)
+		assert.NotNil(t, jobs[0].MatchScore, "First job should have non-NULL match score")
+		assert.Equal(t, 85, *jobs[0].MatchScore)
+		assert.Nil(t, jobs[1].MatchScore, "Second job should have NULL match score (sorted last)")
+	})
+
+	t.Run("invalid sort field uses default", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{
+			"j.id", "j.title", "j.description", "j.location", "j.job_type",
+			"j.source_url", "j.required_skills",
+			"j.application_url", "j.company_id", "j.status", "j.match_score",
+			"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+			"c.name", "c.created_at", "c.updated_at",
+		})
+
+		// Invalid sort field should default to updated_at DESC
+		mock.ExpectQuery("SELECT.*FROM jobs.*ORDER BY j.updated_at DESC").
+			WithArgs(testUserID).
+			WillReturnRows(rows)
+
+		filter := models.JobFilter{
+			SortBy:    "invalid_field", // Invalid field
+			SortOrder: "desc",
+		}
+		_, err := repo.GetAll(context.Background(), testUserID, filter)
+
+		require.NoError(t, err)
+	})
 }
 
 func TestGetStatsByUserID(t *testing.T) {

@@ -255,6 +255,8 @@ type JobFilter struct {
 	Matched   *bool
 	Limit     int
 	Offset    int
+	SortBy    string // "match_score", "updated_at", etc.
+	SortOrder string // "asc" or "desc"
 }
 
 type JobStats struct {

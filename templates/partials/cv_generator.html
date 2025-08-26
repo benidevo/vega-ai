@@ -11,6 +11,10 @@
     <div class="bg-slate-700 bg-opacity-60 rounded-lg p-4 md:p-5">
       <div class="flex flex-col md:flex-row md:justify-end md:items-center gap-3 md:gap-4 mb-4">
         <div class="flex gap-2 w-full md:w-auto">
+          <button class="flex-1 md:flex-none px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md transition-colors"
+                  onclick="saveResumeToDocuments()">
+            Save
+          </button>
           <button class="flex-1 md:flex-none px-3 py-2 bg-primary hover:bg-primary-dark text-white text-sm rounded-md transition-colors"
                   onclick="downloadResumePDF()">
             Download
@@ -279,8 +283,6 @@
 
 <script>
 (function() {
-  var generateTextPDF;
-
   // Track if PDF is being generated to prevent double-clicks
   let isGeneratingPDF = false;
 
@@ -301,467 +303,87 @@
     button.innerText = 'Generating...';
     button.disabled = true;
 
-    try {
-      // Check if jsPDF is available
-      if (typeof window.jspdf === 'undefined') {
-        throw new Error('jsPDF library not loaded. Please check your internet connection and try again.');
-      }
-
-      // Check if resume content exists
-      const resumeElement = document.getElementById('resume-content');
-      if (!resumeElement) {
-        throw new Error('Resume content not found. Please refresh the page and try again.');
-      }
-
-      generateTextPDF();
-
-      // Show success notification
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('Your resume has been downloaded successfully!', 'success', 'Download Complete');
-      }
-    } catch (error) {
-      console.error('PDF generation error:', error);
-
-      let errorMessage = 'Unable to download your resume right now. Please try again in a moment.';
-      if (error.message.includes('jsPDF library')) {
-        errorMessage = 'Download temporarily unavailable. Please refresh the page and try again.';
-      } else if (error.message.includes('Resume content not found')) {
-        errorMessage = 'Your resume content couldn\'t be found. Please refresh the page and try again.';
-      }
-
-      if (typeof window.showNotification === 'function') {
-        window.showNotification(errorMessage, 'error', 'Download Failed');
-      }
-    } finally {
-      // Reset button state
-      isGeneratingPDF = false;
-      button.innerText = originalText;
-      button.disabled = false;
-    }
-  }
-
-  generateTextPDF = window.generateTextPDF = function(skipCustomFonts = false) {
-    // Validate jsPDF is available
-    if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
-      throw new Error('jsPDF library not properly loaded');
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
-      unit: 'pt',
-      format: 'a4',
-      orientation: 'portrait'
-    });
-
-    const fontFamily = 'helvetica';
-
-    // Pre-initialize font metrics with reliable standard fonts
-    try {
-      doc.setFont(fontFamily, 'normal');
-      doc.setFontSize(12);
-      // Force font metric calculation with a dummy text
-      doc.getTextWidth('Test');
-    } catch (metricError) {
-      console.error('Font initialization failed:', metricError);
-      throw new Error('PDF font system initialization failed');
-    }
-
-    const element = document.getElementById('resume-content');
-    if (!element) {
-      throw new Error('Resume content element not found');
-    }
-
-    const margin = 30;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const contentWidth = pageWidth - (2 * margin);
-    let yPos = margin;
-    const lineHeight = 14;
-
-    // Set document properties for better rendering
-    try {
-      doc.setProperties({
-        title: 'Resume',
-        subject: 'Professional Resume',
-        author: element.querySelector('h2')?.textContent?.trim() || 'Resume',
-        keywords: 'resume, cv, professional'
-      });
-    } catch (propError) {
-      console.warn('Failed to set document properties:', propError);
-    }
-
-    // Helper function to add text with wrapping
-    function addText(text, fontSize, options = {}) {
+    // First save the document, then download
+    saveResumeToDocuments(true).then(() => {
       try {
-        const { isBold = false, isItalic = false, color = [0, 0, 0], font = fontFamily } = options;
-
-        // Validate color array
-        const safeColor = Array.isArray(color) && color.length >= 3 ? color : [0, 0, 0];
-
-        doc.setFontSize(fontSize);
-
-        // Set font style with fallback
-        let fontStyle = 'normal';
-        if (isBold && isItalic) fontStyle = 'bolditalic';
-        else if (isBold) fontStyle = 'bold';
-        else if (isItalic) fontStyle = 'italic';
-
-        doc.setFont(font, fontStyle);
-
-        doc.setTextColor(safeColor[0], safeColor[1], safeColor[2]);
-
-        if (!text || typeof text !== 'string') {
-          return;
+        // Check if jsPDF is available
+        if (typeof window.jspdf === 'undefined') {
+          throw new Error('jsPDF library not loaded. Please check your internet connection and try again.');
         }
 
-        if (!contentWidth || contentWidth <= 0) {
-          return;
+        // Check if resume content exists
+        const resumeElement = document.getElementById('resume-content');
+        if (!resumeElement) {
+          throw new Error('Resume content not found. Please refresh the page and try again.');
         }
 
-        const lines = doc.splitTextToSize(text, contentWidth);
-
-        if (!Array.isArray(lines)) {
-          doc.text(text.substring(0, 100), margin, yPos);
-          yPos += fontSize * 1.4;
-          return;
+        // Use centralized PDF generator for consistency
+        if (window.PDFGenerator && window.PDFGenerator.generateResumePDFFromData) {
+          const resumeData = extractResumeData();
+          const jobTitle = {{if .JobTitle}}"{{.JobTitle}}"{{else}}""{{end}};
+          const companyName = {{if .CompanyName}}"{{.CompanyName}}"{{else}}""{{end}};
+          window.PDFGenerator.generateResumePDFFromData(resumeData, {{.JobID}}, jobTitle, companyName);
+        } else {
+          throw new Error('PDF generator not loaded. Please refresh the page.');
         }
 
-        lines.forEach(line => {
-          if (yPos > pageHeight - margin - 20) {
-            doc.addPage();
-            yPos = margin;
-          }
-          doc.text(line, margin, yPos);
-          yPos += fontSize * 1.5;
-        });
-      } catch (textError) {
-        // Fallback for any unexpected text processing errors
-        doc.text(text.substring(0, 50) + '...', margin, yPos);
-        yPos += fontSize * 1.4;
+        // Show success notification
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Your resume has been downloaded successfully!', 'success', 'Download Complete');
+        }
+      } catch (error) {
+        console.error('PDF generation error:', error);
+
+        let errorMessage = 'Unable to download your resume right now. Please try again in a moment.';
+        if (error.message.includes('jsPDF library')) {
+          errorMessage = 'Download temporarily unavailable. Please refresh the page and try again.';
+        } else if (error.message.includes('Resume content not found')) {
+          errorMessage = 'Your resume content couldn\'t be found. Please refresh the page and try again.';
+        }
+
+        if (typeof window.showNotification === 'function') {
+          window.showNotification(errorMessage, 'error', 'Download Failed');
+        }
+      } finally {
+        // Reset button state
+        isGeneratingPDF = false;
+        button.innerText = originalText;
+        button.disabled = false;
       }
-    }
-
-    // Extract personal information
-    const nameElement = element.querySelector('h2');
-    const titleElement = element.querySelector('p.text-sm, p.text-base');
-    const contactInfo = element.querySelector('.text-xs.text-gray-600');
-
-    if (nameElement) {
-      // Name in larger bold font
-      addText(nameElement.textContent.trim(), 18, { isBold: true });
-      yPos += 1;
-    }
-
-    if (titleElement) {
-      // Title in medium gray
-      addText(titleElement.textContent.trim(), 14, { color: [90, 90, 90] });
-      yPos += 2;
-    }
-
-    if (contactInfo) {
-      // Contact info without location in italics
-      const contactText = contactInfo.textContent.replace(/\s+/g, ' ').trim();
-      const parts = contactText.split('|').map(p => p.trim());
-
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      let xPos = margin;
-
-      parts.forEach((part, index) => {
-        if (index > 0) {
-          // Add separator
-          doc.setFont(fontFamily, 'normal');
-          doc.text(' | ', xPos, yPos);
-          xPos += doc.getTextWidth(' | ');
+    }).catch(error => {
+      // If save fails, still allow download
+      console.error('Save failed, proceeding with download:', error);
+      try {
+        // Use centralized PDF generator for consistency
+        if (window.PDFGenerator && window.PDFGenerator.generateResumePDFFromData) {
+          const resumeData = extractResumeData();
+          const jobTitle = {{if .JobTitle}}"{{.JobTitle}}"{{else}}""{{end}};
+          const companyName = {{if .CompanyName}}"{{.CompanyName}}"{{else}}""{{end}};
+          window.PDFGenerator.generateResumePDFFromData(resumeData, {{.JobID}}, jobTitle, companyName);
+        } else {
+          throw new Error('PDF generator not loaded. Please refresh the page.');
         }
-
-        doc.setFont(fontFamily, 'normal');
-
-        doc.text(part, xPos, yPos);
-        xPos += doc.getTextWidth(part);
-      });
-
-      yPos += 18;
-    }
-
-    // Process sections
-    const sections = element.querySelectorAll('.resume-section');
-    sections.forEach(section => {
-      const sectionTitle = section.querySelector('h3');
-      if (sectionTitle) {
-        yPos += 8; // Spacing before section
-
-        // Section title in bold
-        const titleText = sectionTitle.textContent.trim();
-        doc.setFontSize(12);
-        doc.setFont(fontFamily, 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text(titleText, margin, yPos);
-        yPos += 3;
-
-        // Add underline
-        doc.setDrawColor(220, 220, 220);
-        doc.setLineWidth(0.5);
-        doc.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 12; // Spacing after section title
-      }
-
-      const sectionType = section.getAttribute('data-section');
-
-      if (sectionType === 'summary') {
-        const summaryText = section.querySelector('p');
-        if (summaryText) {
-          addText(summaryText.textContent.trim(), 10, { color: [50, 50, 50] });
-          yPos += 12;
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Your resume has been downloaded successfully!', 'success', 'Download Complete');
         }
-      } else if (sectionType === 'skills') {
-        const skillsContainer = section.querySelector('#skills-container');
-        if (skillsContainer) {
-          addText(skillsContainer.textContent.trim(), 10, { color: [50, 50, 50] });
-          yPos += 8;
+      } catch (downloadError) {
+        console.error('PDF generation error:', downloadError);
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Unable to download your resume. Please try again.', 'error', 'Download Failed');
         }
-      } else if (sectionType === 'experience') {
-        const experiences = section.querySelectorAll('.mb-3');
-        experiences.forEach((exp, expIndex) => {
-          const jobTitle = exp.querySelector('h4');
-          const companyInfo = exp.querySelector('p.text-xs');
-          const dates = exp.querySelector('span.text-xs.text-gray-600');
-          const description = exp.querySelector('.whitespace-pre-wrap');
-
-          if (jobTitle) {
-            // Job title (bold) and dates on same line
-            const titleText = jobTitle.textContent.trim();
-            const dateText = dates ? dates.textContent.trim() : '';
-
-            doc.setFontSize(10);
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text(titleText, margin, yPos);
-
-            if (dateText) {
-              doc.setFont(fontFamily, 'normal');
-              doc.setTextColor(100, 100, 100);
-              doc.setFontSize(10);
-              const dateWidth = doc.getTextWidth(dateText);
-              doc.text(dateText, pageWidth - margin - dateWidth, yPos);
-            }
-            yPos += lineHeight * 0.9;
-
-            if (companyInfo) {
-              // Parse company and location
-              const companyText = companyInfo.textContent.trim();
-              const locationMatch = companyText.match(/^(.+?)\s*–\s*(.+)$/);
-
-              if (locationMatch) {
-                // Company name
-                doc.setFontSize(10);
-                doc.setFont(fontFamily, 'normal');
-                doc.setTextColor(100, 100, 100);
-                doc.text(locationMatch[1], margin, yPos);
-
-                // Dash
-                const companyWidth = doc.getTextWidth(locationMatch[1]);
-                doc.text(' – ', margin + companyWidth, yPos);
-
-                // Location in italics
-                doc.setFont(fontFamily, 'italic');
-                doc.text(locationMatch[2], margin + companyWidth + doc.getTextWidth(' – '), yPos);
-              } else {
-                // Just company, no location
-                doc.setFontSize(10);
-                doc.setFont(fontFamily, 'normal');
-                doc.setTextColor(100, 100, 100);
-                doc.text(companyText, margin, yPos);
-              }
-              yPos += lineHeight * 0.9;
-            }
-
-            if (description) {
-              yPos += 2;
-              // Process bullet points
-              const descText = description.textContent.trim();
-              const lines = descText.split('\n').filter(line => line.trim());
-
-              doc.setFontSize(10);
-              doc.setFont(fontFamily, 'normal');
-              doc.setTextColor(50, 50, 50);
-
-              lines.forEach(line => {
-                const trimmedLine = line.trim();
-                if (trimmedLine.startsWith('•')) {
-                  // Bullet point
-                  const bulletText = trimmedLine.substring(1).trim();
-                  const wrappedLines = doc.splitTextToSize(bulletText, contentWidth - 15);
-
-                  // Draw bullet
-                  doc.text('•', margin, yPos);
-
-                  // Draw text with indent
-                  wrappedLines.forEach((wLine, idx) => {
-                    if (yPos > pageHeight - margin - 20) {
-                      doc.addPage();
-                      yPos = margin;
-                    }
-                    doc.text(wLine, margin + 10, yPos);
-                    yPos += 10 * 1.5;
-                  });
-                } else {
-                  // Regular text
-                  const wrappedLines = doc.splitTextToSize(trimmedLine, contentWidth);
-                  wrappedLines.forEach(wLine => {
-                    if (yPos > pageHeight - margin - 20) {
-                      doc.addPage();
-                      yPos = margin;
-                    }
-                    doc.text(wLine, margin, yPos);
-                    yPos += 10 * 1.5;
-                  });
-                }
-              });
-            }
-
-            // spacing between experiences
-            if (expIndex < experiences.length - 1) {
-              yPos += 8;
-            }
-          }
-        });
-        yPos += 4; // Spacing after Work Experience section
-      } else if (sectionType === 'education') {
-        const educationItems = section.querySelectorAll('.mb-2');
-        educationItems.forEach((edu, eduIndex) => {
-          const degree = edu.querySelector('h4');
-          const institution = edu.querySelector('p.text-xs');
-          const endDate = edu.querySelector('span.text-xs.text-gray-600');
-
-          if (degree) {
-            const degreeText = degree.textContent.trim();
-            const dateText = endDate ? endDate.textContent.trim() : '';
-
-            doc.setFontSize(10);
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text(degreeText, margin, yPos);
-
-            if (dateText) {
-              doc.setFont(fontFamily, 'normal');
-              doc.setTextColor(100, 100, 100);
-              doc.setFontSize(10);
-              const dateWidth = doc.getTextWidth(dateText);
-              doc.text(dateText, pageWidth - margin - dateWidth, yPos);
-            }
-            yPos += lineHeight * 0.9;
-
-            if (institution) {
-              doc.setFontSize(10);
-              doc.setFont(fontFamily, 'normal');
-              doc.setTextColor(100, 100, 100);
-              doc.text(institution.textContent.trim(), margin, yPos);
-              yPos += lineHeight * 0.9;
-            }
-
-            // spacing between education items
-            if (eduIndex < educationItems.length - 1) {
-              yPos += 6;
-            }
-          }
-        });
-        yPos += 4; // Spacing after Education section
-      } else if (sectionType === 'certifications') {
-        const certificationItems = section.querySelectorAll('.mb-2');
-        certificationItems.forEach((cert, certIndex) => {
-          const certName = cert.querySelector('h4');
-          const certOrg = cert.querySelector('p.text-xs');
-          const certDate = cert.querySelector('span.text-xs.text-gray-600');
-
-          if (certName) {
-            // Certification name (bold) and date on same line
-            const nameText = certName.textContent.trim();
-            const dateText = certDate ? certDate.textContent.trim() : '';
-
-            doc.setFontSize(10);
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text(nameText, margin, yPos);
-
-            if (dateText) {
-              doc.setFont(fontFamily, 'normal');
-              doc.setTextColor(100, 100, 100);
-              doc.setFontSize(10);
-              const dateWidth = doc.getTextWidth(dateText);
-              doc.text(dateText, pageWidth - margin - dateWidth, yPos);
-            }
-            yPos += lineHeight * 0.9;
-
-            if (certOrg) {
-              doc.setFontSize(10);
-              doc.setFont(fontFamily, 'normal');
-              doc.setTextColor(100, 100, 100);
-              doc.text(certOrg.textContent.trim(), margin, yPos);
-              yPos += lineHeight * 0.9;
-            }
-
-            // spacing between certification items
-            if (certIndex < certificationItems.length - 1) {
-              yPos += 6;
-            }
-          }
-        });
-        yPos += 4; // Spacing after Certifications section
-      } else {
-        // Handle custom sections
-        const sectionClone = section.cloneNode(true);
-        const header = sectionClone.querySelector('.flex.justify-between');
-        if (header) header.remove();
-
-        const textContent = sectionClone.textContent.trim();
-        if (textContent && textContent !== 'Click here to add content...') {
-          const lines = textContent.split('\n').filter(line => line.trim());
-
-          doc.setFontSize(10);
-          doc.setFont(fontFamily, 'normal');
-          doc.setTextColor(50, 50, 50);
-
-          lines.forEach(line => {
-            const trimmedLine = line.trim();
-            if (trimmedLine.startsWith('•')) {
-              // Handle bullet points with proper page breaks and text wrapping
-              if (yPos > pageHeight - margin - 20) {
-                doc.addPage();
-                yPos = margin;
-              }
-              doc.text('•', margin, yPos);
-              const bulletText = trimmedLine.substring(1).trim();
-              const wrappedLines = doc.splitTextToSize(bulletText, contentWidth - 15);
-
-              wrappedLines.forEach((wLine, idx) => {
-                if (yPos > pageHeight - margin - 20) {
-                  doc.addPage();
-                  yPos = margin;
-                }
-                doc.text(wLine, margin + 10, yPos);
-                yPos += 10 * 1.3;
-              });
-            } else if (trimmedLine) {
-              // Handle regular text with proper page breaks and text wrapping
-              const wrappedLines = doc.splitTextToSize(trimmedLine, contentWidth);
-              wrappedLines.forEach(wLine => {
-                if (yPos > pageHeight - margin - 20) {
-                  doc.addPage();
-                  yPos = margin;
-                }
-                doc.text(wLine, margin, yPos);
-                yPos += 10 * 1.3;
-              });
-            }
-          });
-        }
-        yPos += 4;
+      } finally {
+        isGeneratingPDF = false;
+        button.innerText = originalText;
+        button.disabled = false;
       }
     });
-
-    doc.save('resume.pdf');
   }
+
+  // generateTextPDF function removed - using centralized PDF generator instead
+  // The centralized generator in /static/js/pdf-generator.js provides:
+  // - Consistent styling between job details and documents hub
+  // - Proper file naming: [company]-[position]-resume.pdf
+  // - Better maintainability with single source of truth
 
 
 window.editResume = function() {
@@ -965,19 +587,32 @@ window.addCustomSection = function(sectionTitle) {
   newSection.className = 'resume-section mb-3';
   newSection.setAttribute('data-section', sectionTitle.toLowerCase().replace(/\s+/g, '-'));
 
-  newSection.innerHTML = `
-    <div class="flex justify-between items-center mb-2">
-      <h3 class="text-sm md:text-base font-semibold text-gray-900 border-b border-gray-300 pb-0.5 flex-grow" contenteditable="true">${sectionTitle}</h3>
-      <button onclick="deleteSection(this)" class="ml-2 text-red-500 hover:text-red-700 text-xs">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-        </svg>
-      </button>
-    </div>
-    <div contenteditable="true" class="text-xs md:text-sm text-gray-700">
-      Click here to add content...
-    </div>
-  `;
+  const flexContainer = document.createElement('div');
+  flexContainer.className = 'flex justify-between items-center mb-2';
+  
+  const heading = document.createElement('h3');
+  heading.className = 'text-sm md:text-base font-semibold text-gray-900 border-b border-gray-300 pb-0.5 flex-grow';
+  heading.contentEditable = 'true';
+  heading.textContent = sectionTitle;
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'ml-2 text-red-500 hover:text-red-700 text-xs';
+  deleteBtn.onclick = function() { deleteSection(this); };
+  
+  deleteBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+  </svg>`;
+  
+  flexContainer.appendChild(heading);
+  flexContainer.appendChild(deleteBtn);
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.contentEditable = 'true';
+  contentDiv.className = 'text-xs md:text-sm text-gray-700';
+  contentDiv.textContent = 'Click here to add content...';
+  
+  newSection.appendChild(flexContainer);
+  newSection.appendChild(contentDiv);
 
   resumeContent.insertBefore(newSection, addButton);
 }
@@ -985,6 +620,9 @@ window.addCustomSection = function(sectionTitle) {
 // Update extractResumeData to handle new section structure
 window.extractResumeData = function() {
   const resumeContent = document.getElementById('resume-content');
+  if (!resumeContent) {
+    throw new Error('Resume content element not found');
+  }
   const resumeData = {
     isValid: true,
     personalInfo: {
@@ -1002,45 +640,189 @@ window.extractResumeData = function() {
   };
 
   // Extract work experience
-  const workExpSection = cvContent.querySelector('[data-section="experience"]');
+  const workExpSection = resumeContent.querySelector('[data-section="experience"]');
   if (workExpSection) {
-    workExpSection.querySelectorAll('.mb-2').forEach(exp => {
-      resumeData.workExperience.push({
-        title: exp.querySelector('h4').innerText,
-        company: exp.querySelector('p.text-xs').innerText.split(',')[0],
-        location: exp.querySelector('p.text-xs').innerText.split(',')[1]?.trim() || '',
-        startDate: exp.querySelector('.text-xs.text-gray-600').innerText.split(' - ')[0],
-        endDate: exp.querySelector('.text-xs.text-gray-600').innerText.split(' - ')[1],
-        description: exp.querySelector('.whitespace-pre-wrap').innerText
-      });
+    workExpSection.querySelectorAll('.mb-3').forEach(exp => {
+      const titleEl = exp.querySelector('h4');
+      const companyEl = exp.querySelector('p.text-xs');
+      const dateEl = exp.querySelector('.text-xs.text-gray-600');
+      const descEl = exp.querySelector('.whitespace-pre-wrap');
+
+      if (titleEl && companyEl && dateEl) {
+        const companyText = companyEl.innerText;
+        // Parse company and location - format is "Company – Location"
+        const companyParts = companyText.split('–');
+        const company = companyParts[0]?.trim() || companyText.split(',')[0]?.trim() || '';
+        const location = companyParts[1]?.trim() || '';
+
+        const dates = dateEl.innerText.split(' - ');
+
+        resumeData.workExperience.push({
+          title: titleEl.innerText,
+          company: company,
+          location: location,
+          startDate: dates[0]?.trim() || '',
+          endDate: dates[1]?.trim() || '',
+          description: descEl ? descEl.innerText : ''
+        });
+      }
     });
   }
 
   // Extract education
-  const eduSection = cvContent.querySelector('[data-section="education"]');
+  const eduSection = resumeContent.querySelector('[data-section="education"]');
   if (eduSection) {
     eduSection.querySelectorAll('.mb-2').forEach(edu => {
-      const degreeText = edu.querySelector('h4').innerText;
-      const degreeMatch = degreeText.match(/(.*?)(?:\s+in\s+(.*))?$/);
-      resumeData.education.push({
-        degree: degreeMatch[1],
-        fieldOfStudy: degreeMatch[2] || '',
-        institution: edu.querySelector('p.text-xs').innerText,
-        startDate: edu.querySelector('.text-xs.text-gray-600').innerText.split(' - ')[0],
-        endDate: edu.querySelector('.text-xs.text-gray-600').innerText.split(' - ')[1]
-      });
+      const degreeEl = edu.querySelector('h4');
+      const institutionEl = edu.querySelector('p.text-xs');
+      const dateEl = edu.querySelector('.text-xs.text-gray-600');
+
+      if (degreeEl && institutionEl && dateEl) {
+        const degreeText = degreeEl.innerText;
+        const degreeMatch = degreeText.match(/(.*?)(?:\s+in\s+(.*))?$/);
+        const dates = dateEl.innerText.split(' - ');
+
+        resumeData.education.push({
+          degree: degreeMatch ? degreeMatch[1] : degreeText,
+          fieldOfStudy: degreeMatch && degreeMatch[2] ? degreeMatch[2] : '',
+          institution: institutionEl.innerText,
+          startDate: dates[0]?.trim() || '',
+          endDate: dates[1]?.trim() || ''
+        });
+      }
     });
   }
 
   // Extract skills
-  const skillsSection = cvContent.querySelector('[data-section="skills"]');
-  if (skillsSection) {
-    const skillsText = skillsSection.querySelector('#skills-container').innerText;
-    resumeData.skills = skillsText.split(',').map(skill => skill.trim()).filter(skill => skill);
+  const skillsSection = resumeContent.querySelector('[data-section="skills"]');
+  if (!skillsSection) {
+    // Fallback: try to find skills container directly
+    const skillsContainer = resumeContent.querySelector('#skills-container');
+    if (skillsContainer) {
+      const skillsText = skillsContainer.innerText;
+      resumeData.skills = skillsText.split(',').map(skill => skill.trim()).filter(skill => skill);
+    }
+  } else {
+    const skillsContainer = skillsSection.querySelector('#skills-container');
+    if (skillsContainer) {
+      const skillsText = skillsContainer.innerText;
+      resumeData.skills = skillsText.split(',').map(skill => skill.trim()).filter(skill => skill);
+    }
+  }
+
+  // Extract certifications if present
+  resumeData.certifications = [];
+  const certSection = resumeContent.querySelector('[data-section="certifications"]');
+  if (certSection) {
+    certSection.querySelectorAll('.mb-2').forEach(cert => {
+      const nameEl = cert.querySelector('h4');
+      const orgEl = cert.querySelector('p.text-xs');
+      const dateEl = cert.querySelector('.text-xs.text-gray-600');
+
+      if (nameEl && orgEl) {
+        const orgText = orgEl.innerText;
+        // Parse org and credential ID - format is "Org • CredentialID"
+        const orgParts = orgText.split('•');
+        const dates = dateEl ? dateEl.innerText.split(' - ') : ['', ''];
+
+        resumeData.certifications.push({
+          name: nameEl.innerText,
+          issuingOrg: orgParts[0]?.trim() || orgText,
+          credentialId: orgParts[1]?.trim() || '',
+          issueDate: dates[0]?.trim() || '',
+          expiryDate: dates[1]?.trim() || ''
+        });
+      }
+    });
   }
 
   return resumeData;
 }
+
+// Function to save the resume to documents
+window.saveResumeToDocuments = function(isFromDownload = false) {
+  return new Promise((resolve, reject) => {
+    let resumeData;
+    try {
+      resumeData = extractResumeData();
+    } catch (error) {
+      console.error('Error extracting resume data:', error);
+      if (!isFromDownload && typeof window.showNotification === 'function') {
+        window.showNotification('Failed to extract resume data: ' + error.message, 'error', 'Save Failed');
+      }
+      reject(error);
+      return;
+    }
+    const jobID = {{.JobID}};
+
+    if (!jobID) {
+      if (!isFromDownload && typeof window.showNotification === 'function') {
+        window.showNotification('Unable to save: Job ID not found', 'error', 'Save Failed');
+      }
+      reject(new Error('Job ID not found'));
+      return;
+    }
+
+    // Show loading state only if not from download (download has its own loading state)
+    let saveButton = null;
+    let originalText = '';
+    if (!isFromDownload && event && event.target) {
+      saveButton = event.target;
+      originalText = saveButton.innerText;
+      saveButton.disabled = true;
+      saveButton.innerText = 'Saving...';
+    }
+
+    // Prepare the request data
+    const requestData = {
+      jobId: jobID,
+      documentType: 'resume',
+      content: JSON.stringify(resumeData)
+    };
+
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+    // Send the save request
+    fetch('/documents/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken
+      },
+      body: JSON.stringify(requestData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to save document');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (!isFromDownload && typeof window.showNotification === 'function') {
+        window.showNotification('Document saved successfully!', 'success', 'Save Complete');
+      }
+      resolve(data);
+    })
+    .catch(error => {
+      console.error('Error saving resume:', error);
+      if (!isFromDownload && typeof window.showNotification === 'function') {
+        window.showNotification('Failed to save document. Please try again.', 'error', 'Save Failed');
+      }
+      reject(error);
+    })
+    .finally(() => {
+      // Restore button state
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.innerText = originalText;
+      }
+    });
+  });
+}
+
+// This function is no longer needed as we use window.showNotification
+// which is defined in base.html and properly handles toast notifications
 })();
 </script>
 

@@ -12,37 +12,55 @@ jobs:
       pull-requests: read
       issues: read
       id-token: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          
+
           direct_prompt: |
             Act as an expert code reviewer. Start with a brief summary of what this PR accomplishes.
-            
-            ONLY comment on critical issues that could cause:
-            - 🔴 Production failures, crashes, or data loss
-            - 🟡 Significant performance degradation or reliability issues  
-            - 🟠 Security vulnerabilities or major architectural flaws
-            
-            For each issue:
-            - Cite the specific file:line
-            - Show the problematic code
-            - Explain the real-world impact
-            - Provide a concrete fix
-            
-            Ignore all style issues, minor optimizations, and nice-to-haves.
-            If no critical issues exist, simply state "No critical issues found."
+
+            CRITICAL: Before flagging any issue, verify it's actually present in the CURRENT code, not older versions.
+            Focus ONLY on files that were actually modified in this PR (use git diff to check).
+
+            ONLY comment on VERIFIED critical issues that could cause:
+            - 🔴 Production failures, crashes, data loss, or memory leaks
+            - 🔴 Actual race conditions (not theoretical ones with proper locking)
+            - 🟡 Security vulnerabilities with exploitable attack vectors
+            - 🟡 Performance issues causing >100ms latency or O(n²) when O(n) is possible
+
+            DO NOT flag as issues:
+            - Mutex patterns using a single Lock() for atomic operations (this is often correct)
+            - Read-modify-write operations under a single lock (this prevents races)
+            - Minor query optimizations unless they cause N+1 with >10 queries
+            - Style preferences or code organization
+            - Missing features or enhancements
+            - Test coverage unless tests are completely missing
+
+            For each VERIFIED issue:
+            1. Confirm the issue exists in the LATEST code (not a previous commit)
+            2. Cite the specific file:line from the current version
+            3. Show the exact problematic code snippet
+            4. Explain the concrete, real-world impact (not theoretical)
+            5. Provide a tested fix that actually improves the situation
+
+            Common false positives to avoid:
+            - Claiming race conditions when proper locking is in place
+            - Suggesting RLock() when atomic operations require Lock()
+            - Flagging deliberate design decisions as bugs
+            - Confusing defensive programming with actual bugs
+
+            If no critical, verified issues exist, state: "✅ No critical issues found."
 
           use_sticky_comment: true
-          
-          allowed_tools: "Bash(git diff),Bash(git log),Bash(grep)"
+
+          allowed_tools: "Bash(git diff),Bash(git log),Bash(grep),Read,Grep"
 

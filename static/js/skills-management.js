@@ -153,7 +153,13 @@ function showSkillSuggestions(query) {
 
     if (currentCategory) html += '</div>';
 
-    suggestionsDiv.innerHTML = html;
+    suggestionsDiv.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    while (tempDiv.firstChild) {
+        suggestionsDiv.appendChild(tempDiv.firstChild);
+    }
     suggestionsDiv.classList.remove('hidden');
 }
 

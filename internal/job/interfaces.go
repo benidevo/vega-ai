@@ -44,6 +44,12 @@ type CoverLetterGenerator interface {
 	GenerateCoverLetter(ctx context.Context, userID int, jobID int) (*models.CoverLetter, error)
 }
 
+// DocumentChecker checks if documents exist for a job
+type DocumentChecker interface {
+	CheckCoverLetterExists(ctx context.Context, userID int, jobID int) (bool, error)
+	CheckResumeExists(ctx context.Context, userID int, jobID int) (bool, error)
+}
+
 // JobCommandFactory creates commands for job operations
 type JobCommandFactory interface {
 	CreateAnalyzeJobCommand(jobID int) interface{}

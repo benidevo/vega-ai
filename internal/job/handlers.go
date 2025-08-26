@@ -71,7 +71,7 @@ func (f *jobCommandFactory) CreateAnalyzeJobCommand(jobID int) interface{} {
 }
 
 func (f *jobCommandFactory) CreateGenerateCoverLetterCommand(jobID int) interface{} {
-	return map[string]interface{}{"jobID": jobID, "action": "generate_cover_letter"}
+	return map[string]any{"jobID": jobID, "action": "generate_cover_letter"}
 }
 
 func (f *jobCommandFactory) GetCommand(field string) (FieldCommand, error) {
@@ -238,7 +238,7 @@ func (h *JobHandler) renderDashboardError(c *gin.Context, err error) {
 	alerts.RenderError(c, statusCode, sentinelErr.Error(), alerts.ContextDashboard)
 }
 
-// NewJobHandler creates and returns a new JobHandler with the provided JobService and configuration settings.
+// NewJobHandler creates and returns a new JobHandler with the provided JobService and configuration settings.// NewJobHandler creates and returns a new JobHandler with the provided JobService and configuration settings.
 func NewJobHandler(service *JobService, cfg *config.Settings) *JobHandler {
 	return &JobHandler{
 		service:         service,
@@ -285,6 +285,8 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 	statusParam := c.Query("status")
 	pageParam := c.DefaultQuery("page", "1")
 	limitParam := c.DefaultQuery("limit", "12")
+	sortByParam := c.DefaultQuery("sort", "match_score")
+	sortOrderParam := c.DefaultQuery("order", "desc")
 
 	// Parse pagination parameters
 	page := 1
@@ -299,9 +301,25 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 
 	offset := (page - 1) * limit
 
+	// Validate sort parameters
+	validSortFields := map[string]bool{
+		"match_score": true,
+		"updated_at":  true,
+		"created_at":  true,
+	}
+	if !validSortFields[sortByParam] {
+		sortByParam = "match_score" // Default to match_score
+	}
+
+	if sortOrderParam != "asc" && sortOrderParam != "desc" {
+		sortOrderParam = "desc"
+	}
+
 	filter := models.JobFilter{
-		Limit:  limit,
-		Offset: offset,
+		Limit:     limit,
+		Offset:    offset,
+		SortBy:    sortByParam,
+		SortOrder: sortOrderParam,
 	}
 
 	if statusParam != "" && statusParam != "all" {
@@ -348,6 +366,8 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 		"jobs":         jobsWithPagination.Jobs,
 		"pagination":   jobsWithPagination.Pagination,
 		"statusFilter": statusParam,
+		"sortBy":       sortByParam,
+		"sortOrder":    sortOrderParam,
 	}
 
 	// Check if this is an HTMX request
@@ -372,7 +392,7 @@ func (h *JobHandler) GetNewJobForm(c *gin.Context) {
 	})
 }
 
-// CreateJob handles form submission for creating a new job
+// CreateJob handles the HTTP request to create a new job entry.
 func (h *JobHandler) CreateJob(c *gin.Context) {
 	userIDValue, exists := c.Get("userID")
 	if !exists {
@@ -437,12 +457,13 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 		return
 	}
 
-	// Set headers for compatibility with test framework
 	if isNew {
+		// Set headers for compatibility with test framework
 		c.Header("X-Toast-Message", "Job added successfully!")
 		c.Header("X-Toast-Type", "success")
 		alerts.TriggerToast(c, "Job added successfully!", alerts.TypeSuccess)
 	} else {
+		// Set headers for compatibility with test framework
 		c.Header("X-Toast-Message", "Job already exists in your list")
 		c.Header("X-Toast-Type", "info")
 		alerts.TriggerToast(c, "Job already exists in your list", alerts.TypeInfo)
@@ -451,8 +472,6 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 }
 
 // GetJobDetails handles the HTTP request to retrieve and display details for a specific job.
-// It validates the job ID, fetches job data from the service layer, and renders the appropriate HTML template.
-// Returns a 400 error for invalid IDs, 404 if the job is not found, or 500 for other errors.
 func (h *JobHandler) GetJobDetails(c *gin.Context) {
 	if h.cfg != nil && h.cfg.IsTest {
 		c.Status(http.StatusOK)
@@ -559,7 +578,7 @@ func (h *JobHandler) GetJobDetails(c *gin.Context) {
 	})
 }
 
-// UpdateJobField handles the request to update a specific job field
+// UpdateJobField handles the request to update a specific job field// UpdateJobField handles the request to update a specific job field
 func (h *JobHandler) UpdateJobField(c *gin.Context) {
 	jobIDValue, exists := c.Get("jobID")
 	if !exists {
@@ -729,11 +748,22 @@ func (h *JobHandler) GenerateCoverLetter(c *gin.Context) {
 		return
 	}
 
+	// Fetch job details for PDF naming
+	job, err := h.service.GetJob(c.Request.Context(), userID, jobID)
+	if err != nil {
+		h.service.LogError(fmt.Errorf("error fetching job for cover letter generation: %w", err))
+		// Continue without job details. This is not critical for generation
+		job = &models.Job{}
+	}
+
 	html, err := h.renderTemplate("partials/cover_letter_generator.html", gin.H{
 		"CoverLetter": result.CoverLetter,
 		"GeneratedCV": gin.H{
 			"PersonalInfo": result.PersonalInfo,
 		},
+		"JobID":       jobID,
+		"JobTitle":    job.Title,
+		"CompanyName": job.Company.Name,
 	})
 	if err != nil {
 		alerts.RenderError(c, http.StatusInternalServerError, "Error rendering cover letter", alerts.ContextGeneral)
@@ -764,8 +794,19 @@ func (h *JobHandler) GenerateCV(c *gin.Context) {
 		return
 	}
 
+	// Fetch job details for PDF naming
+	job, err := h.service.GetJob(c.Request.Context(), userID, jobID)
+	if err != nil {
+		h.service.LogError(fmt.Errorf("error fetching job for CV generation: %w", err))
+		// Continue without job details. This is not critical for generation
+		job = &models.Job{}
+	}
+
 	html, err := h.renderTemplate("partials/cv_generator.html", gin.H{
 		"GeneratedCV": generatedCV,
+		"JobID":       jobID,
+		"JobTitle":    job.Title,
+		"CompanyName": job.Company.Name,
 	})
 	if err != nil {
 

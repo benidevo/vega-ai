@@ -247,7 +247,7 @@ func TestJobHandler_CreateJob(t *testing.T) {
 			},
 			ExpectedStatus: http.StatusOK,
 			ExpectedHeader: map[string]string{
-				"HX-Redirect": "/jobs/1",
+				"HX-Redirect": "/jobs/1/details",
 			},
 			ExpectedToast: &testutil.ToastAssertion{
 				Message: "Job added successfully!",
@@ -363,7 +363,7 @@ func TestJobHandler_CreateJob(t *testing.T) {
 			},
 			ExpectedStatus: http.StatusOK,
 			ExpectedHeader: map[string]string{
-				"HX-Redirect": "/jobs/1",
+				"HX-Redirect": "/jobs/1/details",
 			},
 			ExpectedToast: &testutil.ToastAssertion{
 				Message: "Job already exists in your list",

@@ -308,7 +308,47 @@ func (r *SQLiteJobRepository) GetAll(ctx context.Context, userID int, filter mod
 		query += " WHERE " + strings.Join(conditions, " AND ")
 	}
 
-	query += " ORDER BY j.updated_at DESC"
+	// Validate sort parameters for defense-in-depth
+	validSortFields := map[string]bool{
+		"match_score": true,
+		"created_at":  true,
+		"updated_at":  true,
+		"":            true, // Allow empty for default
+	}
+
+	if !validSortFields[filter.SortBy] {
+		filter.SortBy = "" // Default to updated_at
+	}
+
+	if filter.SortOrder != "asc" && filter.SortOrder != "desc" && filter.SortOrder != "" {
+		filter.SortOrder = "desc"
+	}
+
+	orderBy := " ORDER BY "
+	switch filter.SortBy {
+	case "match_score":
+		// Sort by match_score, with NULL values last
+		if filter.SortOrder == "asc" {
+			orderBy += "CASE WHEN j.match_score IS NULL THEN 1 ELSE 0 END, j.match_score ASC"
+		} else {
+			orderBy += "CASE WHEN j.match_score IS NULL THEN 1 ELSE 0 END, j.match_score DESC"
+		}
+	case "created_at":
+		if filter.SortOrder == "asc" {
+			orderBy += "j.created_at ASC"
+		} else {
+			orderBy += "j.created_at DESC"
+		}
+	case "updated_at":
+		if filter.SortOrder == "asc" {
+			orderBy += "j.updated_at ASC"
+		} else {
+			orderBy += "j.updated_at DESC"
+		}
+	default:
+		orderBy += "j.updated_at DESC"
+	}
+	query += orderBy
 
 	if filter.Limit > 0 {
 		query += " LIMIT ?"

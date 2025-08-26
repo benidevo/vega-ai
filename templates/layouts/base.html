@@ -18,7 +18,7 @@
   <link href="/static/css/utilities.css" rel="stylesheet">
   <link href="/static/css/print.css" rel="stylesheet" media="print">
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.4/dist/ext/response-targets.js"></script>
   <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -91,6 +91,13 @@
     <div class="min-h-screen bg-slate-900 flex flex-col">
       <div class="flex-1">
         {{template "settings-layout" .}}
+      </div>
+      {{template "footer" .}}
+    </div>
+  {{else if eq .page "documents" }}
+    <div class="min-h-screen bg-slate-900 flex flex-col">
+      <div class="flex-1">
+        {{template "documents-content" .}}
       </div>
       {{template "footer" .}}
     </div>

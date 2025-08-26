@@ -10,6 +10,8 @@ import (
 	"github.com/benidevo/vega/internal/ai"
 	"github.com/benidevo/vega/internal/common/logger"
 	"github.com/benidevo/vega/internal/config"
+	"github.com/benidevo/vega/internal/documents"
+	documentsmodels "github.com/benidevo/vega/internal/documents/models"
 	"github.com/benidevo/vega/internal/job/interfaces"
 	"github.com/benidevo/vega/internal/job/models"
 	"github.com/benidevo/vega/internal/quota"
@@ -23,6 +25,7 @@ type JobService struct {
 	aiService       *ai.AIService
 	settingsService *settings.SettingsService
 	quotaService    *quota.Service
+	documentService *documents.DocumentService
 	cfg             *config.Settings
 	log             *logger.PrivacyLogger
 	validator       *validator.Validate
@@ -35,10 +38,32 @@ func NewJobService(jobRepo interfaces.JobRepository, aiService *ai.AIService, se
 		aiService:       aiService,
 		settingsService: settingsService,
 		quotaService:    quotaService,
+		documentService: nil, // Will be set separately to avoid circular dependencies
 		cfg:             cfg,
 		log:             logger.GetPrivacyLogger("job"),
 		validator:       validator.New(),
 	}
+}
+
+// SetDocumentService sets the document service (called after initialization to avoid circular dependencies)
+func (s *JobService) SetDocumentService(documentService *documents.DocumentService) {
+	s.documentService = documentService
+}
+
+// CheckCoverLetterExists checks if a cover letter exists for a job
+func (s *JobService) CheckCoverLetterExists(ctx context.Context, userID int, jobID int) (bool, error) {
+	if s.documentService == nil {
+		return false, nil
+	}
+	return s.documentService.CheckDocumentExists(ctx, userID, jobID, documentsmodels.DocumentTypeCoverLetter)
+}
+
+// CheckResumeExists checks if a resume exists for a job
+func (s *JobService) CheckResumeExists(ctx context.Context, userID int, jobID int) (bool, error) {
+	if s.documentService == nil {
+		return false, nil
+	}
+	return s.documentService.CheckDocumentExists(ctx, userID, jobID, documentsmodels.DocumentTypeResume)
 }
 
 // GetQuotaStatus returns the current quota status for a user

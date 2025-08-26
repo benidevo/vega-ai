@@ -7,6 +7,7 @@ import (
 	authrepo "github.com/benidevo/vega/internal/auth/repository"
 	"github.com/benidevo/vega/internal/cache"
 	"github.com/benidevo/vega/internal/config"
+	"github.com/benidevo/vega/internal/documents"
 	"github.com/benidevo/vega/internal/job/interfaces"
 	"github.com/benidevo/vega/internal/job/repository"
 	"github.com/benidevo/vega/internal/quota"
@@ -38,6 +39,10 @@ func SetupService(db *sql.DB, cfg *config.Settings, cache cache.Cache) *JobServi
 	quotaService := quota.NewService(db, quotaAdapter, cfg.IsCloudMode)
 
 	jobService := SetupJobService(jobRepo, aiService, settingsService, quotaService, cfg)
+
+	// Setup document service and wire it to job service
+	documentService := documents.SetupService(db, cache)
+	jobService.SetDocumentService(documentService)
 
 	return jobService
 }

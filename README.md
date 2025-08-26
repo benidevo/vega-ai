@@ -65,9 +65,16 @@ docker run --pull always -d \
 
 ## 🔗 Browser Extension
 
-Install the [**Vega AI Job Capture**](https://chromewebstore.google.com/detail/vega-ai-job-capture/oboedhpojbjemdmojfchifppbgbfehol) extension from the Chrome Web Store for one-click job capture from LinkedIn.
+Download the **Vega AI Job Capture** extension from [GitHub Releases](https://github.com/benidevo/vega-ai-extension/releases/latest) for one-click job capture from LinkedIn.
 
-For manual installation or development, visit the [extension repository](https://github.com/benidevo/vega-ai-extension).
+### Installation Steps:
+1. Download the latest `.zip` file from the [releases page](https://github.com/benidevo/vega-ai-extension/releases/latest)
+2. Extract the ZIP file to a folder on your computer
+3. Open Chrome and navigate to `chrome://extensions/`
+4. Enable "Developer mode" in the top right
+5. Click "Load unpacked" and select the extracted folder
+
+For development or to build from source, visit the [extension repository](https://github.com/benidevo/vega-ai-extension).
 
 ## 🐳 Docker Options
 
@@ -137,4 +144,4 @@ What this means:
 - ✅ If you run this software on a server, you must make your source code available to users
 - ✅ Any modifications must also be released under AGPL-3.0
 
-**Commercial licensing:** For commercial use without AGPL restrictions, contact <benjaminidewor@gmail.com> for licensing options.
+**Commercial licensing:** For commercial use without AGPL restrictions, contact <vega@benidevo.com> for licensing options.

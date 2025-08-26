@@ -44,6 +44,13 @@
         New Job
       </a>
 
+      <a href="/documents" class="{{if eq .activeNav "documents"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "documents"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+        </svg>
+        Documents
+      </a>
+
       <a href="/settings/profile" class="{{if eq .activeNav "profile"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "profile"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -188,6 +195,8 @@
         {{template "match-history" .}}
       {{else if eq .page "dashboard"}}
         {{template "dashboard-jobs-content" .}}
+      {{else if eq .page "documents"}}
+        {{template "documents-hub" .}}
       {{else}}
         <!-- Fallback content if no specific template is defined -->
         <div class="text-center py-8">

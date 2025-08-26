@@ -320,48 +320,58 @@
           {{end}}
 
 
-          <button id="cover-letter-button" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-primary hover:bg-primary-dark text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
-                  aria-label="Generate cover letter for this job"
-                  hx-post="/jobs/{{.jobID}}/cover-letter"
-                  hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
-                  hx-target="#cover-letter-section"
-                  hx-swap="innerHTML"
-                  hx-indicator=".cover-letter-spinner"
-                  hx-disable-elt="this"
-                  hx-on:htmx:before-request="window.handleAIOperationStart(this, 'Generating Cover Letter...')"
-                  hx-on:htmx:after-request="window.handleAIOperationEnd(this)"
-                  hx-on:htmx:response-error="window.handleAIOperationEnd(this)">
-            <svg class="cover-letter-spinner htmx-indicator animate-spin h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <svg class="cover-letter-icon h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <span class="button-text">Cover Letter</span>
-          </button>
+          <div class="relative">
+            <button id="cover-letter-button" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-primary hover:bg-primary-dark text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
+                    aria-label="Generate cover letter for this job"
+                    hx-post="/jobs/{{.jobID}}/cover-letter"
+                    hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
+                    hx-target="#cover-letter-section"
+                    hx-swap="innerHTML"
+                    hx-indicator=".cover-letter-spinner"
+                    hx-disable-elt="this"
+                    hx-on:htmx:before-request="window.handleAIOperationStart(this, 'Generating Cover Letter...')"
+                    hx-on:htmx:after-request="window.handleAIOperationEnd(this)"
+                    hx-on:htmx:response-error="window.handleAIOperationEnd(this)">
+              <svg class="cover-letter-spinner htmx-indicator animate-spin h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <svg class="cover-letter-icon h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span class="button-text">Cover Letter</span>
+              {{if .HasCoverLetter}}
+              <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-green-900 bg-opacity-50 text-green-300 font-medium">Saved</span>
+              {{end}}
+            </button>
+          </div>
 
 
-          <button id="cv-button" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-primary hover:bg-primary-dark text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
-                  aria-label="Generate tailored resume for this job"
-                  hx-post="/jobs/{{.jobID}}/cv"
-                  hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
-                  hx-target="#cv-section"
-                  hx-swap="innerHTML"
-                  hx-indicator=".cv-spinner"
-                  hx-disable-elt="this"
-                  hx-on:htmx:before-request="window.handleAIOperationStart(this, 'Generating Resume...')"
-                  hx-on:htmx:after-request="window.handleAIOperationEnd(this)"
-                  hx-on:htmx:response-error="window.handleAIOperationEnd(this)">
-            <svg class="cv-spinner htmx-indicator animate-spin h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <svg class="cv-icon h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="button-text">Resume</span>
-          </button>
+          <div class="relative">
+            <button id="cv-button" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-primary hover:bg-primary-dark text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
+                    aria-label="Generate tailored resume for this job"
+                    hx-post="/jobs/{{.jobID}}/cv"
+                    hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
+                    hx-target="#cv-section"
+                    hx-swap="innerHTML"
+                    hx-indicator=".cv-spinner"
+                    hx-disable-elt="this"
+                    hx-on:htmx:before-request="window.handleAIOperationStart(this, 'Generating Resume...')"
+                    hx-on:htmx:after-request="window.handleAIOperationEnd(this)"
+                    hx-on:htmx:response-error="window.handleAIOperationEnd(this)">
+              <svg class="cv-spinner htmx-indicator animate-spin h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <svg class="cv-icon h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span class="button-text">Resume</span>
+              {{if .HasResume}}
+              <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-green-900 bg-opacity-50 text-green-300 font-medium">Saved</span>
+              {{end}}
+            </button>
+          </div>
 
 
           <a href="/jobs/{{.jobID}}/match-history" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-slate-600 hover:bg-slate-500 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
@@ -369,6 +379,18 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>Match History</span>
+          </a>
+
+          <a href="/documents" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-slate-600 hover:bg-slate-500 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+            </svg>
+            <span>My Documents</span>
+            {{if or .HasCoverLetter .HasResume}}
+            <span class="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary bg-opacity-20 text-primary">
+              {{if and .HasCoverLetter .HasResume}}2{{else}}1{{end}}
+            </span>
+            {{end}}
           </a>
 
           {{if .job.SourceURL}}
@@ -421,6 +443,7 @@
 <script src="/static/js/ai-operations.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/static/js/pdf-generator.js"></script>
 
 <script>
 document.addEventListener('htmx:afterRequest', function(evt) {

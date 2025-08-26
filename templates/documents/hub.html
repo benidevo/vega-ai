@@ -1,0 +1,183 @@
+{{define "documents/hub.html"}}
+  {{template "layouts/base.html" .}}
+{{end}}
+
+{{define "documents-content"}}
+  {{template "dashboard-layout" .}}
+{{end}}
+
+{{define "dashboard-page-content"}}
+  {{template "documents-hub" .}}
+{{end}}
+
+{{define "documents-hub"}}
+<div class="max-w-7xl mx-auto px-0 md:px-6 lg:px-8">
+  <div class="bg-slate-800 rounded-none md:rounded-xl shadow-lg mb-6">
+    <div class="px-4 md:px-6 py-4 md:py-5 border-b border-slate-700">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-white">My Documents</h1>
+          <p class="text-gray-400 text-sm mt-1">Manage your saved cover letters and resumes</p>
+        </div>
+        <div class="flex gap-3">
+          <div class="bg-slate-700 px-4 py-2 rounded-lg">
+            <div class="text-xs text-gray-400">Total Documents</div>
+            <div class="text-xl font-semibold text-white">{{add .CoverLetterCount .ResumeCount}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-b border-slate-700">
+      <nav class="flex -mb-px" aria-label="Document type tabs">
+        <button 
+          class="tab-button flex-1 md:flex-none px-4 md:px-6 py-3 text-sm font-medium border-b-2 transition-colors
+                 {{if eq .ActiveTab "cover-letters"}}
+                   text-primary border-primary bg-slate-700 bg-opacity-50
+                 {{else}}
+                   text-gray-400 border-transparent hover:text-gray-300 hover:border-gray-300
+                 {{end}}"
+          hx-get="/documents?tab=cover-letters"
+          hx-target="#documents-content"
+          hx-push-url="true"
+          hx-indicator="#loading-indicator"
+          aria-current="{{if eq .ActiveTab "cover-letters"}}page{{else}}false{{end}}"
+          aria-label="Cover Letters tab">
+          <div class="flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span>Cover Letters</span>
+            {{if gt .CoverLetterCount 0}}
+              <span class="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary bg-opacity-20 text-primary">{{.CoverLetterCount}}</span>
+            {{end}}
+          </div>
+        </button>
+        
+        <button 
+          class="tab-button flex-1 md:flex-none px-4 md:px-6 py-3 text-sm font-medium border-b-2 transition-colors
+                 {{if eq .ActiveTab "resumes"}}
+                   text-primary border-primary bg-slate-700 bg-opacity-50
+                 {{else}}
+                   text-gray-400 border-transparent hover:text-gray-300 hover:border-gray-300
+                 {{end}}"
+          hx-get="/documents?tab=resumes"
+          hx-target="#documents-content"
+          hx-push-url="true"
+          hx-indicator="#loading-indicator"
+          aria-current="{{if eq .ActiveTab "resumes"}}page{{else}}false{{end}}"
+          aria-label="Resumes tab">
+          <div class="flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Resumes</span>
+            {{if gt .ResumeCount 0}}
+              <span class="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary bg-opacity-20 text-primary">{{.ResumeCount}}</span>
+            {{end}}
+          </div>
+        </button>
+      </nav>
+    </div>
+
+    <div id="documents-content" class="p-4 md:p-6 relative" aria-live="polite" aria-busy="false"
+         hx-get="/documents/partial?tab={{.ActiveTab}}"
+         hx-trigger="load"
+         hx-swap="innerHTML"
+         _="on htmx:beforeRequest set @aria-busy to 'true' then on htmx:afterSwap set @aria-busy to 'false'">
+      <div class="animate-pulse">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-slate-700 h-48 rounded-lg"></div>
+          <div class="bg-slate-700 h-48 rounded-lg"></div>
+          <div class="bg-slate-700 h-48 rounded-lg hidden lg:block"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-indicator" class="htmx-indicator absolute inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-10 rounded-lg">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+</div>
+
+<script>
+  document.body.addEventListener('document-deleted', function(e) {
+    const activeTab = document.querySelector('.tab-button[aria-current="page"]');
+    if (activeTab) {
+      htmx.trigger(activeTab, 'click');
+    }
+    
+    if (window.showToast) {
+      window.showToast('Document deleted successfully', 'success');
+    }
+  });
+
+  document.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'documents-content') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const activeTab = urlParams.get('tab') || 'cover-letters';
+      
+      document.querySelectorAll('.tab-button').forEach(button => {
+        const isActive = button.getAttribute('hx-get').includes(`tab=${activeTab}`);
+        button.setAttribute('aria-current', isActive ? 'page' : 'false');
+        
+        if (isActive) {
+          button.classList.add('text-primary', 'border-primary', 'bg-slate-700', 'bg-opacity-50');
+          button.classList.remove('text-gray-400', 'border-transparent');
+        } else {
+          button.classList.remove('text-primary', 'border-primary', 'bg-slate-700', 'bg-opacity-50');
+          button.classList.add('text-gray-400', 'border-transparent');
+        }
+      });
+    }
+  });
+
+  window.downloadDocument = function(docId, docType) {
+    if (window.PDFGenerator && window.PDFGenerator.downloadDocument) {
+      window.PDFGenerator.downloadDocument(docId, docType);
+    } else {
+      console.error('PDF Generator not loaded');
+      if (typeof window.showNotification === 'function') {
+        window.showNotification('PDF generation is not available. Please refresh the page.', 'error', 'Download Failed');
+      }
+    }
+  };
+
+  window.toggleDropdown = function(id) {
+    const dropdown = document.getElementById('dropdown-' + id);
+    if (dropdown) {
+      if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        
+        const closeDropdown = function(e) {
+          const button = e.target.closest('[onclick*="toggleDropdown"]');
+          const clickedDropdown = e.target.closest('#dropdown-' + id);
+          
+          if (!clickedDropdown && (!button || button.getAttribute('onclick') !== 'toggleDropdown(\'' + id + '\')')) {
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', dropdown._closeHandler, true);
+            delete dropdown._closeHandler;
+          }
+        };
+        
+        dropdown._closeHandler = closeDropdown;
+        
+        setTimeout(() => {
+          document.addEventListener('click', closeDropdown, true);
+        }, 0);
+      } else {
+        dropdown.classList.add('hidden');
+        if (dropdown._closeHandler) {
+          document.removeEventListener('click', dropdown._closeHandler, true);
+          delete dropdown._closeHandler;
+        }
+      }
+    }
+  };
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/static/js/document-formatter.js"></script>
+<script src="/static/js/pdf-generator.js"></script>
+
+{{end}}
