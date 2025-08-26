@@ -94,22 +94,13 @@ jobs:
       run: |
         echo "Waiting for images to be available..."
         sleep 30
-        
+
         # Get the first tag from the metadata output
         FIRST_TAG=$(echo '${{ steps.meta.outputs.tags }}' | head -n 1)
         echo "Verifying image: $FIRST_TAG"
-        
+
         # Try to pull the image to verify it's available
         docker pull "$FIRST_TAG" --platform linux/amd64 || {
           echo "Warning: Image verification failed. This might be a transient issue."
           echo "Users may need to wait a few minutes for the image to be fully available."
         }
-
-    - name: Clean up untagged images
-      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-      uses: actions/delete-package-versions@v4
-      with:
-        package-name: 'vega-ai'
-        package-type: 'container'
-        min-versions-to-keep: 5
-        delete-only-untagged-versions: true

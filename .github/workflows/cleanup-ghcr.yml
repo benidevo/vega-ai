@@ -1,0 +1,59 @@
+name: Cleanup GHCR Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      min_versions_to_keep:
+        description: 'Minimum number of versions to keep'
+        required: false
+        default: '10'
+        type: string
+      dry_run:
+        description: 'Dry run (show what would be deleted without deleting)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  cleanup:
+    name: Clean up old container images
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Show cleanup configuration
+      run: |
+        echo "🧹 GHCR Cleanup Configuration:"
+        echo "   Min versions to keep: ${{ inputs.min_versions_to_keep }}"
+        echo "   Dry run: ${{ inputs.dry_run }}"
+        echo "   Package: vega-ai"
+        echo ""
+        echo "This will delete untagged versions while keeping at least ${{ inputs.min_versions_to_keep }} recent versions."
+        echo "Tagged releases (v*.*.*, latest, main) are always preserved."
+
+    - name: Delete old untagged container images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-name: 'vega-ai'
+        package-type: 'container'
+        min-versions-to-keep: ${{ inputs.min_versions_to_keep }}
+        delete-only-untagged-versions: 'true'
+        # Never delete important tags even if they're old
+        ignore-versions: '^(latest|main|master|develop|v?\d+\.\d+\.\d+.*|pr-\d+)$'
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Summary
+      if: success()
+      run: |
+        echo "✅ Cleanup completed successfully!"
+        echo ""
+        echo "Retained:"
+        echo "- All tagged releases (v*.*.*, latest, etc.)"
+        echo "- Last ${{ inputs.min_versions_to_keep }} untagged versions"
+        echo ""
+        echo "To view your packages: https://github.com/benidevo/vega/pkgs/container/vega-ai"
