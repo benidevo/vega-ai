@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -33,6 +32,163 @@ func NewSQLiteJobRepository(db *sql.DB, companyRepository interfaces.CompanyRepo
 		companyRepository: companyRepository,
 		cache:             cache,
 	}
+}
+
+// BeginTx starts a new database transaction with the given options.
+// The transaction must be either committed or rolled back.
+func (r *SQLiteJobRepository) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
+	return r.db.BeginTx(ctx, opts)
+}
+
+// CommitTx commits the given transaction.
+func (r *SQLiteJobRepository) CommitTx(tx *sql.Tx) error {
+	return tx.Commit()
+}
+
+// RollbackTx rolls back the given transaction.
+func (r *SQLiteJobRepository) RollbackTx(tx *sql.Tx) error {
+	return tx.Rollback()
+}
+
+// CreateWithTx creates a new job within a transaction.
+// The job's company must already exist in the database.
+func (r *SQLiteJobRepository) CreateWithTx(ctx context.Context, tx *sql.Tx, userID int, jobModel *models.Job) (*models.Job, error) {
+	if err := validateJob(jobModel); err != nil {
+		return nil, err
+	}
+
+	now := time.Now().UTC()
+	if jobModel.CreatedAt.IsZero() {
+		jobModel.CreatedAt = now
+	}
+	jobModel.UpdatedAt = now
+	if jobModel.RequiredSkills == nil {
+		jobModel.RequiredSkills = []string{}
+	}
+
+	skillsJSON, err := json.Marshal(jobModel.RequiredSkills)
+	if err != nil {
+		return nil, models.WrapError(models.ErrFailedToCreateJob, err)
+	}
+
+	query := `
+		INSERT INTO jobs (
+			title, description, location, job_type, source_url,
+			required_skills, application_url,
+			company_id, status, notes,
+			created_at, updated_at, user_id
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		jobModel.Title,
+		jobModel.Description,
+		jobModel.Location,
+		int(jobModel.JobType),
+		jobModel.SourceURL,
+		skillsJSON,
+		jobModel.ApplicationURL,
+		jobModel.CompanyID,
+		int(jobModel.Status),
+		jobModel.Notes,
+		jobModel.CreatedAt,
+		jobModel.UpdatedAt,
+		userID,
+	)
+	if err != nil {
+		return nil, models.WrapError(models.ErrFailedToCreateJob, err)
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, models.WrapError(models.ErrFailedToCreateJob, err)
+	}
+
+	jobModel.ID = int(id)
+	jobModel.UserID = userID
+	return jobModel, nil
+}
+
+// UpdateWithTx updates an existing job within a transaction.
+// Returns ErrJobNotFound if the job doesn't exist or doesn't belong to the user.
+func (r *SQLiteJobRepository) UpdateWithTx(ctx context.Context, tx *sql.Tx, userID int, job *models.Job) error {
+	if err := validateJob(job); err != nil {
+		return err
+	}
+
+	job.UpdatedAt = time.Now().UTC()
+
+	skillsJSON, err := json.Marshal(job.RequiredSkills)
+	if err != nil {
+		return models.WrapError(models.ErrFailedToUpdateJob, err)
+	}
+
+	query := `
+		UPDATE jobs SET 
+			title = ?, description = ?, location = ?, job_type = ?,
+			source_url = ?, required_skills = ?, application_url = ?,
+			company_id = ?, status = ?, match_score = ?, notes = ?,
+			updated_at = ?
+		WHERE id = ? AND user_id = ?
+	`
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		job.Title,
+		job.Description,
+		job.Location,
+		int(job.JobType),
+		job.SourceURL,
+		skillsJSON,
+		job.ApplicationURL,
+		job.CompanyID,
+		int(job.Status),
+		job.MatchScore,
+		job.Notes,
+		job.UpdatedAt,
+		job.ID,
+		userID,
+	)
+
+	if err != nil {
+		return models.WrapError(models.ErrFailedToUpdateJob, err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return models.WrapError(models.ErrFailedToUpdateJob, err)
+	}
+
+	if rowsAffected == 0 {
+		return models.ErrJobNotFound
+	}
+
+	return nil
+}
+
+// DeleteWithTx deletes a job within a transaction.
+// Returns ErrJobNotFound if the job doesn't exist or doesn't belong to the user.
+func (r *SQLiteJobRepository) DeleteWithTx(ctx context.Context, tx *sql.Tx, userID int, id int) error {
+	query := `DELETE FROM jobs WHERE id = ? AND user_id = ?`
+
+	result, err := tx.ExecContext(ctx, query, id, userID)
+	if err != nil {
+		return models.WrapError(models.ErrFailedToDeleteJob, err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return models.WrapError(models.ErrFailedToDeleteJob, err)
+	}
+
+	if rowsAffected == 0 {
+		return models.ErrJobNotFound
+	}
+
+	return nil
 }
 
 // validateJob performs basic validation on a job
@@ -97,7 +253,7 @@ func (r *SQLiteJobRepository) scanJob(s scanner) (*models.Job, error) {
 }
 
 // GetOrCreate retrieves a job by its SourceURL or creates it if it does not exist.
-// Returns the existing or newly created job, a boolean indicating if it was newly created, or an error if the operation fails.
+// Returns the job, a boolean indicating if it was newly created, and any error.
 func (r *SQLiteJobRepository) GetOrCreate(ctx context.Context, userID int, jobModel *models.Job) (*models.Job, bool, error) {
 	if err := validateJob(jobModel); err != nil {
 		return nil, false, err
@@ -109,18 +265,78 @@ func (r *SQLiteJobRepository) GetOrCreate(ctx context.Context, userID int, jobMo
 
 	existingJob, err := r.GetBySourceURL(ctx, userID, jobModel.SourceURL)
 	if err == nil {
-		return existingJob, false, nil // Job already exists, not newly created
+		return existingJob, false, nil
 	}
 
-	if !errors.Is(err, models.ErrJobNotFound) {
-		return nil, false, err
-	}
-
-	newJob, err := r.Create(ctx, userID, jobModel)
+	company, err := r.companyRepository.GetOrCreate(ctx, jobModel.Company.Name)
 	if err != nil {
 		return nil, false, err
 	}
-	return newJob, true, nil // Job was newly created
+
+	now := time.Now().UTC()
+	if jobModel.CreatedAt.IsZero() {
+		jobModel.CreatedAt = now
+	}
+	jobModel.UpdatedAt = now
+	jobModel.CompanyID = company.ID
+	if jobModel.RequiredSkills == nil {
+		jobModel.RequiredSkills = []string{}
+	}
+
+	skillsJSON, err := json.Marshal(jobModel.RequiredSkills)
+	if err != nil {
+		return nil, false, models.WrapError(models.ErrFailedToCreateJob, err)
+	}
+
+	query := `
+		INSERT INTO jobs (
+			title, description, location, job_type, source_url,
+			required_skills, application_url,
+			company_id, status, notes,
+			created_at, updated_at, user_id
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+
+	result, err := r.db.ExecContext(
+		ctx,
+		query,
+		jobModel.Title,
+		jobModel.Description,
+		jobModel.Location,
+		int(jobModel.JobType),
+		jobModel.SourceURL,
+		skillsJSON,
+		jobModel.ApplicationURL,
+		company.ID,
+		int(jobModel.Status),
+		jobModel.Notes,
+		jobModel.CreatedAt,
+		jobModel.UpdatedAt,
+		userID,
+	)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "UNIQUE constraint failed") ||
+			strings.Contains(err.Error(), "duplicate key value") {
+			existingJob, err := r.GetBySourceURL(ctx, userID, jobModel.SourceURL)
+			if err != nil {
+				return nil, false, err
+			}
+			return existingJob, false, nil
+		}
+		return nil, false, models.WrapError(models.ErrFailedToCreateJob, err)
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, false, models.WrapError(models.ErrFailedToCreateJob, err)
+	}
+
+	jobModel.ID = int(id)
+	jobModel.UserID = userID
+	jobModel.Company = *company
+
+	return jobModel, true, nil
 }
 
 func (r *SQLiteJobRepository) GetBySourceURL(ctx context.Context, userID int, sourceURL string) (*models.Job, error) {
