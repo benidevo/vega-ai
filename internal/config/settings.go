@@ -94,7 +94,7 @@ func NewSettings() Settings {
 		}
 	}
 
-	dbConnectionString := "/app/data/vega.db?_journal_mode=WAL&_busy_timeout=5000&_foreign_keys=ON&_cache_size=10000&_synchronous=NORMAL"
+	dbConnectionString := "/app/data/vega.db"
 	if envDB := getEnv("DB_CONNECTION_STRING", ""); envDB != "" {
 		dbConnectionString = envDB
 	}
@@ -191,7 +191,7 @@ func NewTestSettingsWithTempDB() (Settings, string) {
 
 	settings := NewSettings()
 	settings.IsTest = true
-	settings.DBConnectionString = tempFile + "?_journal_mode=WAL&_busy_timeout=5000&_foreign_keys=ON"
+	settings.DBConnectionString = tempFile + "?_journal_mode=WAL"
 	settings.ServerPort = ":0"
 
 	return settings, tempFile

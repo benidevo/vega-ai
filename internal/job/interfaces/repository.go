@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/benidevo/vega/internal/job/models"
 )
@@ -45,4 +46,28 @@ type JobRepository interface {
 	// Quota-related methods
 	GetMonthlyAnalysisCount(ctx context.Context, userID int) (int, error)
 	SetFirstAnalyzedAt(ctx context.Context, jobID int) error
+}
+
+// TransactionalRepository provides transaction support for repositories
+type TransactionalRepository interface {
+	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+	CommitTx(tx *sql.Tx) error
+	RollbackTx(tx *sql.Tx) error
+}
+
+// TransactionalJobRepository extends JobRepository with transaction support
+type TransactionalJobRepository interface {
+	JobRepository
+	TransactionalRepository
+	CreateWithTx(ctx context.Context, tx *sql.Tx, userID int, job *models.Job) (*models.Job, error)
+	UpdateWithTx(ctx context.Context, tx *sql.Tx, userID int, job *models.Job) error
+	DeleteWithTx(ctx context.Context, tx *sql.Tx, userID int, id int) error
+}
+
+// TransactionalCompanyRepository extends CompanyRepository with transaction support
+type TransactionalCompanyRepository interface {
+	CompanyRepository
+	TransactionalRepository
+	GetOrCreateWithTx(ctx context.Context, tx *sql.Tx, name string) (*models.Company, error)
+	UpdateWithTx(ctx context.Context, tx *sql.Tx, company *models.Company) error
 }

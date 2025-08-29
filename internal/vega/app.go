@@ -185,23 +185,17 @@ func (a *App) Shutdown(ctx context.Context) error {
 }
 
 func (a *App) setupDependencies() error {
-	database, err := sql.Open(a.config.DBDriver, a.config.DBConnectionString)
-	if err != nil {
-		return err
+	dbConfig := db.DBConfig{
+		MaxOpenConns:    a.config.DBMaxOpenConns,
+		MaxIdleConns:    a.config.DBMaxIdleConns,
+		ConnMaxLifetime: a.config.DBConnMaxLifetime,
+		ConnMaxIdleTime: 1 * time.Minute,
 	}
 
-	database.SetMaxOpenConns(a.config.DBMaxOpenConns)
-	database.SetMaxIdleConns(a.config.DBMaxIdleConns)
-	database.SetConnMaxLifetime(a.config.DBConnMaxLifetime)
-
-	if err := database.Ping(); err != nil {
-		return err
-	}
+	database := db.SqlDBFromPathWithConfig(a.config.DBConnectionString, dbConfig)
 	a.db = database
 
-	// Initialize cache
 	if a.config.IsTest {
-		// Use NoOpCache for tests to avoid file system operations
 		a.cache = cache.NewNoOpCache()
 	} else {
 		cacheInstance, err := cache.NewBadgerCache(a.config.CachePath, a.config.CacheMaxMemoryMB)
@@ -229,15 +223,7 @@ func (a *App) setupDependencies() error {
 
 // runMigrations applies database migrations from the configured migrations directory
 func (a *App) runMigrations() error {
-	dbPath := a.config.DBConnectionString
-	for i, char := range dbPath {
-		if char == '?' {
-			dbPath = dbPath[:i]
-			break
-		}
-	}
-
-	if err := db.MigrateDatabase(dbPath, a.config.MigrationsDir); err != nil {
+	if err := db.MigrateDatabase(a.config.DBConnectionString, a.config.MigrationsDir); err != nil {
 		log.Error().Err(err).Msg("Database migration failed")
 		return err
 	}

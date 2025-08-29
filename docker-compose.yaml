@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - DB_CONNECTION_STRING=/app/data/vega.db?_journal_mode=WAL&_busy_timeout=5000&_foreign_keys=ON&_cache_size=10000&_synchronous=NORMAL
+      - DB_CONNECTION_STRING=/app/data/vega.db
       - IS_DEVELOPMENT=true
     volumes:
       - .:/app
