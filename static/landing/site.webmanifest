@@ -8,14 +8,14 @@
   "theme_color": "#0D9488",
   "icons": [
     {
-      "src": "assets/images/icon-192x192.svg",
+      "src": "/static/images/favicon-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "assets/images/icon-512x512.svg",
+      "src": "/static/images/favicon-192x192.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }

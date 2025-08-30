@@ -1,6 +1,16 @@
-<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="192" height="192" rx="24" fill="#0f172a"/>
-  <g transform="translate(48, 48)">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="6" stroke="#0D9488" fill="none" d="M84 53.02A95.724 95.724 0 0148 60c-12.732 0-24.88-2.48-36-6.98M64 24V16a8 8 0 00-8-8h-16a8 8 0 00-8-8v8m16 24h.04M20 80h56a8 8 0 008-8V32a8 8 0 00-8-8H20a8 8 0 00-8 8v40a8 8 0 008 8z" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" fill="none">
+  <rect width="192" height="192" rx="40" fill="#0f172a"/>
+  <defs>
+    <linearGradient id="icon192Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D9488;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0B7A70;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(96, 96) scale(3.8)">
+    <path d="M0 -20l6.18 12.52L20 -5.44l-10 9.74 2.36 13.76L0 11.54l-12.36 6.52L-10 4.3l-10-9.74L-6.18 -5.44L0 -20z" 
+          fill="url(#icon192Gradient)" 
+          stroke="#0D9488" 
+          stroke-width="0.5"
+          stroke-linejoin="round"/>
   </g>
 </svg>
