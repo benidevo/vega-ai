@@ -39,6 +39,15 @@ func NewAuthHandler(service authService, cfg *config.Settings) *AuthHandler {
 
 // GetLoginPage renders the login page template.
 func (h *AuthHandler) GetLoginPage(c *gin.Context) {
+	tokenString, err := c.Cookie("token")
+	if err == nil && tokenString != "" {
+		_, verifyErr := h.service.VerifyToken(tokenString)
+		if verifyErr == nil {
+			c.Redirect(http.StatusFound, "/dashboard")
+			return
+		}
+	}
+
 	data := gin.H{
 		"title":              "Login",
 		"page":               "login",
