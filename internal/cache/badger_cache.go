@@ -19,7 +19,9 @@ var (
 
 // BadgerCache implements Cache interface using Badger v4
 type BadgerCache struct {
-	db *badger.DB
+	db     *badger.DB
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 func NewBadgerCache(path string, maxMemoryMB int) (*BadgerCache, error) {
@@ -44,21 +46,38 @@ func NewBadgerCache(path string, maxMemoryMB int) (*BadgerCache, error) {
 		return nil, fmt.Errorf("failed to open badger cache: %w", err)
 	}
 
-	bc := &BadgerCache{db: db}
+	ctx, cancel := context.WithCancel(context.Background())
+	bc := &BadgerCache{
+		db:     db,
+		ctx:    ctx,
+		cancel: cancel,
+	}
 
-	go bc.runGC()
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error().Interface("panic", r).Msg("Cache GC panic recovered")
+			}
+		}()
+		bc.runGC(ctx)
+	}()
 
 	return bc, nil
 }
 
-func (c *BadgerCache) runGC() {
+func (c *BadgerCache) runGC(ctx context.Context) {
 	ticker := time.NewTicker(5 * time.Minute)
 	defer ticker.Stop()
 
-	for range ticker.C {
-		err := c.db.RunValueLogGC(0.5)
-		if err != nil && err != badger.ErrNoRewrite {
-			log.Warn().Err(err).Msg("Cache GC error")
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			err := c.db.RunValueLogGC(0.5)
+			if err != nil && err != badger.ErrNoRewrite {
+				log.Warn().Err(err).Msg("Cache GC error")
+			}
 		}
 	}
 }
@@ -199,6 +218,7 @@ func (c *BadgerCache) Close() error {
 		return nil
 	}
 
+	c.cancel()
 	return c.db.Close()
 }
 

@@ -112,13 +112,23 @@ func (a *App) Run() error {
 	}
 
 	a.server = &http.Server{
-		Addr:    a.config.ServerPort,
-		Handler: a.router,
+		Addr:              a.config.ServerPort,
+		Handler:           a.router,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	signal.Notify(a.done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error().Interface("panic", r).Msg("Server goroutine panic recovered")
+			}
+		}()
+
 		log.Info().Str("port", a.config.ServerPort).Msg("Starting server")
 
 		if !a.config.IsCloudMode {
