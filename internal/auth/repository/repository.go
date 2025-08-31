@@ -74,12 +74,12 @@ func (r *SQLiteUserRepository) CreateUser(ctx context.Context, username, passwor
 	if err != nil {
 		return nil, models.WrapError(models.ErrUserCreationFailed, err)
 	}
+	defer tx.Rollback() // No-op if commit succeeds
 
 	// Create user
 	query := "INSERT INTO users (username, password, role) VALUES (?, ?, ?)"
 	result, err := tx.ExecContext(ctx, query, username, password, roleValue)
 	if err != nil {
-		tx.Rollback()
 		if err.Error() == "UNIQUE constraint failed: users.username" {
 			existingUser, findErr := r.FindByUsername(ctx, username)
 			if findErr == nil {
@@ -92,7 +92,6 @@ func (r *SQLiteUserRepository) CreateUser(ctx context.Context, username, passwor
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		tx.Rollback()
 		return nil, models.WrapError(models.ErrUserCreationFailed, err)
 	}
 
