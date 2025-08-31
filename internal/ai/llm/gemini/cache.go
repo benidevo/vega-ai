@@ -96,7 +96,9 @@ func (rc *ResponseCache) Set(request llm.GenerateRequest, response llm.GenerateR
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
 
-	if len(rc.entries) >= rc.maxEntries && rc.entries[key] == nil {
+	// Check if this is a new entry that would exceed capacity
+	_, existingEntry := rc.entries[key]
+	if !existingEntry && len(rc.entries) >= rc.maxEntries {
 		rc.evictLRU()
 	}
 
