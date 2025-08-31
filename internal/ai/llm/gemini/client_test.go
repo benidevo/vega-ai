@@ -369,7 +369,12 @@ func TestGemini_Generate_UnsupportedResponseType(t *testing.T) {
 		APIKey: "test-key",
 		Model:  "gemini-1.5-flash",
 	}
-	g := &Gemini{cfg: cfg}
+	g := &Gemini{
+		cfg:            cfg,
+		cache:          NewResponseCache(10, 5*time.Minute),
+		circuitBreaker: NewCircuitBreaker(DefaultCircuitBreakerConfig()),
+		deduplicator:   NewRequestDeduplicator(),
+	}
 
 	req := llm.GenerateRequest{
 		ResponseType: "unsupported_type",
@@ -724,11 +729,6 @@ func TestGemini_buildCVParsingPrompt(t *testing.T) {
 	assert.Contains(t, result, "expert CV/Resume parser")
 	assert.Contains(t, result, prompt.CVText)
 	assert.Contains(t, result, "Document Text:")
-}
-
-func TestGemini_buildCVGenerationPrompt(t *testing.T) {
-	// This test is removed because buildCVGenerationPrompt simply delegates
-	// to prompt.ToCVGenerationPrompt() which is tested elsewhere
 }
 
 func TestGemini_buildSystemInstruction(t *testing.T) {

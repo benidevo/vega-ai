@@ -17,13 +17,19 @@ import (
 // Gemini represents a client for interacting with the Gemini AI service.
 //
 // It holds a reference to the underlying genai.Client and configuration settings.
+// Gemini is the client for interacting with Google's Gemini AI service.
 type Gemini struct {
 	client *genai.Client
 	cfg    *Config
+
+	cache          *ResponseCache
+	circuitBreaker *CircuitBreaker
+	deduplicator   *RequestDeduplicator
 }
 
 // New creates and initializes a new Gemini client using the provided context and configuration.
 // It returns a pointer to the Gemini instance or an error if the client initialization fails.
+// New creates a new Gemini client with the provided configuration.
 func New(ctx context.Context, cfg *Config) (*Gemini, error) {
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		APIKey:  cfg.APIKey,
@@ -33,29 +39,85 @@ func New(ctx context.Context, cfg *Config) (*Gemini, error) {
 		return nil, WrapError(ErrClientInitFailed, err)
 	}
 
+	cache := NewResponseCache(cfg.CacheMaxEntries, cfg.CacheTTL)
+
+	circuitBreaker := NewCircuitBreaker(&CircuitBreakerConfig{
+		MaxFailures:      cfg.CircuitBreakerMaxFailures,
+		ResetTimeout:     cfg.CircuitBreakerResetTimeout,
+		HalfOpenRequests: cfg.CircuitBreakerHalfOpenRequests,
+		OnStateChange:    nil,
+	})
+
+	deduplicator := NewRequestDeduplicator()
+
 	return &Gemini{
-		client: client,
-		cfg:    cfg,
+		client:         client,
+		cfg:            cfg,
+		cache:          cache,
+		circuitBreaker: circuitBreaker,
+		deduplicator:   deduplicator,
 	}, nil
 }
 
 // Generate implements the Provider interface for the Gemini client.
 // It processes requests based on the ResponseType and returns appropriate data.
+// Generate processes AI requests and returns responses based on the request type.
 func (g *Gemini) Generate(ctx context.Context, request llm.GenerateRequest) (llm.GenerateResponse, error) {
 	start := time.Now()
 
-	switch request.ResponseType {
-	case llm.ResponseTypeCoverLetter:
-		return g.generateCoverLetter(ctx, request.Prompt, start)
-	case llm.ResponseTypeMatchResult:
-		return g.generateMatchResult(ctx, request.Prompt, start)
-	case llm.ResponseTypeCVParsing:
-		return g.parseCVContent(ctx, request.Prompt, start)
-	case llm.ResponseTypeCV:
-		return g.generateCV(ctx, request.Prompt, start)
-	default:
-		return llm.GenerateResponse{}, fmt.Errorf("unsupported response type: %s", request.ResponseType)
+	if ShouldCache(request.ResponseType) {
+		if cached, found := g.cache.Get(request); found {
+			if cached.Metadata == nil {
+				cached.Metadata = make(map[string]interface{})
+			}
+			cached.Metadata["cache_hit"] = true
+			cached.Metadata["original_duration"] = cached.Duration
+			cached.Duration = time.Since(start)
+			return cached, nil
+		}
 	}
+
+	cacheKey := g.cache.generateCacheKey(request)
+
+	response, err := g.deduplicator.Do(ctx, cacheKey, func() (llm.GenerateResponse, error) {
+		var resp llm.GenerateResponse
+		var genErr error
+
+		cbErr := g.circuitBreaker.Call(ctx, func() error {
+			switch request.ResponseType {
+			case llm.ResponseTypeCoverLetter:
+				resp, genErr = g.generateCoverLetter(ctx, request.Prompt, start)
+			case llm.ResponseTypeMatchResult:
+				resp, genErr = g.generateMatchResult(ctx, request.Prompt, start)
+			case llm.ResponseTypeCVParsing:
+				resp, genErr = g.parseCVContent(ctx, request.Prompt, start)
+			case llm.ResponseTypeCV:
+				resp, genErr = g.generateCV(ctx, request.Prompt, start)
+			default:
+				genErr = fmt.Errorf("unsupported response type: %s", request.ResponseType)
+			}
+			return genErr
+		})
+
+		if cbErr != nil {
+			if IsCircuitBreakerError(cbErr) {
+				return llm.GenerateResponse{}, WrapError(ErrServiceUnavailable, cbErr)
+			}
+			return llm.GenerateResponse{}, cbErr
+		}
+
+		return resp, genErr
+	})
+
+	if err != nil {
+		return llm.GenerateResponse{}, err
+	}
+
+	if ShouldCache(request.ResponseType) && err == nil {
+		g.cache.Set(request, response)
+	}
+
+	return response, nil
 }
 
 // generateCoverLetter generates a cover letter based on the provided prompt.
@@ -679,7 +741,6 @@ func (g *Gemini) parseCVJSON(jsonResponse string) (models.CVParsingResult, error
 		return models.CVParsingResult{}, fmt.Errorf("invalid document: %s", reason)
 	}
 
-	// For valid CVs, validate required fields
 	if result.PersonalInfo.FirstName == "" && result.PersonalInfo.LastName == "" {
 		return models.CVParsingResult{}, fmt.Errorf("no name found in CV")
 	}
@@ -706,7 +767,6 @@ func (g *Gemini) parseGeneratedCVJSON(jsonResponse string) (models.CVParsingResu
 		return models.CVParsingResult{}, WrapError(ErrResponseParseFailed, err)
 	}
 
-	// For generated CVs, assume it's valid
 	result.IsValid = true
 
 	if result.WorkExperience == nil {
@@ -787,4 +847,41 @@ func (g *Gemini) generateCV(ctx context.Context, prompt models.Prompt, start tim
 
 func (g *Gemini) buildCVGenerationPrompt(prompt models.Prompt) string {
 	return prompt.ToCVGenerationPrompt()
+}
+
+// GetOptimizationStats returns statistics from all optimization components
+// GetOptimizationStats returns statistics from all optimization components.
+func (g *Gemini) GetOptimizationStats() OptimizationStats {
+	return OptimizationStats{
+		Cache:          g.cache.GetStats(),
+		CircuitBreaker: g.circuitBreaker.GetStats(),
+		Deduplicator:   g.deduplicator.GetStats(),
+	}
+}
+
+// OptimizationStats aggregates metrics from all optimization components.
+type OptimizationStats struct {
+	Cache          CacheStats
+	CircuitBreaker CircuitBreakerStats
+	Deduplicator   DeduplicatorStats
+}
+
+// ResetStats resets all optimization statistics
+// ResetStats clears all optimization statistics.
+func (g *Gemini) ResetStats() {
+	g.cache.Clear()
+	g.circuitBreaker.Reset()
+	g.deduplicator.Clear()
+}
+
+// GetCacheStats returns cache statistics
+// GetCacheStats returns cache performance metrics.
+func (g *Gemini) GetCacheStats() CacheStats {
+	return g.cache.GetStats()
+}
+
+// GetCircuitBreakerState returns the current circuit breaker state
+// GetCircuitBreakerState returns the current circuit breaker state as a string.
+func (g *Gemini) GetCircuitBreakerState() string {
+	return g.circuitBreaker.GetState().String()
 }
