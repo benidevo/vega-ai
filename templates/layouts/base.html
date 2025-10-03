@@ -213,8 +213,10 @@
     let hasUnsavedChanges = false;
 
     function trackFormChanges() {
-      const forms = document.querySelectorAll('form');
+      const forms = document.querySelectorAll('form:not([data-changes-tracked])');
       forms.forEach(form => {
+        form.setAttribute('data-changes-tracked', 'true');
+
         const formData = new FormData(form);
         const originalData = new Map();
 
@@ -326,6 +328,11 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof htmx !== 'undefined') {
+        document.body.addEventListener('htmx:historyRestore', function(event) {
+          formatUTCDates();
+          trackFormChanges();
+        });
+
         document.body.addEventListener('htmx:beforeSwap', function(event) {
           if (event.detail.xhr.status === 404) {
             const contentType = event.detail.xhr.getResponseHeader('content-type');
