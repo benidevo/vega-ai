@@ -507,6 +507,15 @@ func (r *SQLiteJobRepository) GetAll(ctx context.Context, userID int, filter mod
 		args = append(args, int(*filter.Status))
 	}
 
+	if len(filter.ExcludeStatuses) > 0 {
+		placeholders := make([]string, len(filter.ExcludeStatuses))
+		for i, status := range filter.ExcludeStatuses {
+			placeholders[i] = "?"
+			args = append(args, int(status))
+		}
+		conditions = append(conditions, "j.status NOT IN ("+strings.Join(placeholders, ",")+")")
+	}
+
 	if filter.JobType != nil {
 		conditions = append(conditions, "j.job_type = ?")
 		args = append(args, int(*filter.JobType))
@@ -790,6 +799,15 @@ func (r *SQLiteJobRepository) GetCount(ctx context.Context, userID int, filter m
 	if filter.Status != nil {
 		conditions = append(conditions, "j.status = ?")
 		args = append(args, int(*filter.Status))
+	}
+
+	if len(filter.ExcludeStatuses) > 0 {
+		placeholders := make([]string, len(filter.ExcludeStatuses))
+		for i, status := range filter.ExcludeStatuses {
+			placeholders[i] = "?"
+			args = append(args, int(status))
+		}
+		conditions = append(conditions, "j.status NOT IN ("+strings.Join(placeholders, ",")+")")
 	}
 
 	if filter.JobType != nil {
