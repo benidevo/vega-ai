@@ -509,6 +509,44 @@ func TestSQLiteJobRepository_GetAll(t *testing.T) {
 
 		require.NoError(t, err)
 	})
+
+	t.Run("exclude statuses", func(t *testing.T) {
+		now := time.Now()
+
+		rows := sqlmock.NewRows([]string{
+			"j.id", "j.title", "j.description", "j.location", "j.job_type",
+			"j.source_url", "j.required_skills",
+			"j.application_url", "j.company_id", "j.status", "j.match_score",
+			"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+			"c.name", "c.created_at", "c.updated_at",
+		}).AddRow(
+			1, "Software Engineer", "Active job", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Go"]`,
+			"https://apply.example.com", 1, int(models.INTERESTED), 85,
+			"Good job", now.Add(-48*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		).AddRow(
+			2, "Backend Engineer", "Another active job", "Remote", int(models.FULL_TIME),
+			"https://example.com", `["Python"]`,
+			"https://apply.example.com", 1, int(models.APPLIED), 90,
+			"Great job", now.Add(-24*time.Hour), now, testUserID, nil,
+			"Tech Corp", now, now,
+		)
+
+		mock.ExpectQuery("SELECT.*FROM jobs.*WHERE.*user_id.*NOT IN.*ORDER BY").
+			WithArgs(testUserID, int(models.REJECTED), int(models.NOT_INTERESTED)).
+			WillReturnRows(rows)
+
+		filter := models.JobFilter{
+			ExcludeStatuses: []models.JobStatus{models.REJECTED, models.NOT_INTERESTED},
+		}
+		jobs, err := repo.GetAll(context.Background(), testUserID, filter)
+
+		require.NoError(t, err)
+		require.Len(t, jobs, 2)
+		assert.Equal(t, models.INTERESTED, jobs[0].Status)
+		assert.Equal(t, models.APPLIED, jobs[1].Status)
+	})
 }
 
 func TestGetStatsByUserID(t *testing.T) {

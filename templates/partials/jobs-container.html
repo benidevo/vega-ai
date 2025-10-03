@@ -38,11 +38,31 @@
         <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
         </svg>
-        <h3 class="text-lg font-medium text-white mb-2">No jobs yet</h3>
-        <p class="text-gray-400 mb-4">Start tracking your job applications</p>
-        <a href="/jobs/new" class="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 bg-primary hover:bg-primary-dark text-white rounded-md min-h-[48px] sm:min-h-0">
-          Add Job
-        </a>
+        {{if or (eq .statusFilter "active") (eq .statusFilter "")}}
+          <h3 class="text-lg font-medium text-white mb-2">No active jobs</h3>
+          <p class="text-gray-400 mb-4">
+            All your tracked jobs are rejected or marked as not interested.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/jobs/new" class="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 bg-primary hover:bg-primary-dark text-white rounded-md min-h-[48px] sm:min-h-0">
+              Add New Job
+            </a>
+            <button
+              hx-get="/jobs?status=all"
+              hx-target="#jobs-container"
+              hx-push-url="true"
+              _="on click set #status-filter.value to 'all'"
+              class="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md min-h-[48px] sm:min-h-0">
+              View All Jobs
+            </button>
+          </div>
+        {{else}}
+          <h3 class="text-lg font-medium text-white mb-2">No jobs yet</h3>
+          <p class="text-gray-400 mb-4">Start tracking your job applications</p>
+          <a href="/jobs/new" class="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 bg-primary hover:bg-primary-dark text-white rounded-md min-h-[48px] sm:min-h-0">
+            Add Job
+          </a>
+        {{end}}
       </div>
   {{end}}
 </div>

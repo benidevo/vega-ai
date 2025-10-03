@@ -249,14 +249,15 @@ func (j *Job) GetMatchStatus() string {
 
 // JobFilter defines filters for querying jobs
 type JobFilter struct {
-	CompanyID *int
-	Status    *JobStatus
-	JobType   *JobType
-	Matched   *bool
-	Limit     int
-	Offset    int
-	SortBy    string // "match_score", "updated_at", etc.
-	SortOrder string // "asc" or "desc"
+	CompanyID       *int
+	Status          *JobStatus
+	ExcludeStatuses []JobStatus
+	JobType         *JobType
+	Matched         *bool
+	Limit           int
+	Offset          int
+	SortBy          string
+	SortOrder       string
 }
 
 type JobStats struct {

@@ -282,7 +282,7 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 	}
 	userID := userIDValue.(int)
 
-	statusParam := c.Query("status")
+	statusParam := c.DefaultQuery("status", "active")
 	pageParam := c.DefaultQuery("page", "1")
 	limitParam := c.DefaultQuery("limit", "12")
 	sortByParam := c.DefaultQuery("sort", "match_score")
@@ -322,7 +322,12 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 		SortOrder: sortOrderParam,
 	}
 
-	if statusParam != "" && statusParam != "all" {
+	if statusParam == "active" || statusParam == "" {
+		filter.ExcludeStatuses = []models.JobStatus{
+			models.REJECTED,
+			models.NOT_INTERESTED,
+		}
+	} else if statusParam != "all" {
 		jobStatus, err := models.JobStatusFromString(statusParam)
 		if err == nil {
 			filter.Status = &jobStatus
@@ -345,7 +350,7 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 	// Handle edge case: requested page is beyond total pages
 	if page > jobsWithPagination.Pagination.TotalPages && jobsWithPagination.Pagination.TotalPages > 0 {
 		redirectURL := "?page=" + strconv.Itoa(jobsWithPagination.Pagination.TotalPages)
-		if statusParam != "" && statusParam != "all" {
+		if statusParam != "" {
 			redirectURL += "&status=" + statusParam
 		}
 

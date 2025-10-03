@@ -33,7 +33,8 @@
           name="status"
           aria-label="Filter jobs by status"
         >
-          <option value="all" {{if or (eq .statusFilter "") (eq .statusFilter "all")}}selected{{end}}>All Jobs</option>
+          <option value="active" {{if or (eq .statusFilter "") (eq .statusFilter "active")}}selected{{end}}>Active Jobs</option>
+          <option value="all" {{if eq .statusFilter "all"}}selected{{end}}>All Jobs</option>
           <option value="interested" {{if eq .statusFilter "interested"}}selected{{end}}>Interested</option>
           <option value="applied" {{if eq .statusFilter "applied"}}selected{{end}}>Applied</option>
           <option value="interviewing" {{if eq .statusFilter "interviewing"}}selected{{end}}>Interviewing</option>
@@ -74,10 +75,10 @@
     </div>
   </div>
 
-  <div id="jobs-container" class="flex-1 flex flex-col relative" aria-live="polite" aria-busy="false" 
-       hx-get="/jobs{{if or .statusFilter .sortBy}}?{{if .statusFilter}}status={{.statusFilter}}{{end}}{{if and .statusFilter .sortBy}}&{{end}}{{if .sortBy}}sort={{.sortBy}}&order={{.sortOrder}}{{end}}{{end}}" 
-       hx-trigger="load" 
-       hx-swap="innerHTML" 
+  <div id="jobs-container" class="flex-1 flex flex-col relative" aria-live="polite" aria-busy="false"
+       hx-get="/jobs{{if or .statusFilter .sortBy}}?{{if .statusFilter}}status={{.statusFilter}}{{end}}{{if and .statusFilter .sortBy}}&{{end}}{{if .sortBy}}sort={{.sortBy}}&order={{.sortOrder}}{{end}}{{end}}"
+       hx-trigger="load"
+       hx-swap="innerHTML"
        _="on htmx:beforeRequest set @aria-busy to 'true' then on htmx:afterSwap set @aria-busy to 'false'">
     <div class="px-4 md:px-0">
       <div class="animate-pulse">
