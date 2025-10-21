@@ -157,8 +157,8 @@ func NewSettings() Settings {
 
 		AIProvider:             "gemini",
 		GeminiAPIKey:           getEnv("GEMINI_API_KEY", ""),
-		GeminiModel:            getEnv("GEMINI_MODEL", "gemini-2.5-flash"), // Default/fallback model
-		GeminiModelCVParsing:   getEnv("GEMINI_MODEL_CV_PARSING", "gemini-1.5-flash"),
+		GeminiModel:            getEnv("GEMINI_MODEL", "gemini-2.5-flash"),
+		GeminiModelCVParsing:   getEnv("GEMINI_MODEL_CV_PARSING", "gemini-2.5-flash"),
 		GeminiModelJobAnalysis: getEnv("GEMINI_MODEL_JOB_ANALYSIS", "gemini-2.5-flash"),
 		GeminiModelCoverLetter: getEnv("GEMINI_MODEL_COVER_LETTER", "gemini-2.5-flash"),
 

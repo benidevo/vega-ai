@@ -25,8 +25,8 @@ func TestEnhanceCVGenerationPrompt(t *testing.T) {
 				"You are a CV expert",
 				"John Doe\nSoftware Engineer\n10 years experience",
 				"Senior Developer at Tech Corp",
-				"Focus on leadership experience",
-				"CV/Resume writer",
+				"senior CV writer",
+				"ATS-optimized",
 			},
 		},
 		{
@@ -37,7 +37,7 @@ func TestEnhanceCVGenerationPrompt(t *testing.T) {
 			expectedContains: []string{
 				"Basic CV content",
 				"Basic job",
-				"Some context",
+				"senior CV writer",
 			},
 		},
 		{

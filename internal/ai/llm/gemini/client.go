@@ -22,9 +22,8 @@ type Gemini struct {
 	client *genai.Client
 	cfg    *Config
 
-	cache          *ResponseCache
-	circuitBreaker *CircuitBreaker
-	deduplicator   *RequestDeduplicator
+	cache        *ResponseCache
+	deduplicator *RequestDeduplicator
 }
 
 // New creates and initializes a new Gemini client using the provided context and configuration.
@@ -40,22 +39,13 @@ func New(ctx context.Context, cfg *Config) (*Gemini, error) {
 	}
 
 	cache := NewResponseCache(cfg.CacheMaxEntries, cfg.CacheTTL)
-
-	circuitBreaker := NewCircuitBreaker(&CircuitBreakerConfig{
-		MaxFailures:      cfg.CircuitBreakerMaxFailures,
-		ResetTimeout:     cfg.CircuitBreakerResetTimeout,
-		HalfOpenRequests: cfg.CircuitBreakerHalfOpenRequests,
-		OnStateChange:    nil,
-	})
-
 	deduplicator := NewRequestDeduplicator()
 
 	return &Gemini{
-		client:         client,
-		cfg:            cfg,
-		cache:          cache,
-		circuitBreaker: circuitBreaker,
-		deduplicator:   deduplicator,
+		client:       client,
+		cfg:          cfg,
+		cache:        cache,
+		deduplicator: deduplicator,
 	}, nil
 }
 
@@ -67,13 +57,21 @@ func (g *Gemini) Generate(ctx context.Context, request llm.GenerateRequest) (llm
 
 	if ShouldCache(request.ResponseType) {
 		if cached, found := g.cache.Get(request); found {
-			if cached.Metadata == nil {
-				cached.Metadata = make(map[string]interface{})
+			// Create a new metadata map to avoid modifying the cached entry
+			newMetadata := make(map[string]interface{})
+			for k, v := range cached.Metadata {
+				newMetadata[k] = v
 			}
-			cached.Metadata["cache_hit"] = true
-			cached.Metadata["original_duration"] = cached.Duration
-			cached.Duration = time.Since(start)
-			return cached, nil
+			newMetadata["cache_hit"] = true
+			newMetadata["original_duration"] = cached.Duration
+
+			// Return a response with new metadata and updated duration
+			return llm.GenerateResponse{
+				Data:     cached.Data,
+				Tokens:   cached.Tokens,
+				Duration: time.Since(start),
+				Metadata: newMetadata,
+			}, nil
 		}
 	}
 
@@ -83,30 +81,24 @@ func (g *Gemini) Generate(ctx context.Context, request llm.GenerateRequest) (llm
 		var resp llm.GenerateResponse
 		var genErr error
 
-		cbErr := g.circuitBreaker.Call(ctx, func() error {
-			switch request.ResponseType {
-			case llm.ResponseTypeCoverLetter:
-				resp, genErr = g.generateCoverLetter(ctx, request.Prompt, start)
-			case llm.ResponseTypeMatchResult:
-				resp, genErr = g.generateMatchResult(ctx, request.Prompt, start)
-			case llm.ResponseTypeCVParsing:
-				resp, genErr = g.parseCVContent(ctx, request.Prompt, start)
-			case llm.ResponseTypeCV:
-				resp, genErr = g.generateCV(ctx, request.Prompt, start)
-			default:
-				genErr = fmt.Errorf("unsupported response type: %s", request.ResponseType)
-			}
-			return genErr
-		})
-
-		if cbErr != nil {
-			if IsCircuitBreakerError(cbErr) {
-				return llm.GenerateResponse{}, WrapError(ErrServiceUnavailable, cbErr)
-			}
-			return llm.GenerateResponse{}, cbErr
+		switch request.ResponseType {
+		case llm.ResponseTypeCoverLetter:
+			resp, genErr = g.generateCoverLetter(ctx, request.Prompt, start)
+		case llm.ResponseTypeMatchResult:
+			resp, genErr = g.generateMatchResult(ctx, request.Prompt, start)
+		case llm.ResponseTypeCVParsing:
+			resp, genErr = g.parseCVContent(ctx, request.Prompt, start)
+		case llm.ResponseTypeCV:
+			resp, genErr = g.generateCV(ctx, request.Prompt, start)
+		default:
+			genErr = fmt.Errorf("unsupported response type: %s", request.ResponseType)
 		}
 
-		return resp, genErr
+		if genErr != nil {
+			return llm.GenerateResponse{}, genErr
+		}
+
+		return resp, nil
 	})
 
 	if err != nil {
@@ -853,24 +845,21 @@ func (g *Gemini) buildCVGenerationPrompt(prompt models.Prompt) string {
 // GetOptimizationStats returns statistics from all optimization components.
 func (g *Gemini) GetOptimizationStats() OptimizationStats {
 	return OptimizationStats{
-		Cache:          g.cache.GetStats(),
-		CircuitBreaker: g.circuitBreaker.GetStats(),
-		Deduplicator:   g.deduplicator.GetStats(),
+		Cache:        g.cache.GetStats(),
+		Deduplicator: g.deduplicator.GetStats(),
 	}
 }
 
 // OptimizationStats aggregates metrics from all optimization components.
 type OptimizationStats struct {
-	Cache          CacheStats
-	CircuitBreaker CircuitBreakerStats
-	Deduplicator   DeduplicatorStats
+	Cache        CacheStats
+	Deduplicator DeduplicatorStats
 }
 
 // ResetStats resets all optimization statistics
 // ResetStats clears all optimization statistics.
 func (g *Gemini) ResetStats() {
 	g.cache.Clear()
-	g.circuitBreaker.Reset()
 	g.deduplicator.Clear()
 }
 
@@ -878,10 +867,4 @@ func (g *Gemini) ResetStats() {
 // GetCacheStats returns cache performance metrics.
 func (g *Gemini) GetCacheStats() CacheStats {
 	return g.cache.GetStats()
-}
-
-// GetCircuitBreakerState returns the current circuit breaker state
-// GetCircuitBreakerState returns the current circuit breaker state as a string.
-func (g *Gemini) GetCircuitBreakerState() string {
-	return g.circuitBreaker.GetState().String()
 }

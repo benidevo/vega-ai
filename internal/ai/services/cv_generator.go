@@ -43,17 +43,23 @@ func (c *CVGeneratorService) GenerateCV(ctx context.Context, req models.Request,
 		return nil, c.helper.LogValidationError("cv_generation", req.ApplicantName, err)
 	}
 
-	// Use enhanced prompting by default with optimal temperature for CV generation
+	// Use basic prompting for CV generation to reduce processing time
+	// Enhanced templates are too complex for the large JSON output required
 	prompt := models.NewPrompt(
 		"You are a professional career advisor and expert CV writer.",
 		req,
-		true,
+		false, // Use basic template for faster processing
 	)
 
 	optimalTemp := prompt.GetOptimalTemperature(string(models.TaskTypeCVGeneration))
 	prompt.SetTemperature(optimalTemp)
 
-	response, err := c.model.Generate(ctx, llm.GenerateRequest{
+	// Add timeout to prevent indefinite waiting on AI operations
+	// CV generation is complex but should complete within 30 seconds
+	aiCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	response, err := c.model.Generate(aiCtx, llm.GenerateRequest{
 		Prompt:       *prompt,
 		ResponseType: llm.ResponseTypeCV,
 	})

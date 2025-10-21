@@ -370,10 +370,9 @@ func TestGemini_Generate_UnsupportedResponseType(t *testing.T) {
 		Model:  "gemini-1.5-flash",
 	}
 	g := &Gemini{
-		cfg:            cfg,
-		cache:          NewResponseCache(10, 5*time.Minute),
-		circuitBreaker: NewCircuitBreaker(DefaultCircuitBreakerConfig()),
-		deduplicator:   NewRequestDeduplicator(),
+		cfg:          cfg,
+		cache:        NewResponseCache(10, 5*time.Minute),
+		deduplicator: NewRequestDeduplicator(),
 	}
 
 	req := llm.GenerateRequest{

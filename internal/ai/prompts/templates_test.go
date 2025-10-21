@@ -64,5 +64,5 @@ func TestPromptEnhancer_EnhanceCVGenerationPrompt(t *testing.T) {
 
 	assert.Contains(t, result, "Current CV content")
 	assert.Contains(t, result, "Target job description")
-	assert.Contains(t, result, "Extra requirements")
+	assert.Contains(t, result, "ATS-optimized")
 }

@@ -132,9 +132,9 @@ func TestIsRetryableError(t *testing.T) {
 			expected: true,
 		},
 		{
-			name:     "request timeout is retryable",
+			name:     "request timeout is not retryable",
 			err:      ErrRequestTimeout,
-			expected: true,
+			expected: false,
 		},
 		{
 			name:     "invalid request is not retryable",
@@ -172,9 +172,9 @@ func TestIsRetryableError(t *testing.T) {
 			expected: true,
 		},
 		{
-			name:     "gemini error 504 is retryable",
+			name:     "gemini error 504 is not retryable",
 			err:      NewGeminiError(504, "Gateway timeout", nil),
-			expected: true,
+			expected: false,
 		},
 		{
 			name:     "gemini error 400 is not retryable",
@@ -189,6 +189,31 @@ func TestIsRetryableError(t *testing.T) {
 		{
 			name:     "nil error is not retryable",
 			err:      nil,
+			expected: false,
+		},
+		{
+			name:     "error with 'Error 504' in message is not retryable",
+			err:      errors.New("generate content error: Error 504, Message: The request timed out"),
+			expected: false,
+		},
+		{
+			name:     "error with 'DEADLINE_EXCEEDED' in message is not retryable",
+			err:      errors.New("rpc error: code = DeadlineExceeded desc = DEADLINE_EXCEEDED"),
+			expected: false,
+		},
+		{
+			name:     "error with 'deadline exceeded' lowercase is not retryable",
+			err:      errors.New("context deadline exceeded"),
+			expected: false,
+		},
+		{
+			name:     "error with 'Gateway Timeout' title case is not retryable",
+			err:      errors.New("504 Gateway Timeout"),
+			expected: false,
+		},
+		{
+			name:     "wrapped error with 504 in message is not retryable",
+			err:      WrapError(ErrCVGenFailed, errors.New("Error 504, Message: Gateway timeout")),
 			expected: false,
 		},
 	}

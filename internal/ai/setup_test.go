@@ -23,7 +23,7 @@ func TestSetup(t *testing.T) {
 			config: &config.Settings{
 				AIProvider:   ProviderGemini,
 				GeminiAPIKey: "valid-api-key",
-				GeminiModel:  "gemini-1.5-flash",
+				GeminiModel:  "gemini-2.5-flash",
 			},
 			expectError: false,
 		},
@@ -32,7 +32,7 @@ func TestSetup(t *testing.T) {
 			config: &config.Settings{
 				AIProvider:   ProviderGemini,
 				GeminiAPIKey: "",
-				GeminiModel:  "gemini-1.5-flash",
+				GeminiModel:  "gemini-2.5-flash",
 			},
 			expectError: true,
 			errorType:   models.ErrMissingAPIKey,
@@ -87,7 +87,7 @@ func TestCreateProvider(t *testing.T) {
 			config: &config.Settings{
 				AIProvider:   ProviderGemini,
 				GeminiAPIKey: "test-key",
-				GeminiModel:  "gemini-1.5-flash",
+				GeminiModel:  "gemini-2.5-flash",
 			},
 			expectError: false,
 		},

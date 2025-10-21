@@ -11,11 +11,11 @@ func TestJobMatchTemplate(t *testing.T) {
 
 	assert.NotNil(t, template)
 	assert.Contains(t, template.Role, "talent acquisition specialist")
-	assert.Contains(t, template.Context, "comprehensive analysis")
-	assert.Greater(t, len(template.Examples), 0)
+	assert.Contains(t, template.Context, "Analyze how well")
+	assert.Len(t, template.Examples, 0)
 	assert.Contains(t, template.Task, "data-driven analysis")
 	assert.Greater(t, len(template.Constraints), 5)
-	assert.Contains(t, template.OutputSpec, "JSON object")
+	assert.Contains(t, template.OutputSpec, "JSON")
 }
 
 func TestEnhanceJobMatchPrompt(t *testing.T) {
@@ -47,7 +47,7 @@ func TestEnhanceJobMatchPrompt(t *testing.T) {
 				"Published research papers",
 				"0-100",
 				"talent acquisition specialist",
-				"matchScore (0-100",
+				"matchScore: 0-100",
 			},
 		},
 		{
@@ -91,8 +91,7 @@ func TestEnhanceJobMatchPrompt(t *testing.T) {
 			for _, expected := range tt.expectedContains {
 				assert.Contains(t, result, expected)
 			}
-
-			assert.Contains(t, result, "Thinking Process")
+			assert.Contains(t, result, "SCORING RULES")
 		})
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	commonerrors "github.com/benidevo/vega/internal/common/errors"
 )
@@ -70,14 +71,15 @@ func NewGeminiError(code int, message string, err error) *GeminiError {
 	}
 }
 
-// IsRetryableError determines whether the provided error is considered retryable.
-//
-// It checks if the error is a GeminiError with specific HTTP status codes (429, 500, 502, 503, 504)
-// that typically warrant a retry. Also, it checks for sentinel errors such as
-// ErrServiceUnavailable, ErrRateLimitExceeded, and ErrRequestTimeout, which also indicate
-// retryable conditions. Returns true if the error is retryable, false otherwise.
+// IsRetryableError determines whether the error should be retried.
+// Processing timeouts (504, DEADLINE_EXCEEDED) are not retryable as they indicate
+// the request is too complex or slow to process.
 func IsRetryableError(err error) bool {
 	if err == nil {
+		return false
+	}
+
+	if isProcessingTimeout(err.Error()) {
 		return false
 	}
 
@@ -87,14 +89,20 @@ func IsRetryableError(err error) bool {
 		case http.StatusTooManyRequests,
 			http.StatusInternalServerError,
 			http.StatusBadGateway,
-			http.StatusServiceUnavailable,
-			http.StatusGatewayTimeout:
+			http.StatusServiceUnavailable:
 			return true
 		}
 	}
 
 	sentinelErr := GetSentinelError(err)
 	return sentinelErr == ErrServiceUnavailable ||
-		sentinelErr == ErrRateLimitExceeded ||
-		sentinelErr == ErrRequestTimeout
+		sentinelErr == ErrRateLimitExceeded
+}
+
+func isProcessingTimeout(errMsg string) bool {
+	errLower := strings.ToLower(errMsg)
+	return strings.Contains(errLower, "error 504") ||
+		strings.Contains(errLower, "gateway timeout") ||
+		strings.Contains(errLower, "deadline_exceeded") ||
+		strings.Contains(errLower, "deadline exceeded")
 }

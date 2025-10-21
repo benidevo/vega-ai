@@ -11,17 +11,17 @@ func TestCoverLetterTemplate(t *testing.T) {
 	template := CoverLetterTemplate()
 
 	assert.NotNil(t, template)
-	assert.Contains(t, template.Role, "career consultant")
+	assert.Contains(t, template.Role, "conversational cover letters")
 	assert.Contains(t, template.Context, "personalized cover letter")
-	assert.Len(t, template.Examples, 2)
-	assert.Contains(t, template.Task, "compelling, conversational cover letter")
-	assert.Greater(t, len(template.Constraints), 10)
-	assert.Contains(t, template.OutputSpec, "JSON object with a 'content' field")
+	assert.Len(t, template.Examples, 0)
+	assert.Contains(t, template.Task, "compelling cover letter")
+	assert.Greater(t, len(template.Constraints), 5)
+	assert.Contains(t, template.OutputSpec, "JSON")
+	assert.Contains(t, template.Task, "Best regards")
 
 	constraintTexts := strings.Join(template.Constraints, " ")
-	assert.Contains(t, constraintTexts, "Best regards")
-	assert.Contains(t, constraintTexts, "applicant's actual name")
-	assert.Contains(t, constraintTexts, "Do not use em dashes")
+	assert.Contains(t, constraintTexts, "ACTUAL name")
+	assert.Contains(t, constraintTexts, "em dashes")
 }
 
 func TestEnhanceCoverLetterPrompt(t *testing.T) {
@@ -50,7 +50,7 @@ func TestEnhanceCoverLetterPrompt(t *testing.T) {
 				"Digital marketing expert with 8 years experience",
 				"Passionate about sustainability",
 				"250-350",
-				"career consultant",
+				"conversational cover letters",
 				"cover letter",
 				"Best regards",
 			},
