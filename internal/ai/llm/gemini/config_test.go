@@ -88,19 +88,19 @@ func TestConfig_GetModelForTask(t *testing.T) {
 func TestNewConfig(t *testing.T) {
 	cfg := &config.Settings{
 		GeminiAPIKey:           "test-api-key",
-		GeminiModel:            "gemini-1.5-flash",
-		GeminiModelCVParsing:   "gemini-1.5-flash",
-		GeminiModelJobAnalysis: "gemini-2.0-flash",
-		GeminiModelCoverLetter: "gemini-2.0-flash-thinking",
+		GeminiModel:            "gemini-2.5-flash",
+		GeminiModelCVParsing:   "gemini-2.0-flash-lite",
+		GeminiModelJobAnalysis: "gemini-2.5-flash",
+		GeminiModelCoverLetter: "gemini-2.0-flash-lite",
 	}
 
 	result := NewConfig(cfg)
 
 	assert.Equal(t, "test-api-key", result.APIKey)
-	assert.Equal(t, "gemini-1.5-flash", result.Model)
-	assert.Equal(t, "gemini-1.5-flash", result.ModelCVParsing)
-	assert.Equal(t, "gemini-2.0-flash", result.ModelJobAnalysis)
-	assert.Equal(t, "gemini-2.0-flash-thinking", result.ModelCoverLetter)
+	assert.Equal(t, "gemini-2.5-flash", result.Model)
+	assert.Equal(t, "gemini-2.0-flash-lite", result.ModelCVParsing)
+	assert.Equal(t, "gemini-2.5-flash", result.ModelJobAnalysis)
+	assert.Equal(t, "gemini-2.0-flash-lite", result.ModelCoverLetter)
 	assert.Equal(t, 3, result.MaxRetries)
 	assert.Equal(t, 1, result.BaseRetryDelay)
 	assert.Equal(t, 30, result.MaxRetryDelay)

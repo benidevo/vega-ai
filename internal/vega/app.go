@@ -114,10 +114,10 @@ func (a *App) Run() error {
 	a.server = &http.Server{
 		Addr:              a.config.ServerPort,
 		Handler:           a.router,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      15 * time.Second,
-		IdleTimeout:       60 * time.Second,
-		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       30 * time.Second,  // Time to read request body
+		WriteTimeout:      60 * time.Second,  // Time to write response (AI operations need 30s+)
+		IdleTimeout:       120 * time.Second, // Time to keep connection alive between requests
+		ReadHeaderTimeout: 10 * time.Second,  // Time to read request headers
 	}
 
 	signal.Notify(a.done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

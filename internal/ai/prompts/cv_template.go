@@ -2,7 +2,6 @@ package prompts
 
 import (
 	"strings"
-	"time"
 )
 
 const CVGenerationTemplate = `You are an expert CV/Resume writer with extensive experience in creating tailored CVs that effectively highlight relevant qualifications while maintaining complete honesty and professionalism.
@@ -127,99 +126,50 @@ Generate a JSON object with the following structure:
 
 Ensure the output is valid JSON without any additional text or formatting.`
 
-const CVGenerationEnhancedTemplate = `You are a senior CV/Resume writer and career strategist with proven expertise in creating ATS-optimized, tailored CVs that effectively position candidates for their target roles.
-
-## Task
-Create a highly tailored, strategic CV that positions the candidate as the ideal match for the specific role while maintaining absolute honesty and professionalism.
-
-## Current Date Context
-{{.CurrentDate}}
+const CVGenerationEnhancedTemplate = `You are a senior CV writer. Create an ATS-optimized, tailored CV for this role.
 
 ## User Profile
 {{.CVText}}
 
-## Target Job Description
+## Target Job
 {{.JobDescription}}
 
-{{if .CompanyName}}
-## Company: {{.CompanyName}}
-Research and incorporate company values and culture where relevant.
-{{end}}
+## Instructions
 
-## Strategic Instructions
+**Core Principles:**
+1. Match job requirements - highlight relevant experience first
+2. Transform responsibilities into achievements (e.g., "Reduced deployment time 75% via CI/CD" not "Responsible for CI/CD")
+3. Use action verbs, quantify impact where possible
+4. Present truthfully - enhance language, never fabricate facts
+5. Copy dates EXACTLY as provided - don't change formatting
 
-### 1. Job Analysis First
-- Identify key requirements, must-haves, and nice-to-haves from the job description
-- Note specific technologies, methodologies, or domain knowledge required
-- Understand the level of seniority and scope of responsibility
+**Professional Summary:**
+- 3-4 lines max: [Years exp] + [Key skills] + [1-2 relevant achievements]
+- Directly address job requirements
 
-### 2. Professional Summary Strategy
-- Open with a powerful value proposition that directly addresses the employer's needs
-- Structure: [Years of experience] + [Key expertise areas] + [Unique value/achievement]
-- Include 1-2 specific achievements or metrics that relate to the job requirements
-- Maximum 3-4 lines, every word must earn its place
+**Work Experience:**
+- Format: Bullet points starting with "• " on new lines
+- 3-5 bullets for recent roles, 2-3 for older ones
+- Order by relevance to job, not chronology
+- Include scope/scale where impressive (team size, users, budget)
+- Prioritize achievements relevant to target role
 
-### 3. Experience Optimization
-- **TRANSFORM and ELEVATE**: Reframe basic responsibilities as achievements and impact
-- **DATE CONTEXT AWARENESS**: Use current date to assess experience recency, prioritize recent achievements
-- **Achievement-Driven Bullets**: Start each with impact/result, then explain how
-  - ✓ "• Reduced deployment time by 75% by implementing CI/CD pipeline"
-  - ✗ "• Responsible for implementing CI/CD pipeline"
-- **Best Foot Forward**: Use powerful action verbs and emphasize leadership qualities
-- **Contextual Bullet Creation**: Generate 3-5 relevant bullet points per role by intelligently synthesizing the original description
-- **Extract Multiple Achievements**: Break down single descriptions into multiple focused accomplishments
-- **Prioritize Impact**: Emphasize the most relevant achievements for the target role
-- **Relevance Ranking**: Order bullets by relevance to target job, not chronologically
-- **Keyword Integration**: Naturally incorporate keywords from job posting
-- **Scope and Scale**: Include team size, budget, user base where impressive
-- **Problem-Action-Result Format**: When possible, show business impact
-- **Bullet Point Format**: Each description must be formatted as bullet points with "• " prefix
-- **Intelligent Synthesis**: Extract and expand work experience from the user profile, creating comprehensive achievements from basic descriptions
+**Skills:**
+- ONLY include skills relevant to this job (filter out unrelated tech)
+- Order by relevance to job posting
+- Use terminology from job description
 
-### 4. Skills Architecture
-- **Primary Skills**: ONLY include skills that are directly mentioned in or highly relevant to the job posting
-- **Filter Out Irrelevant**: Remove skills that don't relate to the job (e.g., don't include Java/Spring Boot for a Python job)
-- **Secondary Skills**: Related/transferable skills that directly support the role
-- **Order by Relevance**: Most relevant skills first, based on job requirements
+**Language:**
+- Write naturally - avoid AI buzzwords (no "leverage", "spearheaded", "synergies", "cutting-edge", "robust", etc.)
+- Sound like a person explaining work to a colleague, not corporate PR
+- Be specific over generic
 
-### 5. Education Enhancement
-- Include relevant coursework, projects, or thesis if directly applicable
-- GPA only if 3.5+ and graduated within 2 years
-- Certifications that relate to job requirements
-- Professional development/courses that fill gaps in experience
+**Critical Rules:**
+- Use ONLY info from profile - no invented names/companies/experiences
+- Every claim must be verifiable
+- Dates must match input exactly
 
-### 6. ATS Optimization
-- Use standard section headers (Work Experience, Education, Skills)
-- Include exact job title matches where honestly applicable
-- Use both acronyms and full forms: "Machine Learning (ML)"
-- Avoid graphics, tables, or special characters
-
-### 7. Gap Bridging
-- If missing a key requirement, emphasize related experience
-- Show progression toward the target role
-- Highlight quick learning through past role transitions
-- Use freelance, volunteer, or project work to fill gaps
-
-### 8. Length and Density
-- 1 page for <5 years experience, 2 pages for more
-- Every line must add value - no filler
-- White space is OK - readability matters
-
-### 8.5. **CRITICAL: Write Like a Human, Not AI**
-{{.CVConstraints}}
-
-### 9. Authenticity Checks
-- **ELEVATE TRUTHFULLY**: Transform and enhance presentation while maintaining complete honesty
-- Every claim must be verifiable - enhance language, not facts
-- Quantifications should be accurate or reasonably estimated
-- Skills listed must be genuinely possessed
-- Never claim expertise in areas where you have only basic knowledge
-- **Present Best Self**: Reframe responsibilities as achievements using impactful language
-- CRITICAL: Use ONLY the actual user data from the profile - do not invent names, companies, or experiences
-- The person's name, work history, and education must match exactly what's in the profile
-- CRITICAL: Copy all dates EXACTLY as provided in the input - do not modify date formats
-
-## Output Format
+## Output (JSON only, no preamble)
 {
   "isValid": true,
   "personalInfo": {
@@ -228,16 +178,16 @@ Research and incorporate company values and culture where relevant.
     "email": "string",
     "phone": "string",
     "location": "string",
-    "title": "string (match job title style/level)",
-    "summary": "string (strategic positioning statement)"
+    "title": "string",
+    "summary": "string"
   },
-  "skills": ["skill1", "skill2", ...], // Ordered by relevance to job
+  "skills": ["skill1", "skill2", ...],
   "workExperience": [
     {
       "company": "string",
       "title": "string",
       "location": "string",
-      "description": "string (4-5 bullet points for current role, 3-4 for recent roles, 2-3 for older roles, each on a new line starting with '• ')"
+      "description": "string (bullet points, each line: '• [achievement]')"
     }
   ],
   "education": [
@@ -245,42 +195,19 @@ Research and incorporate company values and culture where relevant.
       "institution": "string",
       "degree": "string",
       "fieldOfStudy": "string",
-      "startDate": "Month Year (copy exactly from input)",
-      "endDate": "Month Year (copy exactly from input)"
+      "startDate": "Month Year",
+      "endDate": "Month Year"
     }
   ]
-}
-
-Generate only valid JSON without any preamble or explanation.`
+}`
 
 // EnhanceCVGenerationPrompt enhances a CV generation prompt
 func EnhanceCVGenerationPrompt(systemInstruction, cvText, jobDescription, extraContext string) string {
 	template := CVGenerationEnhancedTemplate
 	enhancedPrompt := systemInstruction + "\n\n" + template
 
-	// Inject CV constraints
-	cvConstraints := CVAntiAIConstraints()
-	constraintsText := ""
-	for _, constraint := range cvConstraints {
-		constraintsText += "- " + constraint + "\n"
-	}
-	enhancedPrompt = strings.ReplaceAll(enhancedPrompt, "{{.CVConstraints}}", constraintsText)
-
 	enhancedPrompt = strings.ReplaceAll(enhancedPrompt, "{{.CVText}}", cvText)
 	enhancedPrompt = strings.ReplaceAll(enhancedPrompt, "{{.JobDescription}}", jobDescription)
-	enhancedPrompt = strings.ReplaceAll(enhancedPrompt, "{{.CurrentDate}}", time.Now().Format("January 2, 2006"))
-
-	if extraContext != "" {
-		enhancedPrompt = strings.ReplaceAll(enhancedPrompt, "{{if .CompanyName}}", "")
-		enhancedPrompt = strings.ReplaceAll(enhancedPrompt, "{{end}}", "")
-		enhancedPrompt = strings.ReplaceAll(enhancedPrompt, "{{.CompanyName}}", extraContext)
-	} else {
-		start := strings.Index(enhancedPrompt, "{{if .CompanyName}}")
-		end := strings.Index(enhancedPrompt, "{{end}}")
-		if start != -1 && end != -1 {
-			enhancedPrompt = enhancedPrompt[:start] + enhancedPrompt[end+7:]
-		}
-	}
 
 	return enhancedPrompt
 }

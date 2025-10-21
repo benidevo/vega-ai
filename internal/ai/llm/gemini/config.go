@@ -40,10 +40,6 @@ type Config struct {
 
 	CacheMaxEntries int
 	CacheTTL        time.Duration
-
-	CircuitBreakerMaxFailures      int
-	CircuitBreakerResetTimeout     time.Duration
-	CircuitBreakerHalfOpenRequests int
 }
 
 // NewConfig creates a new Config from application settings.
@@ -82,10 +78,6 @@ func NewConfig(cfg *config.Settings) *Config {
 
 		CacheMaxEntries: 100,
 		CacheTTL:        60 * time.Second,
-
-		CircuitBreakerMaxFailures:      5,
-		CircuitBreakerResetTimeout:     30 * time.Second,
-		CircuitBreakerHalfOpenRequests: 3,
 	}
 }
 

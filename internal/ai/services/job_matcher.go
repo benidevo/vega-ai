@@ -51,7 +51,13 @@ func (j *JobMatcherService) AnalyzeMatch(ctx context.Context, req models.Request
 		true,
 	)
 
-	response, err := j.model.Generate(ctx, llm.GenerateRequest{
+	// Add timeout to prevent indefinite waiting on AI operations
+	// Job analysis is complex but should complete within 30 seconds
+	// If it takes longer, the prompt is likely too complex
+	aiCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	response, err := j.model.Generate(aiCtx, llm.GenerateRequest{
 		Prompt:       *prompt,
 		ResponseType: llm.ResponseTypeMatchResult,
 	})

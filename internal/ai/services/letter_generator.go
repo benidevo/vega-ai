@@ -50,7 +50,12 @@ func (c *CoverLetterGeneratorService) GenerateCoverLetter(ctx context.Context, r
 		true,
 	)
 
-	response, err := c.model.Generate(ctx, llm.GenerateRequest{
+	// Add timeout to prevent indefinite waiting on AI operations
+	// Cover letter generation should complete within 30 seconds
+	aiCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	response, err := c.model.Generate(aiCtx, llm.GenerateRequest{
 		Prompt:       *prompt,
 		ResponseType: llm.ResponseTypeCoverLetter,
 	})
