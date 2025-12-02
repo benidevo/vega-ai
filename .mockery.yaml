@@ -1,0 +1,75 @@
+# Mockery configuration
+# Docs: https://vektra.github.io/mockery/latest/configuration/
+#
+# Generate mocks: make mocks
+# Or directly: go run github.com/vektra/mockery/v2@v2.53.5
+
+# v3 compatibility settings (silence deprecation warnings)
+resolve-type-alias: false
+disable-version-string: true
+issue-845-fix: true
+
+# Mock settings
+with-expecter: true
+mockname: "Mock{{.InterfaceName}}"
+filename: "mock_{{.InterfaceName | snakecase}}.go"
+
+# Generate mocks in a mocks/ subfolder within each package
+dir: "{{.InterfaceDir}}/mocks"
+outpkg: "mocks"
+
+packages:
+  github.com/benidevo/vega/internal/cache:
+    interfaces:
+      Cache:
+  github.com/benidevo/vega/internal/quota:
+    interfaces:
+      Repository:
+      QuotaChecker:
+      QuotaReporter:
+      QuotaRecorder:
+      QuotaService:
+      JobRepository:
+  github.com/benidevo/vega/internal/job/interfaces:
+    interfaces:
+      CompanyRepository:
+      JobRepository:
+      TransactionalRepository:
+      TransactionalJobRepository:
+      TransactionalCompanyRepository:
+  github.com/benidevo/vega/internal/settings/interfaces:
+    interfaces:
+      SettingsRepository:
+  github.com/benidevo/vega/internal/ai/services:
+    interfaces:
+      CVGenerator:
+      CVParser:
+      JobMatcher:
+      LetterGenerator:
+      CVGeneratorServiceInterface:
+      CVParserServiceInterface:
+      JobMatcherServiceInterface:
+      LetterGeneratorServiceInterface:
+  github.com/benidevo/vega/internal/ai/llm:
+    interfaces:
+      Provider:
+  github.com/benidevo/vega/internal/auth:
+    interfaces:
+      LoginService:
+      TokenService:
+      UserService:
+      FullAuthService:
+      OAuthService:
+  github.com/benidevo/vega/internal/auth/repository:
+    interfaces:
+      UserRepository:
+  github.com/benidevo/vega/internal/documents:
+    interfaces:
+      Service:
+  github.com/benidevo/vega/internal/documents/repository:
+    interfaces:
+      DocumentRepository:
+  github.com/benidevo/vega/internal/common/interfaces:
+    interfaces:
+      HTMLRenderer:
+      ErrorHandler:

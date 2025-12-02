@@ -33,6 +33,12 @@ enter-app:
 format:
 	docker compose exec app sh -c "go fmt ./... && go vet ./..."
 
+mocks:
+	go run github.com/vektra/mockery/v2@v2.53.5
+
+mocks-docker:
+	docker compose exec app sh -c "go run github.com/vektra/mockery/v2@v2.53.5"
+
 migrate-create:
 	@read -p "Migration name: " name; \
 	docker compose exec app sh -c "cd /app && migrate create -ext sql -dir migrations/sqlite -seq $$name"
@@ -50,4 +56,4 @@ migrate-force:
 	@read -p "Version: " version; \
 	docker compose exec app sh -c "cd /app && migrate -path=migrations/sqlite -database 'sqlite3://$${DB_PATH}' force $$version"
 
-.PHONY: run stop logs enter-app format test test-verbose setup-hooks migrate-create migrate-up migrate-down migrate-reset migrate-force
+.PHONY: run stop logs enter-app format mocks mocks-docker test test-verbose setup-hooks migrate-create migrate-up migrate-down migrate-reset migrate-force
