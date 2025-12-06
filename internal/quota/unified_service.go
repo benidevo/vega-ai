@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/benidevo/vega/internal/quota/models"
 )
 
 // UnifiedService provides a single interface for all quota operations
@@ -25,16 +27,16 @@ func NewUnifiedService(db *sql.DB, jobRepo JobRepository, isCloudMode bool) *Uni
 }
 
 // CheckQuota checks any quota type
-func (s *UnifiedService) CheckQuota(ctx context.Context, userID int, quotaType string, metadata map[string]interface{}) (*QuotaCheckResult, error) {
+func (s *UnifiedService) CheckQuota(ctx context.Context, userID int, quotaType string, metadata map[string]interface{}) (*models.QuotaCheckResult, error) {
 	switch quotaType {
-	case QuotaTypeAIAnalysis:
+	case models.QuotaTypeAIAnalysis:
 		jobID, ok := metadata["job_id"].(int)
 		if !ok {
 			return nil, fmt.Errorf("job_id required for AI analysis quota check")
 		}
 		return s.aiQuota.CanAnalyzeJob(ctx, userID, jobID)
 
-	case QuotaTypeJobCapture:
+	case models.QuotaTypeJobCapture:
 		return s.jobCapture.CanCaptureJobs(ctx, userID)
 
 	default:
@@ -45,14 +47,14 @@ func (s *UnifiedService) CheckQuota(ctx context.Context, userID int, quotaType s
 // RecordUsage records usage for any quota type
 func (s *UnifiedService) RecordUsage(ctx context.Context, userID int, quotaType string, metadata map[string]interface{}) error {
 	switch quotaType {
-	case QuotaTypeAIAnalysis:
+	case models.QuotaTypeAIAnalysis:
 		jobID, ok := metadata["job_id"].(int)
 		if !ok {
 			return fmt.Errorf("job_id required for AI analysis recording")
 		}
 		return s.aiQuota.RecordAnalysis(ctx, userID, jobID)
 
-	case QuotaTypeJobCapture:
+	case models.QuotaTypeJobCapture:
 		count, ok := metadata["count"].(int)
 		if !ok {
 			count = 1
@@ -66,7 +68,7 @@ func (s *UnifiedService) RecordUsage(ctx context.Context, userID int, quotaType 
 
 // GetAllQuotaStatus gets all quota statuses for a user
 func (s *UnifiedService) GetAllQuotaStatus(ctx context.Context, userID int) (interface{}, error) {
-	status := &UnifiedQuotaStatus{}
+	status := &models.UnifiedQuotaStatus{}
 
 	// Get AI analysis quota (monthly)
 	aiStatus, err := s.aiQuota.GetQuotaStatus(ctx, userID)

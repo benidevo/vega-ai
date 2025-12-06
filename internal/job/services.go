@@ -15,6 +15,7 @@ import (
 	"github.com/benidevo/vega/internal/job/interfaces"
 	"github.com/benidevo/vega/internal/job/models"
 	"github.com/benidevo/vega/internal/quota"
+	quotamodels "github.com/benidevo/vega/internal/quota/models"
 	"github.com/benidevo/vega/internal/settings"
 	"github.com/go-playground/validator/v10"
 )
@@ -67,10 +68,10 @@ func (s *JobService) CheckResumeExists(ctx context.Context, userID int, jobID in
 }
 
 // GetQuotaStatus returns the current quota status for a user
-func (s *JobService) GetQuotaStatus(ctx context.Context, userID int) (*quota.QuotaStatus, error) {
+func (s *JobService) GetQuotaStatus(ctx context.Context, userID int) (*quotamodels.QuotaStatus, error) {
 	if s.quotaService == nil {
 		// If quota service is not available, return unlimited quota
-		return &quota.QuotaStatus{
+		return &quotamodels.QuotaStatus{
 			Used:      0,
 			Limit:     -1, // -1 indicates no limit
 			ResetDate: time.Now().AddDate(0, 1, 0),
@@ -81,13 +82,13 @@ func (s *JobService) GetQuotaStatus(ctx context.Context, userID int) (*quota.Quo
 }
 
 // CheckJobQuota checks if a user can analyze a specific job
-func (s *JobService) CheckJobQuota(ctx context.Context, userID int, jobID int) (*quota.QuotaCheckResult, error) {
+func (s *JobService) CheckJobQuota(ctx context.Context, userID int, jobID int) (*quotamodels.QuotaCheckResult, error) {
 	if s.quotaService == nil {
 		// If quota service is not available, allow all operations
-		return &quota.QuotaCheckResult{
+		return &quotamodels.QuotaCheckResult{
 			Allowed: true,
-			Reason:  quota.QuotaReasonOK,
-			Status: quota.QuotaStatus{
+			Reason:  quotamodels.QuotaReasonOK,
+			Status: quotamodels.QuotaStatus{
 				Used:      0,
 				Limit:     -1,
 				ResetDate: time.Now().AddDate(0, 1, 0),

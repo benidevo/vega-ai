@@ -15,7 +15,7 @@ import (
 	"github.com/benidevo/vega/internal/common/render"
 	"github.com/benidevo/vega/internal/config"
 	"github.com/benidevo/vega/internal/job/models"
-	"github.com/benidevo/vega/internal/quota"
+	quotamodels "github.com/benidevo/vega/internal/quota/models"
 	settingsmodels "github.com/benidevo/vega/internal/settings/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -41,7 +41,7 @@ type jobService interface {
 	AnalyzeJobMatch(ctx context.Context, userID int, jobID int) (*models.JobMatchAnalysis, error)
 	GenerateCoverLetter(ctx context.Context, userID int, jobID int) (*models.CoverLetterWithProfile, error)
 	GenerateCV(ctx context.Context, userID int, jobID int) (*models.GeneratedCV, error)
-	CheckJobQuota(ctx context.Context, userID int, jobID int) (*quota.QuotaCheckResult, error)
+	CheckJobQuota(ctx context.Context, userID int, jobID int) (*quotamodels.QuotaCheckResult, error)
 	GetJobMatchHistory(ctx context.Context, userID int, jobID int) ([]*models.MatchResult, error)
 	DeleteMatchResult(ctx context.Context, userID int, jobID int, matchID int) error
 
@@ -533,10 +533,10 @@ func (h *JobHandler) GetJobDetails(c *gin.Context) {
 	if err != nil {
 		// Log error but don't fail the page load
 		h.service.LogError(err)
-		quotaCheckResult = &quota.QuotaCheckResult{
+		quotaCheckResult = &quotamodels.QuotaCheckResult{
 			Allowed: true,
 			Reason:  "ok",
-			Status: quota.QuotaStatus{
+			Status: quotamodels.QuotaStatus{
 				Used:  0,
 				Limit: -1,
 			},

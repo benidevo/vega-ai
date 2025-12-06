@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/benidevo/vega/internal/quota/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,7 +18,7 @@ func TestRepository_GetMonthlyUsage(t *testing.T) {
 		userID        int
 		monthYear     string
 		setupMock     func(sqlmock.Sqlmock)
-		expectedUsage *QuotaUsage
+		expectedUsage *models.QuotaUsage
 		expectError   bool
 		errorContains string
 	}{
@@ -32,7 +33,7 @@ func TestRepository_GetMonthlyUsage(t *testing.T) {
 					WithArgs(1, "2024-01").
 					WillReturnRows(rows)
 			},
-			expectedUsage: &QuotaUsage{
+			expectedUsage: &models.QuotaUsage{
 				UserID:       1,
 				MonthYear:    "2024-01",
 				JobsAnalyzed: 5,
@@ -47,7 +48,7 @@ func TestRepository_GetMonthlyUsage(t *testing.T) {
 					WithArgs(2, "2024-01").
 					WillReturnError(sql.ErrNoRows)
 			},
-			expectedUsage: &QuotaUsage{
+			expectedUsage: &models.QuotaUsage{
 				UserID:       2,
 				MonthYear:    "2024-01",
 				JobsAnalyzed: 0,
@@ -179,11 +180,11 @@ func TestRepository_GetDailyUsage(t *testing.T) {
 			name:     "should_return_value_when_exists",
 			userID:   1,
 			date:     "2024-01-15",
-			quotaKey: QuotaKeyJobsCaptured,
+			quotaKey: models.QuotaKeyJobsCaptured,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"value"}).AddRow(10)
 				mock.ExpectQuery("SELECT value FROM user_daily_quotas").
-					WithArgs(1, "2024-01-15", QuotaKeyJobsCaptured).
+					WithArgs(1, "2024-01-15", models.QuotaKeyJobsCaptured).
 					WillReturnRows(rows)
 			},
 			expectedValue: 10,
@@ -192,10 +193,10 @@ func TestRepository_GetDailyUsage(t *testing.T) {
 			name:     "should_return_zero_when_not_exists",
 			userID:   2,
 			date:     "2024-01-15",
-			quotaKey: QuotaKeyJobsCaptured,
+			quotaKey: models.QuotaKeyJobsCaptured,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery("SELECT value FROM user_daily_quotas").
-					WithArgs(2, "2024-01-15", QuotaKeyJobsCaptured).
+					WithArgs(2, "2024-01-15", models.QuotaKeyJobsCaptured).
 					WillReturnError(sql.ErrNoRows)
 			},
 			expectedValue: 0,
@@ -204,10 +205,10 @@ func TestRepository_GetDailyUsage(t *testing.T) {
 			name:     "should_return_error_when_database_fails",
 			userID:   1,
 			date:     "2024-01-15",
-			quotaKey: QuotaKeyJobsCaptured,
+			quotaKey: models.QuotaKeyJobsCaptured,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery("SELECT value FROM user_daily_quotas").
-					WithArgs(1, "2024-01-15", QuotaKeyJobsCaptured).
+					WithArgs(1, "2024-01-15", models.QuotaKeyJobsCaptured).
 					WillReturnError(sql.ErrConnDone)
 			},
 			expectError:   true,
@@ -256,11 +257,11 @@ func TestRepository_IncrementDailyUsage(t *testing.T) {
 			name:     "should_increment_usage_when_successful",
 			userID:   1,
 			date:     "2024-01-15",
-			quotaKey: QuotaKeyJobsCaptured,
+			quotaKey: models.QuotaKeyJobsCaptured,
 			amount:   5,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("INSERT INTO user_daily_quotas").
-					WithArgs(1, "2024-01-15", QuotaKeyJobsCaptured, 5, 5).
+					WithArgs(1, "2024-01-15", models.QuotaKeyJobsCaptured, 5, 5).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 		},
@@ -268,11 +269,11 @@ func TestRepository_IncrementDailyUsage(t *testing.T) {
 			name:     "should_handle_upsert_when_record_exists",
 			userID:   2,
 			date:     "2024-01-15",
-			quotaKey: QuotaKeyJobsCaptured,
+			quotaKey: models.QuotaKeyJobsCaptured,
 			amount:   3,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("INSERT INTO user_daily_quotas").
-					WithArgs(2, "2024-01-15", QuotaKeyJobsCaptured, 3, 3).
+					WithArgs(2, "2024-01-15", models.QuotaKeyJobsCaptured, 3, 3).
 					WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 		},
@@ -280,11 +281,11 @@ func TestRepository_IncrementDailyUsage(t *testing.T) {
 			name:     "should_return_error_when_database_fails",
 			userID:   1,
 			date:     "2024-01-15",
-			quotaKey: QuotaKeyJobsCaptured,
+			quotaKey: models.QuotaKeyJobsCaptured,
 			amount:   1,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("INSERT INTO user_daily_quotas").
-					WithArgs(1, "2024-01-15", QuotaKeyJobsCaptured, 1, 1).
+					WithArgs(1, "2024-01-15", models.QuotaKeyJobsCaptured, 1, 1).
 					WillReturnError(sql.ErrConnDone)
 			},
 			expectError:   true,
@@ -294,11 +295,11 @@ func TestRepository_IncrementDailyUsage(t *testing.T) {
 			name:     "should_handle_zero_amount",
 			userID:   3,
 			date:     "2024-01-15",
-			quotaKey: QuotaKeyJobsCaptured,
+			quotaKey: models.QuotaKeyJobsCaptured,
 			amount:   0,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("INSERT INTO user_daily_quotas").
-					WithArgs(3, "2024-01-15", QuotaKeyJobsCaptured, 0, 0).
+					WithArgs(3, "2024-01-15", models.QuotaKeyJobsCaptured, 0, 0).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 		},
@@ -345,15 +346,15 @@ func TestRepository_GetAllDailyUsage(t *testing.T) {
 			date:   "2024-01-15",
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"quota_key", "value"}).
-					AddRow(QuotaKeyJobsCaptured, 10).
+					AddRow(models.QuotaKeyJobsCaptured, 10).
 					AddRow("other_key", 5)
 				mock.ExpectQuery("SELECT quota_key, value FROM user_daily_quotas").
 					WithArgs(1, "2024-01-15").
 					WillReturnRows(rows)
 			},
 			expectedUsage: map[string]int{
-				QuotaKeyJobsCaptured: 10,
-				"other_key":          5,
+				models.QuotaKeyJobsCaptured: 10,
+				"other_key":                 5,
 			},
 		},
 		{
@@ -386,7 +387,7 @@ func TestRepository_GetAllDailyUsage(t *testing.T) {
 			date:   "2024-01-15",
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"quota_key", "invalid"}).
-					AddRow(QuotaKeyJobsCaptured, "not a number")
+					AddRow(models.QuotaKeyJobsCaptured, "not a number")
 				mock.ExpectQuery("SELECT quota_key, value FROM user_daily_quotas").
 					WithArgs(1, "2024-01-15").
 					WillReturnRows(rows)
@@ -427,24 +428,24 @@ func TestRepository_GetQuotaConfig(t *testing.T) {
 		name           string
 		quotaType      string
 		setupMock      func(sqlmock.Sqlmock)
-		expectedConfig *QuotaConfig
+		expectedConfig *models.QuotaConfig
 		expectError    bool
 		errorContains  string
 	}{
 		{
 			name:      "should_return_config_when_exists",
-			quotaType: QuotaTypeAIAnalysis,
+			quotaType: models.QuotaTypeAIAnalysis,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				createdAt := time.Now().Add(-24 * time.Hour)
 				updatedAt := time.Now()
 				rows := sqlmock.NewRows([]string{"quota_type", "free_limit", "description", "created_at", "updated_at"}).
-					AddRow(QuotaTypeAIAnalysis, 10, "AI Analysis quota", createdAt, updatedAt)
+					AddRow(models.QuotaTypeAIAnalysis, 10, "AI Analysis quota", createdAt, updatedAt)
 				mock.ExpectQuery("SELECT quota_type, free_limit, description, created_at, updated_at FROM quota_configs").
-					WithArgs(QuotaTypeAIAnalysis).
+					WithArgs(models.QuotaTypeAIAnalysis).
 					WillReturnRows(rows)
 			},
-			expectedConfig: &QuotaConfig{
-				QuotaType:   QuotaTypeAIAnalysis,
+			expectedConfig: &models.QuotaConfig{
+				QuotaType:   models.QuotaTypeAIAnalysis,
 				FreeLimit:   10,
 				Description: "AI Analysis quota",
 			},
@@ -462,10 +463,10 @@ func TestRepository_GetQuotaConfig(t *testing.T) {
 		},
 		{
 			name:      "should_return_error_when_database_fails",
-			quotaType: QuotaTypeJobCapture,
+			quotaType: models.QuotaTypeJobCapture,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery("SELECT quota_type, free_limit, description, created_at, updated_at FROM quota_configs").
-					WithArgs(QuotaTypeJobCapture).
+					WithArgs(models.QuotaTypeJobCapture).
 					WillReturnError(sql.ErrConnDone)
 			},
 			expectError:   true,

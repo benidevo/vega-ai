@@ -5,13 +5,16 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/benidevo/vega/internal/quota/models"
 )
 
 // Repository interface defines methods for quota data access
 type Repository interface {
 	// Monthly quota methods (existing functionality)
-	GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*QuotaUsage, error)
+	GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*models.QuotaUsage, error)
 	IncrementMonthlyUsage(ctx context.Context, userID int, monthYear string) error
+	IncrementMonthlyUsageWithTx(ctx context.Context, tx *sql.Tx, userID int, monthYear string) error
 
 	// Daily quota methods (new functionality)
 	GetDailyUsage(ctx context.Context, userID int, date string, quotaKey string) (int, error)
@@ -19,7 +22,7 @@ type Repository interface {
 	GetAllDailyUsage(ctx context.Context, userID int, date string) (map[string]int, error)
 
 	// Configuration methods
-	GetQuotaConfig(ctx context.Context, quotaType string) (*QuotaConfig, error)
+	GetQuotaConfig(ctx context.Context, quotaType string) (*models.QuotaConfig, error)
 }
 
 // repository implements the Repository interface
@@ -33,8 +36,8 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 // GetMonthlyUsage gets the monthly usage for a user
-func (r *repository) GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*QuotaUsage, error) {
-	usage := &QuotaUsage{
+func (r *repository) GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*models.QuotaUsage, error) {
+	usage := &models.QuotaUsage{
 		UserID:       userID,
 		MonthYear:    monthYear,
 		JobsAnalyzed: 0,
@@ -72,6 +75,24 @@ func (r *repository) IncrementMonthlyUsage(ctx context.Context, userID int, mont
 	`
 
 	_, err := r.db.ExecContext(ctx, upsertQuery, userID, monthYear)
+	if err != nil {
+		return fmt.Errorf("failed to update quota usage: %w", err)
+	}
+
+	return nil
+}
+
+// IncrementMonthlyUsageWithTx increments the monthly usage count within a transaction
+func (r *repository) IncrementMonthlyUsageWithTx(ctx context.Context, tx *sql.Tx, userID int, monthYear string) error {
+	upsertQuery := `
+		INSERT INTO user_quota_usage (user_id, month_year, jobs_analyzed, updated_at)
+		VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+		ON CONFLICT(user_id, month_year) DO UPDATE SET
+			jobs_analyzed = jobs_analyzed + 1,
+			updated_at = CURRENT_TIMESTAMP
+	`
+
+	_, err := tx.ExecContext(ctx, upsertQuery, userID, monthYear)
 	if err != nil {
 		return fmt.Errorf("failed to update quota usage: %w", err)
 	}
@@ -153,8 +174,8 @@ func (r *repository) GetAllDailyUsage(ctx context.Context, userID int, date stri
 }
 
 // GetQuotaConfig gets the quota configuration for a specific quota type
-func (r *repository) GetQuotaConfig(ctx context.Context, quotaType string) (*QuotaConfig, error) {
-	config := &QuotaConfig{}
+func (r *repository) GetQuotaConfig(ctx context.Context, quotaType string) (*models.QuotaConfig, error) {
+	config := &models.QuotaConfig{}
 
 	query := `
 		SELECT quota_type, free_limit, description, created_at, updated_at

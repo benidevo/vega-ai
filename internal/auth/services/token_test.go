@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/benidevo/vega/internal/auth/models"
+	repomocks "github.com/benidevo/vega/internal/auth/repository/mocks"
 	"github.com/benidevo/vega/internal/config"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -30,7 +31,7 @@ func TestTokenTypes(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, accessToken)
 
-		repo := new(MockUserRepository)
+		repo := repomocks.NewMockUserRepository(t)
 		authService := NewAuthService(repo, cfg)
 
 		claims, err := authService.VerifyToken(accessToken)
@@ -52,7 +53,7 @@ func TestTokenTypes(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, refreshToken)
 
-		repo := new(MockUserRepository)
+		repo := repomocks.NewMockUserRepository(t)
 		authService := NewAuthService(repo, cfg)
 
 		claims, err := authService.VerifyToken(refreshToken)
@@ -70,7 +71,7 @@ func TestTokenTypes(t *testing.T) {
 	})
 
 	t.Run("login_should_generate_both_token_types", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		ctx := context.Background()
 
 		hashedPassword, err := hashPassword("password123")
@@ -101,7 +102,5 @@ func TestTokenTypes(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, "refresh", refreshClaims.TokenType)
 		require.Equal(t, 1, refreshClaims.UserID)
-
-		mockRepo.AssertExpectations(t)
 	})
 }

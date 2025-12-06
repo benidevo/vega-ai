@@ -9,27 +9,12 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	timeutil "github.com/benidevo/vega/internal/common/time"
+	"github.com/benidevo/vega/internal/quota/mocks"
+	"github.com/benidevo/vega/internal/quota/models"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	testifymock "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
-
-type MockUnifiedJobRepository struct {
-	mock.Mock
-}
-
-func (m *MockUnifiedJobRepository) GetByID(ctx context.Context, userID, jobID int) (*Job, error) {
-	args := m.Called(ctx, userID, jobID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*Job), args.Error(1)
-}
-
-func (m *MockUnifiedJobRepository) SetFirstAnalyzedAt(ctx context.Context, jobID int) error {
-	args := m.Called(ctx, jobID)
-	return args.Error(0)
-}
 
 func TestUnifiedService_CheckQuota(t *testing.T) {
 	tests := []struct {
@@ -37,22 +22,22 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 		userID         int
 		quotaType      string
 		metadata       map[string]interface{}
-		setupMock      func(sqlmock.Sqlmock, *MockUnifiedJobRepository)
-		expectedResult *QuotaCheckResult
+		setupMock      func(sqlmock.Sqlmock, *mocks.MockJobRepository)
+		expectedResult *models.QuotaCheckResult
 		expectError    bool
 		errorContains  string
 	}{
 		{
 			name:      "should_check_ai_analysis_quota_when_job_never_analyzed",
 			userID:    1,
-			quotaType: QuotaTypeAIAnalysis,
+			quotaType: models.QuotaTypeAIAnalysis,
 			metadata: map[string]interface{}{
 				"job_id": 123,
 			},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 				// Job repo returns no analysis
 				jobRepo.On("GetByID", context.Background(), 1, 123).
-					Return(&Job{ID: 123, FirstAnalyzedAt: nil}, nil)
+					Return(&models.Job{ID: 123, FirstAnalyzedAt: nil}, nil)
 
 				// Monthly usage check
 				monthYear := timeutil.GetCurrentMonthYear()
@@ -66,10 +51,10 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"quota_type", "free_limit", "description", "created_at", "updated_at"}).
 						AddRow("ai_analysis_monthly", 10, "AI Analysis quota", time.Now(), time.Now()))
 			},
-			expectedResult: &QuotaCheckResult{
+			expectedResult: &models.QuotaCheckResult{
 				Allowed: true,
-				Reason:  QuotaReasonOK,
-				Status: QuotaStatus{
+				Reason:  models.QuotaReasonOK,
+				Status: models.QuotaStatus{
 					Used:  0,
 					Limit: 10,
 				},
@@ -78,15 +63,15 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 		{
 			name:      "should_check_ai_analysis_quota_when_reanalysis",
 			userID:    2,
-			quotaType: QuotaTypeAIAnalysis,
+			quotaType: models.QuotaTypeAIAnalysis,
 			metadata: map[string]interface{}{
 				"job_id": 456,
 			},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 				// Job was analyzed before
 				analyzedAt := time.Now().Add(-24 * time.Hour)
 				jobRepo.On("GetByID", context.Background(), 2, 456).
-					Return(&Job{ID: 456, FirstAnalyzedAt: &analyzedAt}, nil)
+					Return(&models.Job{ID: 456, FirstAnalyzedAt: &analyzedAt}, nil)
 
 				// The service still checks monthly usage even for reanalysis
 				monthYear := timeutil.GetCurrentMonthYear()
@@ -101,10 +86,10 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"quota_type", "free_limit", "description", "created_at", "updated_at"}).
 						AddRow("ai_analysis_monthly", 10, "AI Analysis quota", time.Now(), time.Now()))
 			},
-			expectedResult: &QuotaCheckResult{
+			expectedResult: &models.QuotaCheckResult{
 				Allowed: true,
-				Reason:  QuotaReasonReanalysis,
-				Status: QuotaStatus{
+				Reason:  models.QuotaReasonReanalysis,
+				Status: models.QuotaStatus{
 					Used:      3,
 					Limit:     10,
 					ResetDate: time.Time{},
@@ -114,19 +99,19 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 		{
 			name:      "should_check_job_search_quota",
 			userID:    3,
-			quotaType: QuotaTypeJobCapture,
+			quotaType: models.QuotaTypeJobCapture,
 			metadata:  map[string]interface{}{},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 				// Daily usage check
 				today := timeutil.GetCurrentDate()
 				mock.ExpectQuery("SELECT value FROM user_daily_quotas").
-					WithArgs(3, today, QuotaKeyJobsCaptured).
+					WithArgs(3, today, models.QuotaKeyJobsCaptured).
 					WillReturnRows(sqlmock.NewRows([]string{"value"}).AddRow(25))
 			},
-			expectedResult: &QuotaCheckResult{
+			expectedResult: &models.QuotaCheckResult{
 				Allowed: true,
-				Reason:  QuotaReasonOK,
-				Status: QuotaStatus{
+				Reason:  models.QuotaReasonOK,
+				Status: models.QuotaStatus{
 					Used:      25,
 					Limit:     -1,
 					ResetDate: time.Time{},
@@ -136,9 +121,9 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 		{
 			name:      "should_return_error_when_job_id_missing_for_ai_quota",
 			userID:    1,
-			quotaType: QuotaTypeAIAnalysis,
+			quotaType: models.QuotaTypeAIAnalysis,
 			metadata:  map[string]interface{}{},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 			},
 			expectError:   true,
 			errorContains: "job_id required for AI analysis quota check",
@@ -148,7 +133,7 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 			userID:    1,
 			quotaType: "unknown_type",
 			metadata:  map[string]interface{}{},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 			},
 			expectError:   true,
 			errorContains: "unknown quota type: unknown_type",
@@ -161,7 +146,7 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			jobRepo := &MockUnifiedJobRepository{}
+			jobRepo := mocks.NewMockJobRepository(t)
 
 			if tt.setupMock != nil {
 				tt.setupMock(sqlMock, jobRepo)
@@ -184,7 +169,6 @@ func TestUnifiedService_CheckQuota(t *testing.T) {
 			}
 
 			assert.NoError(t, sqlMock.ExpectationsWereMet())
-			jobRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -195,25 +179,25 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 		userID        int
 		quotaType     string
 		metadata      map[string]interface{}
-		setupMock     func(sqlmock.Sqlmock, *MockUnifiedJobRepository)
+		setupMock     func(sqlmock.Sqlmock, *mocks.MockJobRepository)
 		expectError   bool
 		errorContains string
 	}{
 		{
 			name:      "should_record_ai_analysis_usage",
 			userID:    1,
-			quotaType: QuotaTypeAIAnalysis,
+			quotaType: models.QuotaTypeAIAnalysis,
 			metadata: map[string]interface{}{
 				"job_id": 123,
 			},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 				// Expect transaction
 				mock.ExpectBegin()
 
-				// Expect SetFirstAnalyzedAt call
-				jobRepo.On("SetFirstAnalyzedAt", context.Background(), 123).Return(nil)
+				// Expect SetFirstAnalyzedAtWithTx call (uses transaction)
+				jobRepo.On("SetFirstAnalyzedAtWithTx", context.Background(), testifymock.Anything, 123).Return(nil)
 
-				// Record analysis
+				// Record analysis (uses transaction via IncrementMonthlyUsageWithTx)
 				monthYear := timeutil.GetCurrentMonthYear()
 				mock.ExpectExec("INSERT INTO user_quota_usage").
 					WithArgs(1, monthYear).
@@ -226,37 +210,37 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 		{
 			name:      "should_record_job_search_usage_with_count",
 			userID:    2,
-			quotaType: QuotaTypeJobCapture,
+			quotaType: models.QuotaTypeJobCapture,
 			metadata: map[string]interface{}{
 				"count": 10,
 			},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 				// Record jobs found
 				today := timeutil.GetCurrentDate()
 				mock.ExpectExec("INSERT INTO user_daily_quotas").
-					WithArgs(2, today, QuotaKeyJobsCaptured, 10, 10).
+					WithArgs(2, today, models.QuotaKeyJobsCaptured, 10, 10).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 		},
 		{
 			name:      "should_record_job_search_usage_with_default_count",
 			userID:    3,
-			quotaType: QuotaTypeJobCapture,
+			quotaType: models.QuotaTypeJobCapture,
 			metadata:  map[string]interface{}{},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 				// Record jobs found with default count of 1
 				today := timeutil.GetCurrentDate()
 				mock.ExpectExec("INSERT INTO user_daily_quotas").
-					WithArgs(3, today, QuotaKeyJobsCaptured, 1, 1).
+					WithArgs(3, today, models.QuotaKeyJobsCaptured, 1, 1).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 		},
 		{
 			name:      "should_return_error_when_job_id_missing_for_ai_recording",
 			userID:    1,
-			quotaType: QuotaTypeAIAnalysis,
+			quotaType: models.QuotaTypeAIAnalysis,
 			metadata:  map[string]interface{}{},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 			},
 			expectError:   true,
 			errorContains: "job_id required for AI analysis recording",
@@ -266,7 +250,7 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 			userID:    1,
 			quotaType: "unknown_type",
 			metadata:  map[string]interface{}{},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 			},
 			expectError:   true,
 			errorContains: "unknown quota type: unknown_type",
@@ -274,16 +258,16 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 		{
 			name:      "should_return_error_when_database_fails",
 			userID:    1,
-			quotaType: QuotaTypeAIAnalysis,
+			quotaType: models.QuotaTypeAIAnalysis,
 			metadata: map[string]interface{}{
 				"job_id": 123,
 			},
-			setupMock: func(mock sqlmock.Sqlmock, jobRepo *MockUnifiedJobRepository) {
+			setupMock: func(mock sqlmock.Sqlmock, jobRepo *mocks.MockJobRepository) {
 				// Expect transaction
 				mock.ExpectBegin()
 
-				// Expect SetFirstAnalyzedAt call
-				jobRepo.On("SetFirstAnalyzedAt", context.Background(), 123).Return(nil)
+				// Expect SetFirstAnalyzedAtWithTx call (uses transaction)
+				jobRepo.On("SetFirstAnalyzedAtWithTx", context.Background(), testifymock.Anything, 123).Return(nil)
 
 				monthYear := timeutil.GetCurrentMonthYear()
 				mock.ExpectExec("INSERT INTO user_quota_usage").
@@ -304,7 +288,7 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			jobRepo := &MockUnifiedJobRepository{}
+			jobRepo := mocks.NewMockJobRepository(t)
 
 			if tt.setupMock != nil {
 				tt.setupMock(sqlMock, jobRepo)
@@ -321,7 +305,6 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 			}
 
 			assert.NoError(t, sqlMock.ExpectationsWereMet())
-			jobRepo.AssertExpectations(t)
 		})
 	}
 }
@@ -331,8 +314,8 @@ func TestUnifiedService_GetAllQuotaStatus(t *testing.T) {
 		name          string
 		userID        int
 		setupMock     func(sqlmock.Sqlmock)
-		expectedAI    QuotaStatus
-		expectedJob   QuotaStatus
+		expectedAI    models.QuotaStatus
+		expectedJob   models.QuotaStatus
 		expectError   bool
 		errorContains string
 	}{
@@ -357,14 +340,14 @@ func TestUnifiedService_GetAllQuotaStatus(t *testing.T) {
 
 				// Job search quota - daily usage
 				mock.ExpectQuery("SELECT value FROM user_daily_quotas").
-					WithArgs(1, today, QuotaKeyJobsCaptured).
+					WithArgs(1, today, models.QuotaKeyJobsCaptured).
 					WillReturnRows(sqlmock.NewRows([]string{"value"}).AddRow(20))
 			},
-			expectedAI: QuotaStatus{
+			expectedAI: models.QuotaStatus{
 				Used:  5,
 				Limit: 10,
 			},
-			expectedJob: QuotaStatus{
+			expectedJob: models.QuotaStatus{
 				Used:      20,
 				Limit:     -1,
 				ResetDate: time.Time{},
@@ -390,14 +373,14 @@ func TestUnifiedService_GetAllQuotaStatus(t *testing.T) {
 
 				// Job search - no usage
 				mock.ExpectQuery("SELECT value FROM user_daily_quotas").
-					WithArgs(2, today, QuotaKeyJobsCaptured).
+					WithArgs(2, today, models.QuotaKeyJobsCaptured).
 					WillReturnError(sql.ErrNoRows)
 			},
-			expectedAI: QuotaStatus{
+			expectedAI: models.QuotaStatus{
 				Used:  0,
 				Limit: 10,
 			},
-			expectedJob: QuotaStatus{
+			expectedJob: models.QuotaStatus{
 				Used:      0,
 				Limit:     -1,
 				ResetDate: time.Time{},
@@ -436,7 +419,7 @@ func TestUnifiedService_GetAllQuotaStatus(t *testing.T) {
 
 				// Job search quota fails
 				mock.ExpectQuery("SELECT value FROM user_daily_quotas").
-					WithArgs(4, today, QuotaKeyJobsCaptured).
+					WithArgs(4, today, models.QuotaKeyJobsCaptured).
 					WillReturnError(errors.New("database error"))
 			},
 			expectError:   true,
@@ -450,7 +433,7 @@ func TestUnifiedService_GetAllQuotaStatus(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			jobRepo := &MockUnifiedJobRepository{}
+			jobRepo := mocks.NewMockJobRepository(t)
 
 			if tt.setupMock != nil {
 				tt.setupMock(sqlMock)
@@ -467,7 +450,7 @@ func TestUnifiedService_GetAllQuotaStatus(t *testing.T) {
 				assert.NoError(t, err)
 				require.NotNil(t, result)
 
-				status, ok := result.(*UnifiedQuotaStatus)
+				status, ok := result.(*models.UnifiedQuotaStatus)
 				require.True(t, ok)
 
 				assert.Equal(t, tt.expectedAI.Used, status.AIAnalysis.Used)
@@ -487,7 +470,7 @@ func TestUnifiedService_ExposedServices(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	jobRepo := &MockUnifiedJobRepository{}
+	jobRepo := mocks.NewMockJobRepository(t)
 	service := NewUnifiedService(db, jobRepo, true)
 
 	t.Run("should_expose_ai_quota_service", func(t *testing.T) {

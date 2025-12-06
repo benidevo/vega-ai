@@ -204,18 +204,18 @@ graph TB
 
 #### What NOT to Log
 
-- ❌ Email addresses
-- ❌ Usernames or names
-- ❌ IP addresses
-- ❌ OAuth tokens
-- ❌ Any direct identifiers
+- Email addresses
+- Usernames or names
+- IP addresses
+- OAuth tokens
+- Any direct identifiers
 
 #### What to Log
 
-- ✅ User references: `user_123`
-- ✅ Hashed identifiers
-- ✅ Event types: `login_success`
-- ✅ Anonymous metrics
+- User references: `user_123`
+- Hashed identifiers
+- Event types: `login_success`
+- Anonymous metrics
 
 #### Privacy Utilities
 

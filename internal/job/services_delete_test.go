@@ -5,14 +5,14 @@ import (
 	"errors"
 	"testing"
 
+	jobinterfacesmocks "github.com/benidevo/vega/internal/job/interfaces/mocks"
 	"github.com/benidevo/vega/internal/job/models"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestJobService_DeleteMatchResult(t *testing.T) {
 	t.Run("successful deletion", func(t *testing.T) {
-		// Arrange
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		cfg := setupTestConfig()
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
 		ctx := context.Background()
@@ -25,11 +25,10 @@ func TestJobService_DeleteMatchResult(t *testing.T) {
 		err := service.DeleteMatchResult(ctx, testUserID, jobID, matchID)
 
 		assert.NoError(t, err)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("invalid job ID", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		cfg := setupTestConfig()
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
 		ctx := context.Background()
@@ -42,7 +41,7 @@ func TestJobService_DeleteMatchResult(t *testing.T) {
 	})
 
 	t.Run("invalid match ID", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		cfg := setupTestConfig()
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
 		ctx := context.Background()
@@ -55,7 +54,7 @@ func TestJobService_DeleteMatchResult(t *testing.T) {
 	})
 
 	t.Run("match result does not belong to job", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		cfg := setupTestConfig()
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
 		ctx := context.Background()
@@ -68,11 +67,10 @@ func TestJobService_DeleteMatchResult(t *testing.T) {
 
 		assert.Equal(t, models.ErrJobNotFound, err)
 		mockRepo.AssertNotCalled(t, "DeleteMatchResult")
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("error checking match ownership", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		cfg := setupTestConfig()
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
 		ctx := context.Background()
@@ -86,12 +84,10 @@ func TestJobService_DeleteMatchResult(t *testing.T) {
 
 		assert.Equal(t, expectedErr, err)
 		mockRepo.AssertNotCalled(t, "DeleteMatchResult")
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("error deleting match result", func(t *testing.T) {
-		// Arrange
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		cfg := setupTestConfig()
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
 		ctx := context.Background()
@@ -105,6 +101,5 @@ func TestJobService_DeleteMatchResult(t *testing.T) {
 		err := service.DeleteMatchResult(ctx, testUserID, jobID, matchID)
 
 		assert.Equal(t, expectedErr, err)
-		mockRepo.AssertExpectations(t)
 	})
 }

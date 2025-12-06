@@ -10,7 +10,7 @@ import (
 	"github.com/benidevo/vega/internal/common/testutil"
 	"github.com/benidevo/vega/internal/config"
 	"github.com/benidevo/vega/internal/job/models"
-	"github.com/benidevo/vega/internal/quota"
+	quotamodels "github.com/benidevo/vega/internal/quota/models"
 	settingsmodels "github.com/benidevo/vega/internal/settings/models"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
@@ -109,12 +109,12 @@ func (m *mockJobService) GenerateCV(ctx context.Context, userID int, jobID int) 
 	return args.Get(0).(*models.GeneratedCV), args.Error(1)
 }
 
-func (m *mockJobService) CheckJobQuota(ctx context.Context, userID int, jobID int) (*quota.QuotaCheckResult, error) {
+func (m *mockJobService) CheckJobQuota(ctx context.Context, userID int, jobID int) (*quotamodels.QuotaCheckResult, error) {
 	args := m.Called(ctx, userID, jobID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*quota.QuotaCheckResult), args.Error(1)
+	return args.Get(0).(*quotamodels.QuotaCheckResult), args.Error(1)
 }
 
 func (m *mockJobService) GetJobMatchHistory(ctx context.Context, userID int, jobID int) ([]*models.MatchResult, error) {

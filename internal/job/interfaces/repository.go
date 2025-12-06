@@ -62,6 +62,7 @@ type TransactionalJobRepository interface {
 	CreateWithTx(ctx context.Context, tx *sql.Tx, userID int, job *models.Job) (*models.Job, error)
 	UpdateWithTx(ctx context.Context, tx *sql.Tx, userID int, job *models.Job) error
 	DeleteWithTx(ctx context.Context, tx *sql.Tx, userID int, id int) error
+	SetFirstAnalyzedAtWithTx(ctx context.Context, tx *sql.Tx, jobID int) error
 }
 
 // TransactionalCompanyRepository extends CompanyRepository with transaction support

@@ -6,7 +6,7 @@ import (
 	apimodels "github.com/benidevo/vega/internal/api/job/models"
 	ctxutil "github.com/benidevo/vega/internal/common/context"
 	"github.com/benidevo/vega/internal/job/models"
-	"github.com/benidevo/vega/internal/quota"
+	quotamodels "github.com/benidevo/vega/internal/quota/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -108,7 +108,7 @@ func (h *JobAPIHandler) CreateJob(c *gin.Context) {
 			}
 		}
 
-		err = h.quotaService.RecordUsage(ctx, userID, quota.QuotaTypeJobCapture, map[string]interface{}{
+		err = h.quotaService.RecordUsage(ctx, userID, quotamodels.QuotaTypeJobCapture, map[string]interface{}{
 			"count": 1,
 		})
 		if err != nil {

@@ -8,12 +8,13 @@ import (
 
 	ctxutil "github.com/benidevo/vega/internal/common/context"
 	timeutil "github.com/benidevo/vega/internal/common/time"
+	"github.com/benidevo/vega/internal/quota/models"
 )
 
 // JobRepository interface defines methods the quota service needs from the job repository
 type JobRepository interface {
-	GetByID(ctx context.Context, userID, jobID int) (*Job, error)
-	SetFirstAnalyzedAt(ctx context.Context, jobID int) error
+	GetByID(ctx context.Context, userID, jobID int) (*models.Job, error)
+	SetFirstAnalyzedAtWithTx(ctx context.Context, tx *sql.Tx, jobID int) error
 }
 
 // Service handles quota management
@@ -41,7 +42,7 @@ func (s *Service) isUserAdmin(ctx context.Context) bool {
 }
 
 // CanAnalyzeJob checks if a user can analyze a specific job
-func (s *Service) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*QuotaCheckResult, error) {
+func (s *Service) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*models.QuotaCheckResult, error) {
 	// Check if job was previously analyzed
 	job, err := s.jobRepo.GetByID(ctx, userID, jobID)
 	if err != nil {
@@ -57,19 +58,19 @@ func (s *Service) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*Qu
 
 	// Check if user is admin (unlimited AI analysis quota in cloud mode)
 	if s.isCloudMode && s.isUserAdmin(ctx) {
-		status := QuotaStatus{
+		status := models.QuotaStatus{
 			Used:      usage.JobsAnalyzed,
 			Limit:     -1,
 			ResetDate: time.Time{},
 		}
 
 		// If job was previously analyzed, note it as re-analysis
-		reason := QuotaReasonOK
+		reason := models.QuotaReasonOK
 		if job.FirstAnalyzedAt != nil {
-			reason = QuotaReasonReanalysis
+			reason = models.QuotaReasonReanalysis
 		}
 
-		return &QuotaCheckResult{
+		return &models.QuotaCheckResult{
 			Allowed: true,
 			Reason:  reason,
 			Status:  status,
@@ -78,19 +79,19 @@ func (s *Service) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*Qu
 
 	// In non-cloud mode, always allow but show actual usage
 	if !s.isCloudMode {
-		status := QuotaStatus{
+		status := models.QuotaStatus{
 			Used:      usage.JobsAnalyzed,
 			Limit:     -1,
 			ResetDate: time.Time{},
 		}
 
 		// If job was previously analyzed, note it as re-analysis
-		reason := QuotaReasonOK
+		reason := models.QuotaReasonOK
 		if job.FirstAnalyzedAt != nil {
-			reason = QuotaReasonReanalysis
+			reason = models.QuotaReasonReanalysis
 		}
 
-		return &QuotaCheckResult{
+		return &models.QuotaCheckResult{
 			Allowed: true,
 			Reason:  reason,
 			Status:  status,
@@ -106,7 +107,7 @@ func (s *Service) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*Qu
 	limit := quotaConfig.FreeLimit
 
 	// Cloud mode: enforce quotas
-	status := QuotaStatus{
+	status := models.QuotaStatus{
 		Used:      usage.JobsAnalyzed,
 		Limit:     limit,
 		ResetDate: timeutil.GetNextMonthStart(),
@@ -114,25 +115,25 @@ func (s *Service) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*Qu
 
 	// If job was previously analyzed, it's a re-analysis (always allowed)
 	if job.FirstAnalyzedAt != nil {
-		return &QuotaCheckResult{
+		return &models.QuotaCheckResult{
 			Allowed: true,
-			Reason:  QuotaReasonReanalysis,
+			Reason:  models.QuotaReasonReanalysis,
 			Status:  status,
 		}, nil
 	}
 
 	// Check monthly limit for new analyses
 	if usage.JobsAnalyzed >= limit {
-		return &QuotaCheckResult{
+		return &models.QuotaCheckResult{
 			Allowed: false,
-			Reason:  QuotaReasonLimitReached,
+			Reason:  models.QuotaReasonLimitReached,
 			Status:  status,
 		}, nil
 	}
 
-	return &QuotaCheckResult{
+	return &models.QuotaCheckResult{
 		Allowed: true,
-		Reason:  QuotaReasonOK,
+		Reason:  models.QuotaReasonOK,
 		Status:  status,
 	}, nil
 }
@@ -146,15 +147,16 @@ func (s *Service) RecordAnalysis(ctx context.Context, userID int, jobID int) err
 	}
 	defer tx.Rollback()
 
-	err = s.jobRepo.SetFirstAnalyzedAt(ctx, jobID)
+	// Use transactional method to ensure operation participates in transaction
+	err = s.jobRepo.SetFirstAnalyzedAtWithTx(ctx, tx, jobID)
 	if err != nil {
 		return fmt.Errorf("failed to set first analyzed at: %w", err)
 	}
 
 	monthYear := timeutil.GetCurrentMonthYear()
 
-	// Use repository to increment usage
-	err = s.repo.IncrementMonthlyUsage(ctx, userID, monthYear)
+	// Use transactional repository method to increment usage within same transaction
+	err = s.repo.IncrementMonthlyUsageWithTx(ctx, tx, userID, monthYear)
 	if err != nil {
 		return fmt.Errorf("failed to update quota usage: %w", err)
 	}
@@ -163,14 +165,14 @@ func (s *Service) RecordAnalysis(ctx context.Context, userID int, jobID int) err
 }
 
 // GetMonthlyUsage gets the current month's usage for a user
-func (s *Service) GetMonthlyUsage(ctx context.Context, userID int) (*QuotaUsage, error) {
+func (s *Service) GetMonthlyUsage(ctx context.Context, userID int) (*models.QuotaUsage, error) {
 	// Always get actual usage data for tracking purposes
 	monthYear := timeutil.GetCurrentMonthYear()
 	return s.repo.GetMonthlyUsage(ctx, userID, monthYear)
 }
 
 // GetQuotaStatus returns the current quota status for a user
-func (s *Service) GetQuotaStatus(ctx context.Context, userID int) (*QuotaStatus, error) {
+func (s *Service) GetQuotaStatus(ctx context.Context, userID int) (*models.QuotaStatus, error) {
 	// Always get actual usage data
 	usage, err := s.GetMonthlyUsage(ctx, userID)
 	if err != nil {
@@ -179,7 +181,7 @@ func (s *Service) GetQuotaStatus(ctx context.Context, userID int) (*QuotaStatus,
 
 	// Check if user is admin (unlimited AI analysis quota in cloud mode)
 	if s.isCloudMode && s.isUserAdmin(ctx) {
-		return &QuotaStatus{
+		return &models.QuotaStatus{
 			Used:      usage.JobsAnalyzed,
 			Limit:     -1,
 			ResetDate: time.Time{},
@@ -188,7 +190,7 @@ func (s *Service) GetQuotaStatus(ctx context.Context, userID int) (*QuotaStatus,
 
 	if !s.isCloudMode {
 		// In self-hosted mode, return actual usage but unlimited limit
-		return &QuotaStatus{
+		return &models.QuotaStatus{
 			Used:      usage.JobsAnalyzed,
 			Limit:     -1,
 			ResetDate: time.Time{},
@@ -202,7 +204,7 @@ func (s *Service) GetQuotaStatus(ctx context.Context, userID int) (*QuotaStatus,
 	}
 
 	// Cloud mode: return actual quota status with limits
-	return &QuotaStatus{
+	return &models.QuotaStatus{
 		Used:      usage.JobsAnalyzed,
 		Limit:     quotaConfig.FreeLimit,
 		ResetDate: timeutil.GetNextMonthStart(),

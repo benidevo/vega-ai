@@ -11,7 +11,7 @@ import (
 
 	"github.com/benidevo/vega/internal/common/testutil"
 	"github.com/benidevo/vega/internal/job/models"
-	"github.com/benidevo/vega/internal/quota"
+	quotamodels "github.com/benidevo/vega/internal/quota/models"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -53,12 +53,12 @@ func (m *mockJobService) DeleteJob(ctx context.Context, userID int, jobID int) e
 	return args.Error(0)
 }
 
-func (m *mockJobService) GetQuotaStatus(ctx context.Context, userID int) (*quota.QuotaStatus, error) {
+func (m *mockJobService) GetQuotaStatus(ctx context.Context, userID int) (*quotamodels.QuotaStatus, error) {
 	args := m.Called(ctx, userID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*quota.QuotaStatus), args.Error(1)
+	return args.Get(0).(*quotamodels.QuotaStatus), args.Error(1)
 }
 
 func (m *mockJobService) LogError(err error) {
@@ -266,7 +266,7 @@ func TestJobAPIHandler_GetQuotaStatus(t *testing.T) {
 			Method: "GET",
 			Path:   "/api/quota/status",
 			MockSetup: func() {
-				quotaStatus := &quota.QuotaStatus{
+				quotaStatus := &quotamodels.QuotaStatus{
 					Used:      5,
 					Limit:     10,
 					ResetDate: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -291,7 +291,7 @@ func TestJobAPIHandler_GetQuotaStatus(t *testing.T) {
 			Method: "GET",
 			Path:   "/api/quota/status",
 			MockSetup: func() {
-				quotaStatus := &quota.QuotaStatus{
+				quotaStatus := &quotamodels.QuotaStatus{
 					Used:      3,
 					Limit:     -1,
 					ResetDate: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),

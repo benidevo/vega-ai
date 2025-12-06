@@ -6,33 +6,25 @@ import (
 	"testing"
 
 	"github.com/benidevo/vega/internal/ai/llm"
+	llmMocks "github.com/benidevo/vega/internal/ai/llm/mocks"
 	"github.com/benidevo/vega/internal/ai/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-type MockCVParser struct {
-	mock.Mock
-}
-
-func (m *MockCVParser) Generate(ctx context.Context, request llm.GenerateRequest) (llm.GenerateResponse, error) {
-	args := m.Called(ctx, request)
-	return args.Get(0).(llm.GenerateResponse), args.Error(1)
-}
-
 func TestCVParserService_ParseCV(t *testing.T) {
 	tests := []struct {
 		name          string
 		cvText        string
-		setupMock     func(*MockCVParser)
+		setupMock     func(*llmMocks.MockProvider)
 		expectError   bool
 		errorContains string
 	}{
 		{
 			name:   "should_parse_cv_when_content_valid",
 			cvText: "John Doe\nSoftware Engineer\njohn@email.com\nGo, Python, React",
-			setupMock: func(m *MockCVParser) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				result := models.CVParsingResult{
 					IsValid: true,
 					PersonalInfo: models.PersonalInfo{
@@ -55,7 +47,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 		{
 			name:   "should_return_error_when_cv_empty",
 			cvText: "",
-			setupMock: func(m *MockCVParser) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -63,7 +55,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 		{
 			name:   "should_return_error_when_cv_too_short",
 			cvText: "John",
-			setupMock: func(m *MockCVParser) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				result := models.CVParsingResult{
 					IsValid: false,
 					Reason:  "CV content too short to extract meaningful information",
@@ -79,7 +71,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 		{
 			name:   "should_return_error_when_provider_fails",
 			cvText: "This is a valid CV content with enough text for parsing",
-			setupMock: func(m *MockCVParser) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				m.On("Generate", mock.Anything, mock.MatchedBy(func(req llm.GenerateRequest) bool {
 					return req.ResponseType == llm.ResponseTypeCVParsing
 				})).Return(llm.GenerateResponse{}, fmt.Errorf("AI service error"))
@@ -90,7 +82,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 		{
 			name:   "should_return_error_when_response_invalid_type",
 			cvText: "Valid CV content for testing type mismatch error case",
-			setupMock: func(m *MockCVParser) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				m.On("Generate", mock.Anything, mock.MatchedBy(func(req llm.GenerateRequest) bool {
 					return req.ResponseType == llm.ResponseTypeCVParsing
 				})).Return(llm.GenerateResponse{
@@ -103,7 +95,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 		{
 			name:   "should_return_error_when_parsed_cv_invalid",
 			cvText: "This is not a CV, it's a police report or other non-CV document",
-			setupMock: func(m *MockCVParser) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				result := models.CVParsingResult{
 					IsValid: false,
 					Reason:  "Invalid document: not a CV",
@@ -119,7 +111,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 		{
 			name:   "should_parse_cv_with_full_details_when_comprehensive",
 			cvText: "Jane Smith\nSenior Backend Developer\njane.smith@email.com\n+1-555-0123\n\nExperience:\nTech Corp - Senior Developer (2020-Present)\nStartup Inc - Developer (2018-2020)\n\nEducation:\nBS Computer Science - MIT (2018)\n\nSkills: Go, Python, Kubernetes, Docker",
-			setupMock: func(m *MockCVParser) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				result := models.CVParsingResult{
 					IsValid: true,
 					PersonalInfo: models.PersonalInfo{
@@ -164,7 +156,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockProvider := &MockCVParser{}
+			mockProvider := llmMocks.NewMockProvider(t)
 			if tt.setupMock != nil {
 				tt.setupMock(mockProvider)
 			}
@@ -179,10 +171,7 @@ func TestCVParserService_ParseCV(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				require.NotNil(t, result)
-				// Don't assert IsValid for all cases, it depends on the test
 			}
-
-			mockProvider.AssertExpectations(t)
 		})
 	}
 }

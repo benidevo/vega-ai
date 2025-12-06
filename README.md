@@ -1,4 +1,4 @@
-# 🌟 Vega AI
+# Vega AI
 
 [![CI](https://github.com/benidevo/vega-ai/workflows/CI/badge.svg)](https://github.com/benidevo/vega-ai/actions/workflows/ci.yaml)
 [![Docker](https://github.com/benidevo/vega-ai/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)](https://github.com/benidevo/vega-ai/actions/workflows/docker-build.yml)
@@ -9,9 +9,9 @@
 
 Just as ancient navigators used the star Vega to find their way, Vega AI helps you navigate your career journey with intelligent job search tools. Track applications, generate tailored documents using AI, get smart job matching based on your profile, and capture opportunities from LinkedIn with the browser extension.
 
-**🚀 Try it now:** Visit [vega.benidevo.com](https://vega.benidevo.com) for the cloud mode, or self-host for complete data privacy.
+**Try it now:** Visit [vega.benidevo.com](https://vega.benidevo.com) for the cloud mode, or self-host for complete data privacy.
 
-## 🚀 Self-Hosted Quick Start
+## Self-Hosted Quick Start
 
 Self-hosting Vega AI gives you complete control over your data. You only need a Gemini API key to get started.
 
@@ -52,18 +52,18 @@ docker run --pull always -d \
    - Password: `VegaAdmin`
 3. **Important:** Change your password after first login via Settings → Account
 
-## ✨ Features
+## Features
 
-- **🤖 AI Document Generation**: Generate tailored cover letters and CVs based on your profile
-- **📊 Smart Job Matching**: Get AI-powered match scores and detailed analysis for job compatibility
-- **📝 CV Parsing**: Upload your existing CV to automatically populate your profile
-- **💼 Job Management**: Track job applications with customizable statuses
-- **🔗 Browser Extension**: One-click job capture from LinkedIn and other job boards
-- **👤 Profile Management**: Comprehensive professional profile with experience, education, and skills
-- **🔒 Privacy-First**: Self-hosted option with complete data control
-- **📊 Usage Quotas**: Fair usage limits for AI features (cloud mode)
+- **AI Document Generation**: Generate tailored cover letters and CVs based on your profile
+- **Smart Job Matching**: Get AI-powered match scores and detailed analysis for job compatibility
+- **CV Parsing**: Upload your existing CV to automatically populate your profile
+- **Job Management**: Track job applications with customizable statuses
+- **Browser Extension**: One-click job capture from LinkedIn and other job boards
+- **Profile Management**: Comprehensive professional profile with experience, education, and skills
+- **Privacy-First**: Self-hosted option with complete data control
+- **Usage Quotas**: Fair usage limits for AI features (cloud mode)
 
-## 🔗 Browser Extension
+## Browser Extension
 
 Download the **Vega AI Job Capture** extension from [GitHub Releases](https://github.com/benidevo/vega-ai-extension/releases/latest) for one-click job capture from LinkedIn.
 
@@ -76,7 +76,7 @@ Download the **Vega AI Job Capture** extension from [GitHub Releases](https://gi
 
 For development or to build from source, visit the [extension repository](https://github.com/benidevo/vega-ai-extension).
 
-## 🐳 Docker Options
+## Docker Options
 
 ### ARM64 Support (Apple Silicon)
 
@@ -130,18 +130,18 @@ See [docs/DOCKER_SWARM.md](docs/DOCKER_SWARM.md) for detailed instructions.
 - **Docker Secrets**: Use `_FILE` environment variables for secure configuration. See [Docker Swarm deployment](docs/DOCKER_SWARM.md#method-3-using-docker-secrets-recommended-for-production).
 - **Development Setup**: Custom ports, SSL, external databases. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
-## 🛠️ Development
+## Development
 
 See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development setup, testing, and contributing guidelines.
 
-## 📝 License
+## License
 
 This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
 
 What this means:
 
-- ✅ You can use, study, modify, and distribute the code
-- ✅ If you run this software on a server, you must make your source code available to users
-- ✅ Any modifications must also be released under AGPL-3.0
+- You can use, study, modify, and distribute the code
+- If you run this software on a server, you must make your source code available to users
+- Any modifications must also be released under AGPL-3.0
 
 **Commercial licensing:** For commercial use without AGPL restrictions, contact <vega@benidevo.com> for licensing options.

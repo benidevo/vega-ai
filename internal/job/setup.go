@@ -47,8 +47,8 @@ func SetupService(db *sql.DB, cfg *config.Settings, cache cache.Cache) *JobServi
 	return jobService
 }
 
-// SetupJobRepository initializes and returns a job repository.
-func SetupJobRepository(db *sql.DB, cache cache.Cache) interfaces.JobRepository {
+// SetupJobRepository initializes and returns a transactional job repository.
+func SetupJobRepository(db *sql.DB, cache cache.Cache) interfaces.TransactionalJobRepository {
 	companyRepo := repository.NewSQLiteCompanyRepository(db, cache)
 	return repository.NewSQLiteJobRepository(db, companyRepo, cache)
 }

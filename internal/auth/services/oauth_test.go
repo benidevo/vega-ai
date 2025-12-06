@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/benidevo/vega/internal/auth/models"
+	repomocks "github.com/benidevo/vega/internal/auth/repository/mocks"
 	commonerrors "github.com/benidevo/vega/internal/common/errors"
 	"github.com/benidevo/vega/internal/common/logger"
 	"github.com/benidevo/vega/internal/config"
@@ -14,28 +15,20 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// setupGoogleAuthTest prepares common test dependencies
-func setupGoogleAuthTest() (*MockUserRepository, *config.Settings, context.Context) {
-	mockRepo := new(MockUserRepository)
+// setupGoogleAuthTestConfig prepares common test configuration
+func setupGoogleAuthTestConfig() (*config.Settings, context.Context) {
 	cfg := &config.Settings{
 		TokenSecret:             "test-secret-key",
 		GoogleAuthUserInfoURL:   "https://www.googleapis.com/oauth2/v1/userinfo",
 		GoogleAuthUserInfoScope: "https://www.googleapis.com/auth/userinfo.email",
 	}
 	ctx := context.Background()
-	return mockRepo, cfg, ctx
+	return cfg, ctx
 }
 
 func TestGetOrCreateUser(t *testing.T) {
-	mockRepo, cfg, ctx := setupGoogleAuthTest()
-
+	cfg, ctx := setupGoogleAuthTestConfig()
 	log := logger.GetPrivacyLogger("test")
-
-	service := &GoogleAuthService{
-		cfg:  cfg,
-		repo: mockRepo,
-		log:  log,
-	}
 
 	userInfo := &GoogleAuthUserInfo{
 		ID:            "12345",
@@ -44,12 +37,19 @@ func TestGetOrCreateUser(t *testing.T) {
 	}
 
 	t.Run("should_return_existing_user", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		service := &GoogleAuthService{
+			cfg:  cfg,
+			repo: mockRepo,
+			log:  log,
+		}
+
 		existingUser := &models.User{
 			ID:       1,
 			Username: "test@example.com",
 			Role:     models.STANDARD,
 		}
-		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(existingUser, nil).Once()
+		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(existingUser, nil)
 
 		user, err := service.getOrCreateUser(ctx, userInfo)
 
@@ -57,18 +57,24 @@ func TestGetOrCreateUser(t *testing.T) {
 		require.NotNil(t, user)
 		require.Equal(t, existingUser.ID, user.ID)
 		require.Equal(t, existingUser.Username, user.Username)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_create_new_user_when_not_found", func(t *testing.T) {
-		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(nil, models.ErrUserNotFound).Once()
+		mockRepo := repomocks.NewMockUserRepository(t)
+		service := &GoogleAuthService{
+			cfg:  cfg,
+			repo: mockRepo,
+			log:  log,
+		}
+
+		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(nil, models.ErrUserNotFound)
 
 		newUser := &models.User{
 			ID:       2,
 			Username: "test@example.com",
 			Role:     models.STANDARD,
 		}
-		mockRepo.On("CreateUser", ctx, "test@example.com", "", "Standard").Return(newUser, nil).Once()
+		mockRepo.On("CreateUser", ctx, "test@example.com", "", "Standard").Return(newUser, nil)
 
 		user, err := service.getOrCreateUser(ctx, userInfo)
 
@@ -76,38 +82,49 @@ func TestGetOrCreateUser(t *testing.T) {
 		require.NotNil(t, user)
 		require.Equal(t, newUser.ID, user.ID)
 		require.Equal(t, newUser.Username, user.Username)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_return_error_when_user_lookup_fails", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		service := &GoogleAuthService{
+			cfg:  cfg,
+			repo: mockRepo,
+			log:  log,
+		}
+
 		repoErr := commonerrors.WrapError(models.ErrUserRetrievalFailed, errors.New("database error"))
-		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(nil, repoErr).Once()
+		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(nil, repoErr)
 
 		user, err := service.getOrCreateUser(ctx, userInfo)
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrGoogleUserCreationFailed, err)
 		require.Nil(t, user)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_return_error_when_user_creation_fails", func(t *testing.T) {
-		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(nil, models.ErrUserNotFound).Once()
+		mockRepo := repomocks.NewMockUserRepository(t)
+		service := &GoogleAuthService{
+			cfg:  cfg,
+			repo: mockRepo,
+			log:  log,
+		}
+
+		mockRepo.On("FindByUsername", ctx, "test@example.com").Return(nil, models.ErrUserNotFound)
 
 		repoErr := commonerrors.WrapError(models.ErrUserCreationFailed, errors.New("database error"))
-		mockRepo.On("CreateUser", ctx, "test@example.com", "", "Standard").Return(nil, repoErr).Once()
+		mockRepo.On("CreateUser", ctx, "test@example.com", "", "Standard").Return(nil, repoErr)
 
 		user, err := service.getOrCreateUser(ctx, userInfo)
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrGoogleUserCreationFailed, err)
 		require.Nil(t, user)
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestGetAuthURL(t *testing.T) {
-	_, cfg, _ := setupGoogleAuthTest()
+	cfg, _ := setupGoogleAuthTestConfig()
 	log := logger.GetPrivacyLogger("test")
 
 	t.Run("should_return_auth_url_with_state", func(t *testing.T) {
@@ -167,7 +184,7 @@ func TestNewGoogleAuthService(t *testing.T) {
 			GoogleAuthUserInfoURL:   "https://www.googleapis.com/oauth2/v1/userinfo",
 			GoogleAuthUserInfoScope: "https://www.googleapis.com/auth/userinfo.email",
 		}
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 
 		service, err := NewGoogleAuthService(cfg, mockRepo)
 
@@ -187,7 +204,7 @@ func TestNewGoogleAuthService(t *testing.T) {
 			GoogleAuthUserInfoURL:   "https://www.googleapis.com/oauth2/v1/userinfo",
 			GoogleAuthUserInfoScope: "https://www.googleapis.com/auth/userinfo.email",
 		}
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 
 		service, err := NewGoogleAuthService(cfg, mockRepo)
 
@@ -205,15 +222,6 @@ type mockHTTPClient struct {
 
 func (m *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	return m.response, m.err
-}
-
-func TestAuthenticate(t *testing.T) {
-	t.Run("should_authenticate_successfully_with_valid_code", func(t *testing.T) {
-		// Testing Authenticate method requires mocking external OAuth2 and HTTP dependencies
-		// which is complex due to the external nature of Google OAuth
-		// The core logic is tested through unit tests of getOrCreateUser and other methods
-		t.Skip("Skipping due to external OAuth2 dependencies")
-	})
 }
 
 func TestGetGoogleCredentials(t *testing.T) {
@@ -283,12 +291,11 @@ func TestOAuthLogError(t *testing.T) {
 		GoogleAuthUserInfoURL:   "https://www.googleapis.com/oauth2/v1/userinfo",
 		GoogleAuthUserInfoScope: "https://www.googleapis.com/auth/userinfo.email",
 	}
-	mockRepo := new(MockUserRepository)
+	mockRepo := repomocks.NewMockUserRepository(t)
 
 	service, err := NewGoogleAuthService(cfg, mockRepo)
 	require.NoError(t, err)
 
-	// Test LogError method - just ensure it doesn't panic
 	service.LogError(errors.New("test oauth error"))
 	service.LogError(nil)
 }

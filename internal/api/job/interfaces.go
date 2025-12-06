@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/benidevo/vega/internal/job/models"
-	"github.com/benidevo/vega/internal/quota"
+	quotamodels "github.com/benidevo/vega/internal/quota/models"
 )
 
 // jobService defines job operations needed by the API handler
@@ -13,7 +13,7 @@ type jobService interface {
 	GetJob(ctx context.Context, userID int, jobID int) (*models.Job, error)
 	UpdateJob(ctx context.Context, userID int, job *models.Job) error
 	DeleteJob(ctx context.Context, userID int, jobID int) error
-	GetQuotaStatus(ctx context.Context, userID int) (*quota.QuotaStatus, error)
+	GetQuotaStatus(ctx context.Context, userID int) (*quotamodels.QuotaStatus, error)
 	LogError(err error)
 }
 
