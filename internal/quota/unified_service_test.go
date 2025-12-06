@@ -12,6 +12,7 @@ import (
 	"github.com/benidevo/vega/internal/quota/mocks"
 	"github.com/benidevo/vega/internal/quota/models"
 	"github.com/stretchr/testify/assert"
+	testifymock "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -193,10 +194,10 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 				// Expect transaction
 				mock.ExpectBegin()
 
-				// Expect SetFirstAnalyzedAt call
-				jobRepo.On("SetFirstAnalyzedAt", context.Background(), 123).Return(nil)
+				// Expect SetFirstAnalyzedAtWithTx call (uses transaction)
+				jobRepo.On("SetFirstAnalyzedAtWithTx", context.Background(), testifymock.Anything, 123).Return(nil)
 
-				// Record analysis
+				// Record analysis (uses transaction via IncrementMonthlyUsageWithTx)
 				monthYear := timeutil.GetCurrentMonthYear()
 				mock.ExpectExec("INSERT INTO user_quota_usage").
 					WithArgs(1, monthYear).
@@ -265,8 +266,8 @@ func TestUnifiedService_RecordUsage(t *testing.T) {
 				// Expect transaction
 				mock.ExpectBegin()
 
-				// Expect SetFirstAnalyzedAt call
-				jobRepo.On("SetFirstAnalyzedAt", context.Background(), 123).Return(nil)
+				// Expect SetFirstAnalyzedAtWithTx call (uses transaction)
+				jobRepo.On("SetFirstAnalyzedAtWithTx", context.Background(), testifymock.Anything, 123).Return(nil)
 
 				monthYear := timeutil.GetCurrentMonthYear()
 				mock.ExpectExec("INSERT INTO user_quota_usage").

@@ -1376,6 +1376,54 @@ func (_c *MockTransactionalJobRepository_SetFirstAnalyzedAt_Call) RunAndReturn(r
 	return _c
 }
 
+// SetFirstAnalyzedAtWithTx provides a mock function with given fields: ctx, tx, jobID
+func (_m *MockTransactionalJobRepository) SetFirstAnalyzedAtWithTx(ctx context.Context, tx *sql.Tx, jobID int) error {
+	ret := _m.Called(ctx, tx, jobID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetFirstAnalyzedAtWithTx")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *sql.Tx, int) error); ok {
+		r0 = rf(ctx, tx, jobID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetFirstAnalyzedAtWithTx'
+type MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call struct {
+	*mock.Call
+}
+
+// SetFirstAnalyzedAtWithTx is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tx *sql.Tx
+//   - jobID int
+func (_e *MockTransactionalJobRepository_Expecter) SetFirstAnalyzedAtWithTx(ctx interface{}, tx interface{}, jobID interface{}) *MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call {
+	return &MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call{Call: _e.mock.On("SetFirstAnalyzedAtWithTx", ctx, tx, jobID)}
+}
+
+func (_c *MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call) Run(run func(ctx context.Context, tx *sql.Tx, jobID int)) *MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*sql.Tx), args[2].(int))
+	})
+	return _c
+}
+
+func (_c *MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call) Return(_a0 error) *MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call) RunAndReturn(run func(context.Context, *sql.Tx, int) error) *MockTransactionalJobRepository_SetFirstAnalyzedAtWithTx_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Update provides a mock function with given fields: ctx, userID, job
 func (_m *MockTransactionalJobRepository) Update(ctx context.Context, userID int, job *models.Job) error {
 	ret := _m.Called(ctx, userID, job)

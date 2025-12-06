@@ -14,7 +14,7 @@ import (
 // JobRepository interface defines methods the quota service needs from the job repository
 type JobRepository interface {
 	GetByID(ctx context.Context, userID, jobID int) (*models.Job, error)
-	SetFirstAnalyzedAt(ctx context.Context, jobID int) error
+	SetFirstAnalyzedAtWithTx(ctx context.Context, tx *sql.Tx, jobID int) error
 }
 
 // Service handles quota management
@@ -147,15 +147,16 @@ func (s *Service) RecordAnalysis(ctx context.Context, userID int, jobID int) err
 	}
 	defer tx.Rollback()
 
-	err = s.jobRepo.SetFirstAnalyzedAt(ctx, jobID)
+	// Use transactional method to ensure operation participates in transaction
+	err = s.jobRepo.SetFirstAnalyzedAtWithTx(ctx, tx, jobID)
 	if err != nil {
 		return fmt.Errorf("failed to set first analyzed at: %w", err)
 	}
 
 	monthYear := timeutil.GetCurrentMonthYear()
 
-	// Use repository to increment usage
-	err = s.repo.IncrementMonthlyUsage(ctx, userID, monthYear)
+	// Use transactional repository method to increment usage within same transaction
+	err = s.repo.IncrementMonthlyUsageWithTx(ctx, tx, userID, monthYear)
 	if err != nil {
 		return fmt.Errorf("failed to update quota usage: %w", err)
 	}

@@ -126,7 +126,7 @@ func (r *SQLiteJobRepository) UpdateWithTx(ctx context.Context, tx *sql.Tx, user
 	}
 
 	query := `
-		UPDATE jobs SET 
+		UPDATE jobs SET
 			title = ?, description = ?, location = ?, job_type = ?,
 			source_url = ?, required_skills = ?, application_url = ?,
 			company_id = ?, status = ?, match_score = ?, notes = ?,
@@ -1323,6 +1323,29 @@ func (r *SQLiteJobRepository) SetFirstAnalyzedAt(ctx context.Context, jobID int)
 	`
 
 	result, err := r.db.ExecContext(ctx, query, jobID)
+	if err != nil {
+		return models.WrapError(models.ErrFailedToUpdateJob, err)
+	}
+
+	_, err = result.RowsAffected()
+	if err != nil {
+		return models.WrapError(models.ErrFailedToUpdateJob, err)
+	}
+
+	return nil
+}
+
+// SetFirstAnalyzedAtWithTx sets the first_analyzed_at timestamp within a transaction.
+// Only updates if first_analyzed_at is currently NULL.
+func (r *SQLiteJobRepository) SetFirstAnalyzedAtWithTx(ctx context.Context, tx *sql.Tx, jobID int) error {
+	query := `
+		UPDATE jobs
+		SET first_analyzed_at = CURRENT_TIMESTAMP
+		WHERE id = ?
+		AND first_analyzed_at IS NULL
+	`
+
+	result, err := tx.ExecContext(ctx, query, jobID)
 	if err != nil {
 		return models.WrapError(models.ErrFailedToUpdateJob, err)
 	}

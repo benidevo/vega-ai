@@ -14,6 +14,7 @@ type Repository interface {
 	// Monthly quota methods (existing functionality)
 	GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*models.QuotaUsage, error)
 	IncrementMonthlyUsage(ctx context.Context, userID int, monthYear string) error
+	IncrementMonthlyUsageWithTx(ctx context.Context, tx *sql.Tx, userID int, monthYear string) error
 
 	// Daily quota methods (new functionality)
 	GetDailyUsage(ctx context.Context, userID int, date string, quotaKey string) (int, error)
@@ -74,6 +75,24 @@ func (r *repository) IncrementMonthlyUsage(ctx context.Context, userID int, mont
 	`
 
 	_, err := r.db.ExecContext(ctx, upsertQuery, userID, monthYear)
+	if err != nil {
+		return fmt.Errorf("failed to update quota usage: %w", err)
+	}
+
+	return nil
+}
+
+// IncrementMonthlyUsageWithTx increments the monthly usage count within a transaction
+func (r *repository) IncrementMonthlyUsageWithTx(ctx context.Context, tx *sql.Tx, userID int, monthYear string) error {
+	upsertQuery := `
+		INSERT INTO user_quota_usage (user_id, month_year, jobs_analyzed, updated_at)
+		VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+		ON CONFLICT(user_id, month_year) DO UPDATE SET
+			jobs_analyzed = jobs_analyzed + 1,
+			updated_at = CURRENT_TIMESTAMP
+	`
+
+	_, err := tx.ExecContext(ctx, upsertQuery, userID, monthYear)
 	if err != nil {
 		return fmt.Errorf("failed to update quota usage: %w", err)
 	}
