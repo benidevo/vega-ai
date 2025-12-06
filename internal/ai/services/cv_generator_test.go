@@ -6,26 +6,18 @@ import (
 	"testing"
 
 	"github.com/benidevo/vega/internal/ai/llm"
+	llmMocks "github.com/benidevo/vega/internal/ai/llm/mocks"
 	"github.com/benidevo/vega/internal/ai/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-type MockCVGenerator struct {
-	mock.Mock
-}
-
-func (m *MockCVGenerator) Generate(ctx context.Context, request llm.GenerateRequest) (llm.GenerateResponse, error) {
-	args := m.Called(ctx, request)
-	return args.Get(0).(llm.GenerateResponse), args.Error(1)
-}
-
 func TestCVGeneratorService_GenerateCV(t *testing.T) {
 	tests := []struct {
 		name          string
 		request       models.Request
-		setupMock     func(*MockCVGenerator)
+		setupMock     func(*llmMocks.MockProvider)
 		expectError   bool
 		errorContains string
 	}{
@@ -36,7 +28,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 				ApplicantProfile: "Senior Frontend Developer with 6+ years experience",
 				JobDescription:   "Frontend Developer position requiring React skills",
 			},
-			setupMock: func(m *MockCVGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				validCVResult := models.CVParsingResult{
 					IsValid: true,
 					PersonalInfo: models.PersonalInfo{
@@ -78,7 +70,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 				ApplicantProfile: "",
 				JobDescription:   "",
 			},
-			setupMock: func(m *MockCVGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -90,7 +82,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 				ApplicantProfile: "Software Engineer",
 				JobDescription:   "Developer position",
 			},
-			setupMock: func(m *MockCVGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				m.On("Generate", mock.Anything, mock.MatchedBy(func(req llm.GenerateRequest) bool {
 					return req.ResponseType == llm.ResponseTypeCV
 				})).Return(llm.GenerateResponse{}, fmt.Errorf("AI service error"))
@@ -105,7 +97,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 				ApplicantProfile: "Backend Developer",
 				JobDescription:   "Python Developer",
 			},
-			setupMock: func(m *MockCVGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				m.On("Generate", mock.Anything, mock.MatchedBy(func(req llm.GenerateRequest) bool {
 					return req.ResponseType == llm.ResponseTypeCV
 				})).Return(llm.GenerateResponse{
@@ -122,7 +114,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 				ApplicantProfile: "Full Stack Developer",
 				JobDescription:   "Web Developer",
 			},
-			setupMock: func(m *MockCVGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				invalidCVResult := models.CVParsingResult{
 					IsValid: false,
 					Reason:  "Failed to generate valid CV structure",
@@ -140,7 +132,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockProvider := &MockCVGenerator{}
+			mockProvider := llmMocks.NewMockProvider(t)
 			if tt.setupMock != nil {
 				tt.setupMock(mockProvider)
 			}
@@ -158,8 +150,6 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 				assert.True(t, result.IsValid)
 				assert.NotEmpty(t, result.PersonalInfo.FirstName)
 			}
-
-			mockProvider.AssertExpectations(t)
 		})
 	}
 }

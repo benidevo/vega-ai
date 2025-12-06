@@ -5,12 +5,14 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/benidevo/vega/internal/quota/models"
 )
 
 // Repository interface defines methods for quota data access
 type Repository interface {
 	// Monthly quota methods (existing functionality)
-	GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*QuotaUsage, error)
+	GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*models.QuotaUsage, error)
 	IncrementMonthlyUsage(ctx context.Context, userID int, monthYear string) error
 
 	// Daily quota methods (new functionality)
@@ -19,7 +21,7 @@ type Repository interface {
 	GetAllDailyUsage(ctx context.Context, userID int, date string) (map[string]int, error)
 
 	// Configuration methods
-	GetQuotaConfig(ctx context.Context, quotaType string) (*QuotaConfig, error)
+	GetQuotaConfig(ctx context.Context, quotaType string) (*models.QuotaConfig, error)
 }
 
 // repository implements the Repository interface
@@ -33,8 +35,8 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 // GetMonthlyUsage gets the monthly usage for a user
-func (r *repository) GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*QuotaUsage, error) {
-	usage := &QuotaUsage{
+func (r *repository) GetMonthlyUsage(ctx context.Context, userID int, monthYear string) (*models.QuotaUsage, error) {
+	usage := &models.QuotaUsage{
 		UserID:       userID,
 		MonthYear:    monthYear,
 		JobsAnalyzed: 0,
@@ -153,8 +155,8 @@ func (r *repository) GetAllDailyUsage(ctx context.Context, userID int, date stri
 }
 
 // GetQuotaConfig gets the quota configuration for a specific quota type
-func (r *repository) GetQuotaConfig(ctx context.Context, quotaType string) (*QuotaConfig, error) {
-	config := &QuotaConfig{}
+func (r *repository) GetQuotaConfig(ctx context.Context, quotaType string) (*models.QuotaConfig, error) {
+	config := &models.QuotaConfig{}
 
 	query := `
 		SELECT quota_type, free_limit, description, created_at, updated_at

@@ -9,6 +9,7 @@ import (
 	"github.com/benidevo/vega/internal/ai"
 	aimodels "github.com/benidevo/vega/internal/ai/models"
 	"github.com/benidevo/vega/internal/config"
+	jobinterfacesmocks "github.com/benidevo/vega/internal/job/interfaces/mocks"
 	"github.com/benidevo/vega/internal/job/models"
 	settingsmodels "github.com/benidevo/vega/internal/settings/models"
 	"github.com/rs/zerolog"
@@ -21,38 +22,7 @@ func init() {
 	zerolog.SetGlobalLevel(zerolog.Disabled)
 }
 
-// MockJobMatcherService mocks the JobMatcherService
-type MockJobMatcherService struct {
-	mock.Mock
-}
-
-func (m *MockJobMatcherService) AnalyzeMatch(ctx context.Context, req aimodels.Request) (*aimodels.MatchResult, error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*aimodels.MatchResult), args.Error(1)
-}
-
-func (m *MockJobMatcherService) GetMatchCategories(score int) (string, string) {
-	args := m.Called(score)
-	return args.String(0), args.String(1)
-}
-
-// MockCoverLetterGeneratorService mocks the CoverLetterGeneratorService
-type MockCoverLetterGeneratorService struct {
-	mock.Mock
-}
-
-func (m *MockCoverLetterGeneratorService) GenerateCoverLetter(ctx context.Context, req aimodels.Request) (*aimodels.CoverLetter, error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*aimodels.CoverLetter), args.Error(1)
-}
-
-// MockSettingsService mocks the SettingsService
+// MockSettingsService mocks the unexported settingsService interface
 type MockSettingsService struct {
 	mock.Mock
 }
@@ -114,7 +84,7 @@ func createTestProfile() *settingsmodels.Profile {
 }
 
 func TestJobService_AnalyzeJobMatch_NoAIService(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
@@ -127,7 +97,7 @@ func TestJobService_AnalyzeJobMatch_NoAIService(t *testing.T) {
 }
 
 func TestJobService_AnalyzeJobMatch_NoSettingsService(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 
 	// Create service with AI service but no settings service
@@ -141,7 +111,7 @@ func TestJobService_AnalyzeJobMatch_NoSettingsService(t *testing.T) {
 }
 
 func TestJobService_GenerateCoverLetter_NoAIService(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
@@ -230,7 +200,7 @@ func TestJobService_ValidateProfileForAI(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockJobRepo := &MockJobRepository{}
+			mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 			cfg := &config.Settings{}
 			service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -247,7 +217,7 @@ func TestJobService_ValidateProfileForAI(t *testing.T) {
 }
 
 func TestJobService_buildAIRequest(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -268,7 +238,7 @@ func TestJobService_buildAIRequest(t *testing.T) {
 }
 
 func TestJobService_buildAIRequest_EmptyName(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -283,7 +253,7 @@ func TestJobService_buildAIRequest_EmptyName(t *testing.T) {
 }
 
 func TestJobService_buildProfileSummary(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -307,7 +277,7 @@ func TestJobService_buildProfileSummary(t *testing.T) {
 }
 
 func TestJobService_buildProfileSummary_LimitedExperience(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -334,7 +304,7 @@ func TestJobService_buildProfileSummary_LimitedExperience(t *testing.T) {
 }
 
 func TestJobService_convertToJobMatchAnalysis(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -361,7 +331,7 @@ func TestJobService_convertToJobMatchAnalysis(t *testing.T) {
 }
 
 func TestJobService_convertToCoverLetter(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -382,7 +352,7 @@ func TestJobService_convertToCoverLetter(t *testing.T) {
 }
 
 func TestJobService_GenerateCV_NoAIService(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
@@ -395,7 +365,7 @@ func TestJobService_GenerateCV_NoAIService(t *testing.T) {
 }
 
 func TestJobService_GenerateCV_NoSettingsService(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 
 	service := NewJobService(mockJobRepo, &ai.AIService{}, nil, nil, cfg)
@@ -408,7 +378,7 @@ func TestJobService_GenerateCV_NoSettingsService(t *testing.T) {
 }
 
 func TestJobService_calculateTotalExperience(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -495,7 +465,7 @@ func TestJobService_calculateTotalExperience(t *testing.T) {
 }
 
 func TestJobService_buildAIRequest_ExperienceContext(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -555,7 +525,7 @@ func TestJobService_buildAIRequest_ExperienceContext(t *testing.T) {
 }
 
 func TestJobService_buildAIRequest_SimilarSkillsHandling(t *testing.T) {
-	mockJobRepo := &MockJobRepository{}
+	mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 	cfg := &config.Settings{}
 	service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 

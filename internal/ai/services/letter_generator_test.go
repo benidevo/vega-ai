@@ -6,36 +6,25 @@ import (
 	"testing"
 
 	"github.com/benidevo/vega/internal/ai/llm"
+	llmMocks "github.com/benidevo/vega/internal/ai/llm/mocks"
 	"github.com/benidevo/vega/internal/ai/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-type MockLetterGenerator struct {
-	mock.Mock
-}
-
-func (m *MockLetterGenerator) Generate(ctx context.Context, request llm.GenerateRequest) (llm.GenerateResponse, error) {
-	args := m.Called(ctx, request)
-	if args.Get(0) == nil {
-		return llm.GenerateResponse{}, args.Error(1)
-	}
-	return args.Get(0).(llm.GenerateResponse), args.Error(1)
-}
-
 func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 	tests := []struct {
 		name          string
 		request       models.Request
-		setupMock     func(*MockLetterGenerator)
+		setupMock     func(*llmMocks.MockProvider)
 		expectError   bool
 		errorContains string
 	}{
 		{
 			name:    "should_generate_cover_letter_when_request_valid",
 			request: createTestRequest(),
-			setupMock: func(m *MockLetterGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				coverLetter := models.CoverLetter{
 					Content: "Dear Hiring Manager,\n\nI am writing to express my interest...",
 					Format:  models.CoverLetterTypePlainText,
@@ -57,7 +46,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 				ApplicantProfile: "Some profile",
 				JobDescription:   "Some job description",
 			},
-			setupMock: func(m *MockLetterGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -69,7 +58,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 				ApplicantProfile: "",
 				JobDescription:   "Some job description",
 			},
-			setupMock: func(m *MockLetterGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -81,7 +70,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 				ApplicantProfile: "Some profile",
 				JobDescription:   "",
 			},
-			setupMock: func(m *MockLetterGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -89,7 +78,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 		{
 			name:    "should_return_error_when_provider_fails",
 			request: createTestRequest(),
-			setupMock: func(m *MockLetterGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				m.On("Generate", mock.Anything, mock.MatchedBy(func(req llm.GenerateRequest) bool {
 					return req.ResponseType == llm.ResponseTypeCoverLetter
 				})).Return(llm.GenerateResponse{}, fmt.Errorf("AI service error"))
@@ -100,7 +89,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 		{
 			name:    "should_return_error_when_response_invalid_type",
 			request: createTestRequest(),
-			setupMock: func(m *MockLetterGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				response := llm.GenerateResponse{
 					Data: "invalid type",
 				}
@@ -120,7 +109,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 				JobDescription:   "Go Developer position",
 				ExtraContext:     "Focus on microservices experience",
 			},
-			setupMock: func(m *MockLetterGenerator) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				coverLetter := models.CoverLetter{
 					Content: "<p>Dear Hiring Manager,</p><p>I am excited to apply...</p>",
 					Format:  models.CoverLetterTypeHtml,
@@ -137,7 +126,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockProvider := &MockLetterGenerator{}
+			mockProvider := llmMocks.NewMockProvider(t)
 			if tt.setupMock != nil {
 				tt.setupMock(mockProvider)
 			}
@@ -154,8 +143,6 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 				require.NotNil(t, result)
 				assert.NotEmpty(t, result.Content)
 			}
-
-			mockProvider.AssertExpectations(t)
 		})
 	}
 }

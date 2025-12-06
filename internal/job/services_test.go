@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/benidevo/vega/internal/config"
+	jobinterfacesmocks "github.com/benidevo/vega/internal/job/interfaces/mocks"
 	"github.com/benidevo/vega/internal/job/models"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -19,157 +20,6 @@ func init() {
 }
 
 const testUserID = 1
-
-// MockJobRepository mocks the JobRepository interface
-type MockJobRepository struct {
-	mock.Mock
-}
-
-func (m *MockJobRepository) Create(ctx context.Context, userID int, job *models.Job) (*models.Job, error) {
-	args := m.Called(ctx, userID, job)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.Job), args.Error(1)
-}
-
-func (m *MockJobRepository) UpdateMatchScore(ctx context.Context, userID int, jobID int, matchScore *int) error {
-	args := m.Called(ctx, userID, jobID, matchScore)
-	return args.Error(0)
-}
-
-func (m *MockJobRepository) GetBySourceURL(ctx context.Context, userID int, sourceURL string) (*models.Job, error) {
-	args := m.Called(ctx, userID, sourceURL)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.Job), args.Error(1)
-}
-
-func (m *MockJobRepository) GetOrCreate(ctx context.Context, userID int, job *models.Job) (*models.Job, bool, error) {
-	args := m.Called(ctx, userID, job)
-	if args.Get(0) == nil {
-		return nil, args.Bool(1), args.Error(2)
-	}
-	return args.Get(0).(*models.Job), args.Bool(1), args.Error(2)
-}
-
-func (m *MockJobRepository) GetByID(ctx context.Context, userID int, id int) (*models.Job, error) {
-	args := m.Called(ctx, userID, id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.Job), args.Error(1)
-}
-
-func (m *MockJobRepository) GetAll(ctx context.Context, userID int, filter models.JobFilter) ([]*models.Job, error) {
-	args := m.Called(ctx, userID, filter)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*models.Job), args.Error(1)
-}
-
-func (m *MockJobRepository) GetCount(ctx context.Context, userID int, filter models.JobFilter) (int, error) {
-	args := m.Called(ctx, userID, filter)
-	return args.Int(0), args.Error(1)
-}
-
-func (m *MockJobRepository) Update(ctx context.Context, userID int, job *models.Job) error {
-	args := m.Called(ctx, userID, job)
-	return args.Error(0)
-}
-
-func (m *MockJobRepository) Delete(ctx context.Context, userID int, id int) error {
-	args := m.Called(ctx, userID, id)
-	return args.Error(0)
-}
-
-func (m *MockJobRepository) UpdateStatus(ctx context.Context, userID int, id int, status models.JobStatus) error {
-	args := m.Called(ctx, userID, id, status)
-	return args.Error(0)
-}
-
-func (m *MockJobRepository) GetStats(ctx context.Context, userID int) (*models.JobStats, error) {
-	args := m.Called(ctx, userID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.JobStats), args.Error(1)
-}
-
-func (m *MockJobRepository) CreateMatchResult(ctx context.Context, userID int, matchResult *models.MatchResult) error {
-	args := m.Called(ctx, userID, matchResult)
-	return args.Error(0)
-}
-
-func (m *MockJobRepository) GetJobMatchHistory(ctx context.Context, userID int, jobID int) ([]*models.MatchResult, error) {
-	args := m.Called(ctx, userID, jobID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*models.MatchResult), args.Error(1)
-}
-
-func (m *MockJobRepository) GetRecentMatchResults(ctx context.Context, userID int, limit int) ([]*models.MatchResult, error) {
-	args := m.Called(ctx, userID, limit)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*models.MatchResult), args.Error(1)
-}
-
-func (m *MockJobRepository) GetRecentMatchResultsWithDetails(ctx context.Context, userID int, limit int, currentJobID int) ([]*models.MatchSummary, error) {
-	args := m.Called(ctx, userID, limit, currentJobID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*models.MatchSummary), args.Error(1)
-}
-
-func (m *MockJobRepository) DeleteMatchResult(ctx context.Context, userID int, matchID int) error {
-	args := m.Called(ctx, userID, matchID)
-	return args.Error(0)
-}
-
-func (m *MockJobRepository) MatchResultBelongsToJob(ctx context.Context, userID int, matchID, jobID int) (bool, error) {
-	args := m.Called(ctx, userID, matchID, jobID)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockJobRepository) GetStatsByUserID(ctx context.Context, userID int) (*models.JobStats, error) {
-	args := m.Called(ctx, userID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.JobStats), args.Error(1)
-}
-
-func (m *MockJobRepository) GetRecentJobsByUserID(ctx context.Context, userID int, limit int) ([]*models.Job, error) {
-	args := m.Called(ctx, userID, limit)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*models.Job), args.Error(1)
-}
-
-func (m *MockJobRepository) GetJobStatsByStatus(ctx context.Context, userID int) (map[models.JobStatus]int, error) {
-	args := m.Called(ctx, userID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(map[models.JobStatus]int), args.Error(1)
-}
-
-func (m *MockJobRepository) SetFirstAnalyzedAt(ctx context.Context, jobID int) error {
-	args := m.Called(ctx, jobID)
-	return args.Error(0)
-}
-
-func (m *MockJobRepository) GetMonthlyAnalysisCount(ctx context.Context, userID int) (int, error) {
-	args := m.Called(ctx, userID)
-	return args.Int(0), args.Error(1)
-}
 
 func setupTestConfig() *config.Settings {
 	return &config.Settings{
@@ -207,7 +57,7 @@ func TestJobService(t *testing.T) {
 	cfg := setupTestConfig()
 
 	t.Run("should create job successfully", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		mockRepo.On("GetOrCreate", ctx, testUserID, mock.AnythingOfType("*models.Job")).Return(job, true, nil)
 
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
@@ -217,11 +67,10 @@ func TestJobService(t *testing.T) {
 		assert.True(t, isNew)
 		assert.Equal(t, job.ID, createdJob.ID)
 		assert.Equal(t, job.Title, createdJob.Title)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should return job when valid ID", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		mockRepo.On("GetByID", ctx, testUserID, 1).Return(job, nil)
 
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
@@ -229,7 +78,6 @@ func TestJobService(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, job.ID, foundJob.ID)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should return error when invalid ID", func(t *testing.T) {
@@ -248,7 +96,7 @@ func TestJobService(t *testing.T) {
 		}
 
 		t.Run("should filter by status", func(t *testing.T) {
-			mockRepo := new(MockJobRepository)
+			mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 			status := models.APPLIED
 			statusFilter := models.JobFilter{
 				Status: &status,
@@ -262,11 +110,10 @@ func TestJobService(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.Len(t, result.Jobs, 2)
-			mockRepo.AssertExpectations(t)
 		})
 
 		t.Run("should filter by company ID", func(t *testing.T) {
-			mockRepo := new(MockJobRepository)
+			mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 			companyID := 1
 			companyFilter := models.JobFilter{
 				CompanyID: &companyID,
@@ -280,11 +127,10 @@ func TestJobService(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.Len(t, result.Jobs, 2)
-			mockRepo.AssertExpectations(t)
 		})
 
 		t.Run("should filter by job type", func(t *testing.T) {
-			mockRepo := new(MockJobRepository)
+			mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 			jobType := models.FULL_TIME
 			typeFilter := models.JobFilter{
 				JobType: &jobType,
@@ -298,11 +144,10 @@ func TestJobService(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.Len(t, result.Jobs, 2)
-			mockRepo.AssertExpectations(t)
 		})
 
 		t.Run("should apply complex filter with multiple criteria", func(t *testing.T) {
-			mockRepo := new(MockJobRepository)
+			mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 			status := models.APPLIED
 			jobType := models.FULL_TIME
 			complexFilter := models.JobFilter{
@@ -319,12 +164,11 @@ func TestJobService(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.Len(t, result.Jobs, 1)
-			mockRepo.AssertExpectations(t)
 		})
 	})
 
 	t.Run("should validate URLs for XSS prevention", func(t *testing.T) {
-		mockJobRepo := new(MockJobRepository)
+		mockJobRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		cfg := &config.Settings{}
 		service := NewJobService(mockJobRepo, nil, nil, nil, cfg)
 
@@ -357,14 +201,13 @@ func TestJobService(t *testing.T) {
 	})
 
 	t.Run("should update job successfully", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		mockRepo.On("Update", ctx, testUserID, mock.AnythingOfType("*models.Job")).Return(nil)
 
 		service := NewJobService(mockRepo, nil, nil, nil, cfg)
 		err := service.UpdateJob(ctx, testUserID, job)
 
 		require.NoError(t, err)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should validate job before updating", func(t *testing.T) {
@@ -381,7 +224,7 @@ func TestJobService(t *testing.T) {
 	})
 
 	t.Run("should delete job successfully", func(t *testing.T) {
-		mockRepo := new(MockJobRepository)
+		mockRepo := jobinterfacesmocks.NewMockJobRepository(t)
 		mockRepo.On("GetByID", ctx, testUserID, 1).Return(job, nil)
 		mockRepo.On("Delete", ctx, testUserID, 1).Return(nil)
 
@@ -389,7 +232,6 @@ func TestJobService(t *testing.T) {
 		err := service.DeleteJob(ctx, testUserID, 1)
 
 		require.NoError(t, err)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should return error when trying to delete with invalid ID", func(t *testing.T) {

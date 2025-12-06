@@ -6,23 +6,12 @@ import (
 	"testing"
 
 	"github.com/benidevo/vega/internal/ai/llm"
+	llmMocks "github.com/benidevo/vega/internal/ai/llm/mocks"
 	"github.com/benidevo/vega/internal/ai/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
-
-type MockJobMatcher struct {
-	mock.Mock
-}
-
-func (m *MockJobMatcher) Generate(ctx context.Context, request llm.GenerateRequest) (llm.GenerateResponse, error) {
-	args := m.Called(ctx, request)
-	if args.Get(0) == nil {
-		return llm.GenerateResponse{}, args.Error(1)
-	}
-	return args.Get(0).(llm.GenerateResponse), args.Error(1)
-}
 
 func createTestRequest() models.Request {
 	return models.Request{
@@ -50,7 +39,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 	tests := []struct {
 		name           string
 		request        models.Request
-		setupMock      func(*MockJobMatcher)
+		setupMock      func(*llmMocks.MockProvider)
 		expectedResult *models.MatchResult
 		expectError    bool
 		errorContains  string
@@ -58,7 +47,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 		{
 			name:    "should_match_job_when_request_valid",
 			request: createTestRequest(),
-			setupMock: func(m *MockJobMatcher) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				matchResult := models.MatchResult{
 					MatchScore: 85,
 					Strengths:  []string{"Strong Go skills", "Relevant experience"},
@@ -90,7 +79,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 				ApplicantProfile: "Some profile",
 				JobDescription:   "Some job description",
 			},
-			setupMock: func(m *MockJobMatcher) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -102,7 +91,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 				ApplicantProfile: "", // Empty
 				JobDescription:   "Some job description",
 			},
-			setupMock: func(m *MockJobMatcher) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -114,7 +103,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 				ApplicantProfile: "Some profile",
 				JobDescription:   "", // Empty
 			},
-			setupMock: func(m *MockJobMatcher) {
+			setupMock: func(m *llmMocks.MockProvider) {
 			},
 			expectError:   true,
 			errorContains: "validation failed",
@@ -122,7 +111,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 		{
 			name:    "should_return_error_when_provider_fails",
 			request: createTestRequest(),
-			setupMock: func(m *MockJobMatcher) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				m.On("Generate", mock.Anything, mock.MatchedBy(func(req llm.GenerateRequest) bool {
 					return req.ResponseType == llm.ResponseTypeMatchResult
 				})).Return(llm.GenerateResponse{}, fmt.Errorf("AI service error"))
@@ -133,7 +122,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 		{
 			name:    "should_return_error_when_response_invalid_type",
 			request: createTestRequest(),
-			setupMock: func(m *MockJobMatcher) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				m.On("Generate", mock.Anything, mock.MatchedBy(func(req llm.GenerateRequest) bool {
 					return req.ResponseType == llm.ResponseTypeMatchResult
 				})).Return(llm.GenerateResponse{
@@ -151,7 +140,7 @@ func TestJobMatcherService_AnalyzeMatch(t *testing.T) {
 Skills: Python, ML, SQL`,
 				JobDescription: "Data Scientist role requiring ML experience",
 			},
-			setupMock: func(m *MockJobMatcher) {
+			setupMock: func(m *llmMocks.MockProvider) {
 				matchResult := models.MatchResult{
 					MatchScore: 80,
 					Strengths:  []string{"Strong ML background"},
@@ -178,7 +167,7 @@ Skills: Python, ML, SQL`,
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockProvider := &MockJobMatcher{}
+			mockProvider := llmMocks.NewMockProvider(t)
 			if tt.setupMock != nil {
 				tt.setupMock(mockProvider)
 			}
@@ -195,8 +184,6 @@ Skills: Python, ML, SQL`,
 				require.NotNil(t, result)
 				assert.Equal(t, tt.expectedResult, result)
 			}
-
-			mockProvider.AssertExpectations(t)
 		})
 	}
 }
@@ -278,7 +265,7 @@ func TestJobMatcherService_GetMatchCategories(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockProvider := &MockJobMatcher{}
+			mockProvider := llmMocks.NewMockProvider(t)
 			service := NewJobMatcherService(mockProvider)
 
 			category, description := service.GetMatchCategories(tt.score)

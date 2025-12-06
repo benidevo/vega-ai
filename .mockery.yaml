@@ -24,11 +24,11 @@ packages:
       Cache:
   github.com/benidevo/vega/internal/quota:
     interfaces:
-      Repository:
       QuotaChecker:
       QuotaReporter:
       QuotaRecorder:
       QuotaService:
+      Repository:
       JobRepository:
   github.com/benidevo/vega/internal/job/interfaces:
     interfaces:
@@ -37,6 +37,9 @@ packages:
       TransactionalRepository:
       TransactionalJobRepository:
       TransactionalCompanyRepository:
+  github.com/benidevo/vega/internal/settings:
+    interfaces:
+      AuthServiceInterface:
   github.com/benidevo/vega/internal/settings/interfaces:
     interfaces:
       SettingsRepository:

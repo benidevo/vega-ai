@@ -1,4 +1,4 @@
-package quota
+package models
 
 import (
 	"time"

@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	quota "github.com/benidevo/vega/internal/quota"
+	models "github.com/benidevo/vega/internal/quota/models"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -23,23 +23,23 @@ func (_m *MockJobRepository) EXPECT() *MockJobRepository_Expecter {
 }
 
 // GetByID provides a mock function with given fields: ctx, userID, jobID
-func (_m *MockJobRepository) GetByID(ctx context.Context, userID int, jobID int) (*quota.Job, error) {
+func (_m *MockJobRepository) GetByID(ctx context.Context, userID int, jobID int) (*models.Job, error) {
 	ret := _m.Called(ctx, userID, jobID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 *quota.Job
+	var r0 *models.Job
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int, int) (*quota.Job, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int, int) (*models.Job, error)); ok {
 		return rf(ctx, userID, jobID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int, int) *quota.Job); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int, int) *models.Job); ok {
 		r0 = rf(ctx, userID, jobID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*quota.Job)
+			r0 = ret.Get(0).(*models.Job)
 		}
 	}
 
@@ -72,12 +72,12 @@ func (_c *MockJobRepository_GetByID_Call) Run(run func(ctx context.Context, user
 	return _c
 }
 
-func (_c *MockJobRepository_GetByID_Call) Return(_a0 *quota.Job, _a1 error) *MockJobRepository_GetByID_Call {
+func (_c *MockJobRepository_GetByID_Call) Return(_a0 *models.Job, _a1 error) *MockJobRepository_GetByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockJobRepository_GetByID_Call) RunAndReturn(run func(context.Context, int, int) (*quota.Job, error)) *MockJobRepository_GetByID_Call {
+func (_c *MockJobRepository_GetByID_Call) RunAndReturn(run func(context.Context, int, int) (*models.Job, error)) *MockJobRepository_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -7,60 +7,12 @@ import (
 	"time"
 
 	"github.com/benidevo/vega/internal/auth/models"
+	repomocks "github.com/benidevo/vega/internal/auth/repository/mocks"
 	commonerrors "github.com/benidevo/vega/internal/common/errors"
 	"github.com/benidevo/vega/internal/config"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
-
-type MockUserRepository struct {
-	mock.Mock
-}
-
-func (m *MockUserRepository) CreateUser(ctx context.Context, username, password, role string) (*models.User, error) {
-	args := m.Called(ctx, username, password, role)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) FindByUsername(ctx context.Context, username string) (*models.User, error) {
-	args := m.Called(ctx, username)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) FindByID(ctx context.Context, id int) (*models.User, error) {
-	args := m.Called(ctx, id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
-	args := m.Called(ctx, user)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) DeleteUser(ctx context.Context, id int) error {
-	args := m.Called(ctx, id)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindAllUsers(ctx context.Context) ([]*models.User, error) {
-	args := m.Called(ctx)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*models.User), args.Error(1)
-}
 
 func setupTestConfig() *config.Settings {
 	return &config.Settings{
@@ -72,7 +24,7 @@ func setupTestConfig() *config.Settings {
 
 func TestRegisterUser(t *testing.T) {
 	t.Run("should_register_user_successfully_when_valid_data", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -90,12 +42,10 @@ func TestRegisterUser(t *testing.T) {
 		require.NotNil(t, user)
 		require.Equal(t, "testuser", user.Username)
 		require.Equal(t, models.ADMIN, user.Role)
-
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_return_error_when_repository_fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -109,14 +59,12 @@ func TestRegisterUser(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserCreationFailed, err)
 		require.Nil(t, user)
-
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestLogin(t *testing.T) {
 	t.Run("should_login_successfully_when_credentials_valid", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -139,12 +87,10 @@ func TestLogin(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, accessToken)
 		require.NotEmpty(t, refreshToken)
-
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_return_error_when_credentials_invalid", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -172,27 +118,23 @@ func TestLogin(t *testing.T) {
 		require.Equal(t, models.ErrInvalidCredentials, err2)
 		require.Empty(t, accessToken2)
 		require.Empty(t, refreshToken2)
-
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestGetUserByID(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	cfg := setupTestConfig()
-	ctx := context.Background()
-
-	mockRepo.On("FindByID", ctx, 1).Return(&models.User{
-		ID:       1,
-		Username: "testuser",
-		Role:     models.ADMIN,
-	}, nil)
-
-	mockRepo.On("FindByID", ctx, 999).Return(nil, models.ErrUserNotFound)
-
-	authService := NewAuthService(mockRepo, cfg)
-
 	t.Run("should_return_user_when_found", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		cfg := setupTestConfig()
+		ctx := context.Background()
+
+		mockRepo.On("FindByID", ctx, 1).Return(&models.User{
+			ID:       1,
+			Username: "testuser",
+			Role:     models.ADMIN,
+		}, nil)
+
+		authService := NewAuthService(mockRepo, cfg)
+
 		user, err := authService.GetUserByID(ctx, 1)
 
 		require.NoError(t, err)
@@ -202,31 +144,37 @@ func TestGetUserByID(t *testing.T) {
 	})
 
 	t.Run("should_return_error_when_user_not_found", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		cfg := setupTestConfig()
+		ctx := context.Background()
+
+		mockRepo.On("FindByID", ctx, 999).Return(nil, models.ErrUserNotFound)
+
+		authService := NewAuthService(mockRepo, cfg)
+
 		user, err := authService.GetUserByID(ctx, 999)
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserNotFound, err)
 		require.Nil(t, user)
 	})
-
-	mockRepo.AssertExpectations(t)
 }
 
 func TestVerifyToken(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	cfg := setupTestConfig()
-	authService := NewAuthService(mockRepo, cfg)
-
-	user := &models.User{
-		ID:       1,
-		Username: "testuser",
-		Role:     models.ADMIN,
-	}
-
-	token, err := GenerateAccessToken(user, cfg)
-	require.NoError(t, err)
-
 	t.Run("should_verify_token_when_valid", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		cfg := setupTestConfig()
+		authService := NewAuthService(mockRepo, cfg)
+
+		user := &models.User{
+			ID:       1,
+			Username: "testuser",
+			Role:     models.ADMIN,
+		}
+
+		token, err := GenerateAccessToken(user, cfg)
+		require.NoError(t, err)
+
 		claims, err := authService.VerifyToken(token)
 
 		require.NoError(t, err)
@@ -236,6 +184,10 @@ func TestVerifyToken(t *testing.T) {
 	})
 
 	t.Run("should_reject_token_when_invalid", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		cfg := setupTestConfig()
+		authService := NewAuthService(mockRepo, cfg)
+
 		claims, err := authService.VerifyToken("invalid.token.here")
 
 		require.Error(t, err)
@@ -245,47 +197,62 @@ func TestVerifyToken(t *testing.T) {
 }
 
 func TestChangePassword(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	cfg := setupTestConfig()
-	ctx := context.Background()
-
-	mockRepo.On("FindByID", ctx, 1).Return(&models.User{
-		ID:       1,
-		Username: "testuser",
-		Password: "oldhash",
-	}, nil)
-
-	mockRepo.On("FindByID", ctx, 999).Return(nil, models.ErrUserNotFound)
-
-	mockRepo.On("UpdateUser", ctx, mock.AnythingOfType("*models.User")).Return(&models.User{}, nil).Once()
-	updateErr := commonerrors.WrapError(models.ErrUserPasswordChangeFailed, errors.New("update error"))
-	mockRepo.On("UpdateUser", ctx, mock.AnythingOfType("*models.User")).Return(nil, updateErr).Once()
-
-	authService := NewAuthService(mockRepo, cfg)
-
 	t.Run("should_change_password_when_user_exists", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		cfg := setupTestConfig()
+		ctx := context.Background()
+
+		mockRepo.On("FindByID", ctx, 1).Return(&models.User{
+			ID:       1,
+			Username: "testuser",
+			Password: "oldhash",
+		}, nil)
+		mockRepo.On("UpdateUser", ctx, mock.AnythingOfType("*models.User")).Return(&models.User{}, nil)
+
+		authService := NewAuthService(mockRepo, cfg)
+
 		err := authService.ChangePassword(ctx, 1, "newpassword")
 		require.NoError(t, err)
 	})
 
 	t.Run("should_return_error_when_user_not_found", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		cfg := setupTestConfig()
+		ctx := context.Background()
+
+		mockRepo.On("FindByID", ctx, 999).Return(nil, models.ErrUserNotFound)
+
+		authService := NewAuthService(mockRepo, cfg)
+
 		err := authService.ChangePassword(ctx, 999, "newpassword")
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserNotFound, err)
 	})
 
 	t.Run("should_return_error_when_update_fails", func(t *testing.T) {
+		mockRepo := repomocks.NewMockUserRepository(t)
+		cfg := setupTestConfig()
+		ctx := context.Background()
+
+		mockRepo.On("FindByID", ctx, 1).Return(&models.User{
+			ID:       1,
+			Username: "testuser",
+			Password: "oldhash",
+		}, nil)
+		updateErr := commonerrors.WrapError(models.ErrUserPasswordChangeFailed, errors.New("update error"))
+		mockRepo.On("UpdateUser", ctx, mock.AnythingOfType("*models.User")).Return(nil, updateErr)
+
+		authService := NewAuthService(mockRepo, cfg)
+
 		err := authService.ChangePassword(ctx, 1, "newpassword")
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserPasswordChangeFailed, err)
 	})
-
-	mockRepo.AssertExpectations(t)
 }
 
 func TestRefreshAccessToken(t *testing.T) {
 	t.Run("should_refresh_token_successfully_when_valid_refresh_token", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -311,12 +278,10 @@ func TestRefreshAccessToken(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, "access", claims.TokenType)
 		require.Equal(t, 1, claims.UserID)
-
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_return_error_when_refresh_token_invalid", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -330,7 +295,7 @@ func TestRefreshAccessToken(t *testing.T) {
 	})
 
 	t.Run("should_return_error_when_access_token_provided_instead_of_refresh", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -353,7 +318,7 @@ func TestRefreshAccessToken(t *testing.T) {
 	})
 
 	t.Run("should_return_error_when_user_not_found", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -375,12 +340,10 @@ func TestRefreshAccessToken(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)
 		require.Empty(t, newAccessToken)
-
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_return_error_when_user_repository_returns_nil", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -402,13 +365,11 @@ func TestRefreshAccessToken(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)
 		require.Empty(t, newAccessToken)
-
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestVerifyPassword(t *testing.T) {
-	mockRepo := new(MockUserRepository)
+	mockRepo := repomocks.NewMockUserRepository(t)
 	cfg := setupTestConfig()
 	authService := NewAuthService(mockRepo, cfg)
 
@@ -431,7 +392,7 @@ func TestVerifyPassword(t *testing.T) {
 
 func TestDeleteAccount(t *testing.T) {
 	t.Run("should_delete_account_successfully", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -442,11 +403,10 @@ func TestDeleteAccount(t *testing.T) {
 		err := authService.DeleteAccount(ctx, 1)
 
 		require.NoError(t, err)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_return_error_when_deletion_fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -458,13 +418,12 @@ func TestDeleteAccount(t *testing.T) {
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserDeletionFailed, err)
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestRegisterPasswordResetScenarios(t *testing.T) {
 	t.Run("should_return_error_when_username_already_exists", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -478,14 +437,12 @@ func TestRegisterPasswordResetScenarios(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserAlreadyExists, err)
 		require.Nil(t, user)
-
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestLoginEdgeCases(t *testing.T) {
 	t.Run("should_return_error_when_oauth_account_tries_password_login", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -504,12 +461,10 @@ func TestLoginEdgeCases(t *testing.T) {
 		require.Equal(t, models.ErrInvalidCredentials, err)
 		require.Empty(t, accessToken)
 		require.Empty(t, refreshToken)
-
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_handle_repository_error_during_login", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -524,13 +479,11 @@ func TestLoginEdgeCases(t *testing.T) {
 		require.Equal(t, models.ErrInvalidCredentials, err)
 		require.Empty(t, accessToken)
 		require.Empty(t, refreshToken)
-
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestVerifyTokenEdgeCases(t *testing.T) {
-	mockRepo := new(MockUserRepository)
+	mockRepo := repomocks.NewMockUserRepository(t)
 	cfg := setupTestConfig()
 	authService := NewAuthService(mockRepo, cfg)
 
@@ -587,7 +540,7 @@ func TestHashPasswordEdgeCases(t *testing.T) {
 }
 
 func TestLogError(t *testing.T) {
-	mockRepo := new(MockUserRepository)
+	mockRepo := repomocks.NewMockUserRepository(t)
 	cfg := setupTestConfig()
 	authService := NewAuthService(mockRepo, cfg)
 
@@ -597,7 +550,7 @@ func TestLogError(t *testing.T) {
 
 func TestRegisterWithLongPassword(t *testing.T) {
 	t.Run("should_handle_password_at_bcrypt_limit", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -618,11 +571,10 @@ func TestRegisterWithLongPassword(t *testing.T) {
 
 		require.NoError(t, err)
 		require.NotNil(t, user)
-		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should_fail_with_password_over_bcrypt_limit", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -643,7 +595,7 @@ func TestRegisterWithLongPassword(t *testing.T) {
 
 func TestGetUserByIDWithRepositoryError(t *testing.T) {
 	t.Run("should_return_retrieval_failed_error_for_unknown_errors", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -657,14 +609,12 @@ func TestGetUserByIDWithRepositoryError(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserRetrievalFailed, err)
 		require.Nil(t, user)
-
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestRefreshAccessTokenErrorScenarios(t *testing.T) {
 	t.Run("should_handle_repository_error_during_user_lookup", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -687,13 +637,11 @@ func TestRefreshAccessTokenErrorScenarios(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, models.ErrInvalidToken, err)
 		require.Empty(t, newAccessToken)
-
-		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestVerifyTokenWithInvalidSigningMethod(t *testing.T) {
-	mockRepo := new(MockUserRepository)
+	mockRepo := repomocks.NewMockUserRepository(t)
 	cfg := setupTestConfig()
 	authService := NewAuthService(mockRepo, cfg)
 
@@ -708,7 +656,7 @@ func TestVerifyTokenWithInvalidSigningMethod(t *testing.T) {
 
 func TestChangePasswordErrorCases(t *testing.T) {
 	t.Run("should_handle_generic_repository_error", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := repomocks.NewMockUserRepository(t)
 		cfg := setupTestConfig()
 		ctx := context.Background()
 
@@ -721,7 +669,5 @@ func TestChangePasswordErrorCases(t *testing.T) {
 
 		require.Error(t, err)
 		require.Equal(t, models.ErrUserPasswordChangeFailed, err)
-
-		mockRepo.AssertExpectations(t)
 	})
 }

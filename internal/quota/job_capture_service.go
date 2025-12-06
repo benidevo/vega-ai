@@ -6,6 +6,7 @@ import (
 	"time"
 
 	timeutil "github.com/benidevo/vega/internal/common/time"
+	"github.com/benidevo/vega/internal/quota/models"
 )
 
 // JobCaptureService handles job capture tracking from browser extension
@@ -23,17 +24,17 @@ func NewJobCaptureService(repo Repository, isCloudMode bool) *JobCaptureService 
 }
 
 // CanCaptureJobs checks if a user can capture more jobs (always returns true)
-func (s *JobCaptureService) CanCaptureJobs(ctx context.Context, userID int) (*QuotaCheckResult, error) {
+func (s *JobCaptureService) CanCaptureJobs(ctx context.Context, userID int) (*models.QuotaCheckResult, error) {
 	today := timeutil.GetCurrentDate()
-	usage, err := s.repo.GetDailyUsage(ctx, userID, today, QuotaKeyJobsCaptured)
+	usage, err := s.repo.GetDailyUsage(ctx, userID, today, models.QuotaKeyJobsCaptured)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get job capture usage: %w", err)
 	}
 
-	return &QuotaCheckResult{
+	return &models.QuotaCheckResult{
 		Allowed: true,
-		Reason:  QuotaReasonOK,
-		Status: QuotaStatus{
+		Reason:  models.QuotaReasonOK,
+		Status: models.QuotaStatus{
 			Used:      usage,
 			Limit:     -1,
 			ResetDate: time.Time{},
@@ -44,22 +45,22 @@ func (s *JobCaptureService) CanCaptureJobs(ctx context.Context, userID int) (*Qu
 // RecordJobsCaptured records that jobs were captured via extension
 func (s *JobCaptureService) RecordJobsCaptured(ctx context.Context, userID int, count int) error {
 	today := timeutil.GetCurrentDate()
-	return s.repo.IncrementDailyUsage(ctx, userID, today, QuotaKeyJobsCaptured, count)
+	return s.repo.IncrementDailyUsage(ctx, userID, today, models.QuotaKeyJobsCaptured, count)
 }
 
 // GetStatus returns the current job capture status
-func (s *JobCaptureService) GetStatus(ctx context.Context, userID int) (*QuotaCheckResult, error) {
+func (s *JobCaptureService) GetStatus(ctx context.Context, userID int) (*models.QuotaCheckResult, error) {
 	today := timeutil.GetCurrentDate()
-	jobsCaptured, err := s.repo.GetDailyUsage(ctx, userID, today, QuotaKeyJobsCaptured)
+	jobsCaptured, err := s.repo.GetDailyUsage(ctx, userID, today, models.QuotaKeyJobsCaptured)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get job capture usage: %w", err)
 	}
 
 	// Job captures are unlimited for everyone
-	return &QuotaCheckResult{
+	return &models.QuotaCheckResult{
 		Allowed: true,
-		Reason:  QuotaReasonOK,
-		Status: QuotaStatus{
+		Reason:  models.QuotaReasonOK,
+		Status: models.QuotaStatus{
 			Used:      jobsCaptured,
 			Limit:     -1,
 			ResetDate: time.Time{},

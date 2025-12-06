@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	quota "github.com/benidevo/vega/internal/quota"
+	models "github.com/benidevo/vega/internal/quota/models"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -23,23 +23,23 @@ func (_m *MockQuotaService) EXPECT() *MockQuotaService_Expecter {
 }
 
 // CanAnalyzeJob provides a mock function with given fields: ctx, userID, jobID
-func (_m *MockQuotaService) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*quota.QuotaCheckResult, error) {
+func (_m *MockQuotaService) CanAnalyzeJob(ctx context.Context, userID int, jobID int) (*models.QuotaCheckResult, error) {
 	ret := _m.Called(ctx, userID, jobID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CanAnalyzeJob")
 	}
 
-	var r0 *quota.QuotaCheckResult
+	var r0 *models.QuotaCheckResult
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int, int) (*quota.QuotaCheckResult, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int, int) (*models.QuotaCheckResult, error)); ok {
 		return rf(ctx, userID, jobID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int, int) *quota.QuotaCheckResult); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int, int) *models.QuotaCheckResult); ok {
 		r0 = rf(ctx, userID, jobID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*quota.QuotaCheckResult)
+			r0 = ret.Get(0).(*models.QuotaCheckResult)
 		}
 	}
 
@@ -72,34 +72,34 @@ func (_c *MockQuotaService_CanAnalyzeJob_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *MockQuotaService_CanAnalyzeJob_Call) Return(_a0 *quota.QuotaCheckResult, _a1 error) *MockQuotaService_CanAnalyzeJob_Call {
+func (_c *MockQuotaService_CanAnalyzeJob_Call) Return(_a0 *models.QuotaCheckResult, _a1 error) *MockQuotaService_CanAnalyzeJob_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockQuotaService_CanAnalyzeJob_Call) RunAndReturn(run func(context.Context, int, int) (*quota.QuotaCheckResult, error)) *MockQuotaService_CanAnalyzeJob_Call {
+func (_c *MockQuotaService_CanAnalyzeJob_Call) RunAndReturn(run func(context.Context, int, int) (*models.QuotaCheckResult, error)) *MockQuotaService_CanAnalyzeJob_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetMonthlyUsage provides a mock function with given fields: ctx, userID
-func (_m *MockQuotaService) GetMonthlyUsage(ctx context.Context, userID int) (*quota.QuotaUsage, error) {
+func (_m *MockQuotaService) GetMonthlyUsage(ctx context.Context, userID int) (*models.QuotaUsage, error) {
 	ret := _m.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetMonthlyUsage")
 	}
 
-	var r0 *quota.QuotaUsage
+	var r0 *models.QuotaUsage
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int) (*quota.QuotaUsage, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int) (*models.QuotaUsage, error)); ok {
 		return rf(ctx, userID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int) *quota.QuotaUsage); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int) *models.QuotaUsage); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*quota.QuotaUsage)
+			r0 = ret.Get(0).(*models.QuotaUsage)
 		}
 	}
 
@@ -131,34 +131,34 @@ func (_c *MockQuotaService_GetMonthlyUsage_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *MockQuotaService_GetMonthlyUsage_Call) Return(_a0 *quota.QuotaUsage, _a1 error) *MockQuotaService_GetMonthlyUsage_Call {
+func (_c *MockQuotaService_GetMonthlyUsage_Call) Return(_a0 *models.QuotaUsage, _a1 error) *MockQuotaService_GetMonthlyUsage_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockQuotaService_GetMonthlyUsage_Call) RunAndReturn(run func(context.Context, int) (*quota.QuotaUsage, error)) *MockQuotaService_GetMonthlyUsage_Call {
+func (_c *MockQuotaService_GetMonthlyUsage_Call) RunAndReturn(run func(context.Context, int) (*models.QuotaUsage, error)) *MockQuotaService_GetMonthlyUsage_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetQuotaStatus provides a mock function with given fields: ctx, userID
-func (_m *MockQuotaService) GetQuotaStatus(ctx context.Context, userID int) (*quota.QuotaStatus, error) {
+func (_m *MockQuotaService) GetQuotaStatus(ctx context.Context, userID int) (*models.QuotaStatus, error) {
 	ret := _m.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetQuotaStatus")
 	}
 
-	var r0 *quota.QuotaStatus
+	var r0 *models.QuotaStatus
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int) (*quota.QuotaStatus, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int) (*models.QuotaStatus, error)); ok {
 		return rf(ctx, userID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int) *quota.QuotaStatus); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int) *models.QuotaStatus); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*quota.QuotaStatus)
+			r0 = ret.Get(0).(*models.QuotaStatus)
 		}
 	}
 
@@ -190,12 +190,12 @@ func (_c *MockQuotaService_GetQuotaStatus_Call) Run(run func(ctx context.Context
 	return _c
 }
 
-func (_c *MockQuotaService_GetQuotaStatus_Call) Return(_a0 *quota.QuotaStatus, _a1 error) *MockQuotaService_GetQuotaStatus_Call {
+func (_c *MockQuotaService_GetQuotaStatus_Call) Return(_a0 *models.QuotaStatus, _a1 error) *MockQuotaService_GetQuotaStatus_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockQuotaService_GetQuotaStatus_Call) RunAndReturn(run func(context.Context, int) (*quota.QuotaStatus, error)) *MockQuotaService_GetQuotaStatus_Call {
+func (_c *MockQuotaService_GetQuotaStatus_Call) RunAndReturn(run func(context.Context, int) (*models.QuotaStatus, error)) *MockQuotaService_GetQuotaStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }
