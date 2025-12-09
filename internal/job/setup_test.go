@@ -22,6 +22,7 @@ func TestSetup(t *testing.T) {
 			name: "should_initialize_job_handler_with_dependencies",
 			cfg: &config.Settings{
 				IsCloudMode:  false,
+				IsTest:       true,
 				TokenSecret:  "test-secret",
 				GeminiAPIKey: "test-api-key",
 			},
@@ -31,6 +32,7 @@ func TestSetup(t *testing.T) {
 			name: "should_initialize_job_handler_in_cloud_mode",
 			cfg: &config.Settings{
 				IsCloudMode:  true,
+				IsTest:       true,
 				TokenSecret:  "test-secret",
 				GeminiAPIKey: "test-api-key",
 			},
@@ -44,8 +46,9 @@ func TestSetup(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			handler := Setup(db, tt.cfg, tt.cache)
+			handler, err := Setup(db, tt.cfg, tt.cache)
 
+			require.NoError(t, err)
 			assert.NotNil(t, handler)
 			assert.NotNil(t, handler.service)
 			assert.Equal(t, tt.cfg, handler.cfg)

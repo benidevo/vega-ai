@@ -12,6 +12,7 @@ import (
 
 	"github.com/benidevo/vega/internal/cache"
 	commonerrors "github.com/benidevo/vega/internal/common/errors"
+	"github.com/benidevo/vega/internal/common/logger"
 	"github.com/benidevo/vega/internal/db/querybuilder"
 	"github.com/benidevo/vega/internal/job/interfaces"
 	"github.com/benidevo/vega/internal/job/models"
@@ -36,6 +37,7 @@ type SQLiteJobRepository struct {
 	db                *sql.DB
 	companyRepository interfaces.CompanyRepository
 	cache             cache.Cache
+	log               *logger.PrivacyLogger
 }
 
 func NewSQLiteJobRepository(db *sql.DB, companyRepository interfaces.CompanyRepository, cache cache.Cache) *SQLiteJobRepository {
@@ -43,6 +45,7 @@ func NewSQLiteJobRepository(db *sql.DB, companyRepository interfaces.CompanyRepo
 		db:                db,
 		companyRepository: companyRepository,
 		cache:             cache,
+		log:               logger.GetPrivacyLogger("job_repository"),
 	}
 }
 
@@ -62,13 +65,27 @@ func (r *SQLiteJobRepository) RollbackTx(tx *sql.Tx) error {
 	return tx.Rollback()
 }
 
-// CreateWithTx creates a new job within a transaction.
-// The job's company must already exist in the database.
-func (r *SQLiteJobRepository) CreateWithTx(ctx context.Context, tx *sql.Tx, userID int, jobModel *models.Job) (*models.Job, error) {
-	if err := validateJob(jobModel); err != nil {
-		return nil, err
+// invalidateCache deletes cache keys and logs any failures for observability.
+// Cache invalidation is best-effort; failures are logged but don't cause errors.
+func (r *SQLiteJobRepository) invalidateCache(ctx context.Context, keys ...string) {
+	if err := r.cache.Delete(ctx, keys...); err != nil {
+		r.log.Warn().
+			Err(err).
+			Strs("keys", keys).
+			Msg("Failed to invalidate cache")
 	}
+}
 
+func (r *SQLiteJobRepository) invalidateCachePattern(ctx context.Context, pattern string) {
+	if err := r.cache.DeletePattern(ctx, pattern); err != nil {
+		r.log.Warn().
+			Err(err).
+			Str("pattern", pattern).
+			Msg("Failed to invalidate cache pattern")
+	}
+}
+
+func (r *SQLiteJobRepository) prepareJobInsert(jobModel *models.Job, userID int) (string, []interface{}, error) {
 	now := time.Now().UTC()
 	if jobModel.CreatedAt.IsZero() {
 		jobModel.CreatedAt = now
@@ -80,7 +97,7 @@ func (r *SQLiteJobRepository) CreateWithTx(ctx context.Context, tx *sql.Tx, user
 
 	skillsJSON, err := json.Marshal(jobModel.RequiredSkills)
 	if err != nil {
-		return nil, models.WrapError(models.ErrFailedToCreateJob, err)
+		return "", nil, models.WrapError(models.ErrFailedToCreateJob, err)
 	}
 
 	query, args, err := querybuilder.Insert("jobs").
@@ -99,7 +116,22 @@ func (r *SQLiteJobRepository) CreateWithTx(ctx context.Context, tx *sql.Tx, user
 		).
 		ToSql()
 	if err != nil {
-		return nil, models.WrapError(models.ErrFailedToCreateJob, err)
+		return "", nil, models.WrapError(models.ErrFailedToCreateJob, err)
+	}
+
+	return query, args, nil
+}
+
+// CreateWithTx creates a new job within a transaction.
+// The job's company must already exist in the database.
+func (r *SQLiteJobRepository) CreateWithTx(ctx context.Context, tx *sql.Tx, userID int, jobModel *models.Job) (*models.Job, error) {
+	if err := validateJob(jobModel); err != nil {
+		return nil, err
+	}
+
+	query, args, err := r.prepareJobInsert(jobModel, userID)
+	if err != nil {
+		return nil, err
 	}
 
 	result, err := tx.ExecContext(ctx, query, args...)
@@ -279,41 +311,13 @@ func (r *SQLiteJobRepository) GetOrCreate(ctx context.Context, userID int, jobMo
 
 	company, err := r.companyRepository.GetOrCreate(ctx, jobModel.Company.Name)
 	if err != nil {
-		return nil, false, err
+		return nil, false, fmt.Errorf("failed to get/create company for job: %w", err)
 	}
-
-	now := time.Now().UTC()
-	if jobModel.CreatedAt.IsZero() {
-		jobModel.CreatedAt = now
-	}
-	jobModel.UpdatedAt = now
 	jobModel.CompanyID = company.ID
-	if jobModel.RequiredSkills == nil {
-		jobModel.RequiredSkills = []string{}
-	}
 
-	skillsJSON, err := json.Marshal(jobModel.RequiredSkills)
+	query, args, err := r.prepareJobInsert(jobModel, userID)
 	if err != nil {
-		return nil, false, models.WrapError(models.ErrFailedToCreateJob, err)
-	}
-
-	query, args, err := querybuilder.Insert("jobs").
-		Columns(
-			"title", "description", "location", "job_type", "source_url",
-			"required_skills", "application_url",
-			"company_id", "status", "notes",
-			"created_at", "updated_at", "user_id",
-		).
-		Values(
-			jobModel.Title, jobModel.Description, jobModel.Location,
-			int(jobModel.JobType), jobModel.SourceURL,
-			skillsJSON, jobModel.ApplicationURL,
-			company.ID, int(jobModel.Status), jobModel.Notes,
-			jobModel.CreatedAt, jobModel.UpdatedAt, userID,
-		).
-		ToSql()
-	if err != nil {
-		return nil, false, models.WrapError(models.ErrFailedToCreateJob, err)
+		return nil, false, err
 	}
 
 	result, err := r.db.ExecContext(ctx, query, args...)
@@ -372,40 +376,13 @@ func (r *SQLiteJobRepository) Create(ctx context.Context, userID int, jobModel *
 	}
 	company, err := r.companyRepository.GetOrCreate(ctx, jobModel.Company.Name)
 	if err != nil {
+		return nil, fmt.Errorf("failed to get/create company for job creation: %w", err)
+	}
+	jobModel.CompanyID = company.ID
+
+	query, args, err := r.prepareJobInsert(jobModel, userID)
+	if err != nil {
 		return nil, err
-	}
-
-	now := time.Now().UTC()
-	if jobModel.CreatedAt.IsZero() {
-		jobModel.CreatedAt = now
-	}
-	jobModel.UpdatedAt = now
-	if jobModel.RequiredSkills == nil {
-		jobModel.RequiredSkills = []string{}
-	}
-
-	skillsJSON, err := json.Marshal(jobModel.RequiredSkills)
-	if err != nil {
-		return nil, models.WrapError(models.ErrFailedToCreateJob, err)
-	}
-
-	query, args, err := querybuilder.Insert("jobs").
-		Columns(
-			"title", "description", "location", "job_type", "source_url",
-			"required_skills", "application_url",
-			"company_id", "status", "notes",
-			"created_at", "updated_at", "user_id",
-		).
-		Values(
-			jobModel.Title, jobModel.Description, jobModel.Location,
-			int(jobModel.JobType), jobModel.SourceURL,
-			skillsJSON, jobModel.ApplicationURL,
-			company.ID, int(jobModel.Status), jobModel.Notes,
-			jobModel.CreatedAt, jobModel.UpdatedAt, userID,
-		).
-		ToSql()
-	if err != nil {
-		return nil, models.WrapError(models.ErrFailedToCreateJob, err)
 	}
 
 	result, err := r.db.ExecContext(ctx, query, args...)
@@ -421,7 +398,7 @@ func (r *SQLiteJobRepository) Create(ctx context.Context, userID int, jobModel *
 	jobModel.ID = int(id)
 	jobModel.Company = *company
 
-	_ = r.cache.Delete(ctx,
+	r.invalidateCache(ctx,
 		fmt.Sprintf("stats:u%d:summary", userID),
 		fmt.Sprintf("stats:u%d:by-status", userID),
 	)
@@ -597,7 +574,7 @@ func (r *SQLiteJobRepository) Update(ctx context.Context, userID int, job *model
 
 	company, err := r.companyRepository.GetOrCreate(ctx, job.Company.Name)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get/create company for job update: %w", err)
 	}
 
 	job.UpdatedAt = time.Now().UTC()
@@ -642,7 +619,7 @@ func (r *SQLiteJobRepository) Update(ctx context.Context, userID int, job *model
 
 	job.Company = *company
 
-	_ = r.cache.Delete(ctx,
+	r.invalidateCache(ctx,
 		fmt.Sprintf("job:u%d:id%d", userID, job.ID),
 		fmt.Sprintf("stats:u%d:summary", userID),
 		fmt.Sprintf("stats:u%d:by-status", userID),
@@ -679,7 +656,7 @@ func (r *SQLiteJobRepository) UpdateMatchScore(ctx context.Context, userID int, 
 		return models.ErrJobNotFound
 	}
 
-	_ = r.cache.Delete(ctx,
+	r.invalidateCache(ctx,
 		fmt.Sprintf("job:u%d:id%d", userID, jobID),
 		fmt.Sprintf("stats:u%d:summary", userID),
 	)
@@ -713,7 +690,7 @@ func (r *SQLiteJobRepository) Delete(ctx context.Context, userID int, id int) er
 		return models.ErrJobNotFound
 	}
 
-	_ = r.cache.Delete(ctx,
+	r.invalidateCache(ctx,
 		fmt.Sprintf("job:u%d:id%d", userID, id),
 		fmt.Sprintf("stats:u%d:summary", userID),
 		fmt.Sprintf("stats:u%d:by-status", userID),
@@ -754,7 +731,7 @@ func (r *SQLiteJobRepository) UpdateStatus(ctx context.Context, userID int, id i
 		return models.ErrJobNotFound
 	}
 
-	_ = r.cache.Delete(ctx,
+	r.invalidateCache(ctx,
 		fmt.Sprintf("stats:u%d:summary", userID),
 		fmt.Sprintf("stats:u%d:by-status", userID),
 		fmt.Sprintf("job:u%d:id%d", userID, id),
@@ -980,10 +957,10 @@ func (r *SQLiteJobRepository) CreateMatchResult(ctx context.Context, userID int,
 
 	matchResult.ID = int(id)
 
-	_ = r.cache.Delete(ctx,
+	r.invalidateCache(ctx,
 		fmt.Sprintf("match:u%d:job%d:history", userID, matchResult.JobID),
 	)
-	_ = r.cache.DeletePattern(ctx, fmt.Sprintf("match:u%d:recent:*", userID))
+	r.invalidateCachePattern(ctx, fmt.Sprintf("match:u%d:recent:*", userID))
 
 	return nil
 }
@@ -1059,20 +1036,32 @@ func (r *SQLiteJobRepository) GetRecentMatchResultsWithDetails(ctx context.Conte
 		limit = 5
 	}
 
-	query := `
-		SELECT mr.job_id, j.title, c.name, mr.match_score, mr.strengths,
-		       mr.weaknesses, mr.created_at
-		FROM match_results mr
-		JOIN jobs j ON mr.job_id = j.id
+	cte := `WITH current_company AS (
+		SELECT c.name as company_name
+		FROM jobs j
 		JOIN companies c ON j.company_id = c.id
-		WHERE mr.job_id != ? AND mr.user_id = ?
-		ORDER BY
-			CASE WHEN c.name = (SELECT c2.name FROM jobs j2 JOIN companies c2 ON j2.company_id = c2.id WHERE j2.id = ?) THEN 0 ELSE 1 END,
-			mr.created_at DESC
-		LIMIT ?
-	`
+		WHERE j.id = ?
+	)`
 
-	rows, err := r.db.QueryContext(ctx, query, currentJobID, userID, currentJobID, limit)
+	query, args, err := querybuilder.Select(
+		"mr.job_id", "j.title", "c.name", "mr.match_score",
+		"mr.strengths", "mr.weaknesses", "mr.created_at",
+	).
+		Prefix(cte, currentJobID).
+		From("match_results mr").
+		Join("jobs j ON mr.job_id = j.id").
+		Join("companies c ON j.company_id = c.id").
+		LeftJoin("current_company cc ON 1=1").
+		Where(sq.NotEq{"mr.job_id": currentJobID}).
+		Where(sq.Eq{"mr.user_id": userID}).
+		OrderBy("CASE WHEN c.name = cc.company_name THEN 0 ELSE 1 END", "mr.created_at DESC").
+		Limit(uint64(limit)).
+		ToSql()
+	if err != nil {
+		return nil, models.WrapError(models.ErrFailedToGetJob, err)
+	}
+
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, models.WrapError(models.ErrFailedToGetJob, err)
 	}
@@ -1243,10 +1232,10 @@ func (r *SQLiteJobRepository) DeleteMatchResult(ctx context.Context, userID int,
 		return models.ErrJobNotFound
 	}
 
-	_ = r.cache.Delete(ctx,
+	r.invalidateCache(ctx,
 		fmt.Sprintf("match:u%d:job%d:history", userID, jobID),
 	)
-	_ = r.cache.DeletePattern(ctx, fmt.Sprintf("match:u%d:recent:*", userID))
+	r.invalidateCachePattern(ctx, fmt.Sprintf("match:u%d:recent:*", userID))
 
 	return nil
 }

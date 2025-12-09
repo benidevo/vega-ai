@@ -85,6 +85,7 @@ type JobHandler struct {
 	commandFactory  commandFactory
 	renderer        *render.HTMLRenderer
 	settingsService settingsService
+	templateCache   map[string]*template.Template
 }
 
 // formatValidationError converts validator errors to user-friendly messages
@@ -238,15 +239,37 @@ func (h *JobHandler) renderDashboardError(c *gin.Context, err error) {
 	alerts.RenderError(c, statusCode, sentinelErr.Error(), alerts.ContextDashboard)
 }
 
-// NewJobHandler creates and returns a new JobHandler with the provided JobService and configuration settings.// NewJobHandler creates and returns a new JobHandler with the provided JobService and configuration settings.
-func NewJobHandler(service *JobService, cfg *config.Settings) *JobHandler {
-	return &JobHandler{
+// NewJobHandler creates and returns a new JobHandler with the provided JobService and configuration settings.
+func NewJobHandler(service *JobService, cfg *config.Settings) (*JobHandler, error) {
+	h := &JobHandler{
 		service:         service,
 		cfg:             cfg,
 		commandFactory:  &jobCommandFactory{factory: NewCommandFactory()},
 		renderer:        render.NewHTMLRenderer(cfg),
 		settingsService: service.settingsService,
+		templateCache:   make(map[string]*template.Template),
 	}
+
+	// Skip template validation in test mode
+	if cfg != nil && cfg.IsTest {
+		return h, nil
+	}
+
+	// Pre-compile partial templates used by renderTemplate.
+	partials := []string{
+		"partials/job_match_analysis.html",
+		"partials/cover_letter_generator.html",
+		"partials/cv_generator.html",
+	}
+	for _, name := range partials {
+		tmpl, err := template.ParseFiles("templates/" + name)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse required template %s: %w", name, err)
+		}
+		h.templateCache[name] = tmpl
+	}
+
+	return h, nil
 }
 
 // ValidateJobID is a middleware that validates the job ID parameter
@@ -531,14 +554,15 @@ func (h *JobHandler) GetJobDetails(c *gin.Context) {
 
 	quotaCheckResult, err := h.service.CheckJobQuota(ctx, userID, jobID)
 	if err != nil {
-		// Log error but don't fail the page load
+		// Fail closed: deny AI features when quota service is unavailable
+		// Log the error for observability but don't fail the page load
 		h.service.LogError(err)
 		quotaCheckResult = &quotamodels.QuotaCheckResult{
-			Allowed: true,
-			Reason:  "ok",
+			Allowed: false,
+			Reason:  "Unable to verify quota status. Please try again later.",
 			Status: quotamodels.QuotaStatus{
 				Used:  0,
-				Limit: -1,
+				Limit: 0,
 			},
 		}
 	}
@@ -854,11 +878,12 @@ func (h *JobHandler) buildMatchAnalysisData(analysis *models.JobMatchAnalysis) g
 	}
 }
 
-// renderTemplate renders a template to string with given data
+// renderTemplate renders a pre-cached template to string with given data.
+// Templates must be registered during NewJobHandler initialization.
 func (h *JobHandler) renderTemplate(templateName string, data interface{}) (string, error) {
-	tmpl, err := template.ParseFiles("templates/" + templateName)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse template %s: %w", templateName, err)
+	tmpl, ok := h.templateCache[templateName]
+	if !ok {
+		return "", fmt.Errorf("template %s not found in cache (must be registered in NewJobHandler)", templateName)
 	}
 
 	var buf bytes.Buffer

@@ -112,22 +112,17 @@ func TestGetDocumentsByType(t *testing.T) {
 	repo := NewSQLiteDocumentRepository(db, nil)
 
 	t.Run("get documents with pagination", func(t *testing.T) {
-		countRows := sqlmock.NewRows([]string{"count"}).AddRow(2)
-		mock.ExpectQuery(`SELECT COUNT\(\*\) FROM documents`).
-			WithArgs(1, models.DocumentTypeCoverLetter).
-			WillReturnRows(countRows)
-
 		now := time.Now()
 		docRows := sqlmock.NewRows([]string{
 			"id", "job_id", "title", "name", "status", "document_type",
-			"preview", "size_bytes", "created_at", "updated_at",
+			"preview", "size_bytes", "created_at", "updated_at", "total_count",
 		}).AddRow(1, 1, "Software Engineer", "Tech Corp", 0, "cover_letter",
-			"Dear Hiring Manager...", 100, now, now).
+			"Dear Hiring Manager...", 100, now, now, 2).
 			AddRow(2, 2, "Senior Developer", "Another Corp", 1, "cover_letter",
-				"I am writing to...", 150, now, now)
+				"I am writing to...", 150, now, now, 2)
 
-		mock.ExpectQuery(`SELECT .+ FROM documents d JOIN jobs j`).
-			WithArgs(1, models.DocumentTypeCoverLetter).
+		mock.ExpectQuery(`SELECT .+ COUNT\(\*\) OVER\(\) .+ FROM documents d`).
+			WithArgs(1, models.DocumentTypeCoverLetter, 10, 0).
 			WillReturnRows(docRows)
 
 		summaries, total, err := repo.GetDocumentsByType(ctx, 1, models.DocumentTypeCoverLetter, 10, 0)

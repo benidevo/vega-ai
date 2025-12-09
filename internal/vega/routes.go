@@ -51,7 +51,11 @@ func SetupRoutes(a *App) {
 
 	authHandler, authService := auth.SetupAuthWithService(a.db, &a.config)
 	jobService := job.SetupService(a.db, &a.config, a.cache)
-	jobHandler := job.NewJobHandler(jobService, &a.config)
+
+	jobHandler, err := job.NewJobHandler(jobService, &a.config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to initialize job handler: missing or invalid templates")
+	}
 
 	// Setup unified quota service
 	jobRepo := job.SetupJobRepository(a.db, a.cache)
