@@ -127,7 +127,7 @@ func TestGetDocumentsByType(t *testing.T) {
 				"I am writing to...", 150, now, now)
 
 		mock.ExpectQuery(`SELECT .+ FROM documents d JOIN jobs j`).
-			WithArgs(1, models.DocumentTypeCoverLetter, 10, 0).
+			WithArgs(1, models.DocumentTypeCoverLetter).
 			WillReturnRows(docRows)
 
 		summaries, total, err := repo.GetDocumentsByType(ctx, 1, models.DocumentTypeCoverLetter, 10, 0)

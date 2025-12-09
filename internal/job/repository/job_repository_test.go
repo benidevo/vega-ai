@@ -751,7 +751,7 @@ func TestGetRecentJobsByUserID(t *testing.T) {
 				)
 
 				mock.ExpectQuery("SELECT.*FROM jobs.*WHERE.*user_id.*ORDER BY.*LIMIT").
-					WithArgs(testUserID, 2).
+					WithArgs(testUserID).
 					WillReturnRows(rows)
 			},
 			want: []*models.Job{
@@ -797,7 +797,7 @@ func TestGetRecentJobsByUserID(t *testing.T) {
 				})
 
 				mock.ExpectQuery("SELECT.*FROM jobs.*WHERE.*user_id.*ORDER BY.*LIMIT").
-					WithArgs(testUserID, 10). // Default limit
+					WithArgs(testUserID).
 					WillReturnRows(rows)
 			},
 			want:    []*models.Job{},

@@ -5,8 +5,11 @@ import (
 	"database/sql"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/benidevo/vega/internal/auth/models"
 	commonerrors "github.com/benidevo/vega/internal/common/errors"
+	"github.com/benidevo/vega/internal/db/querybuilder"
 )
 
 // UserRepository defines the interface for user-related data operations.
@@ -36,6 +39,9 @@ type UserRepository interface {
 	// It returns an empty slice if no users are found.
 	FindAllUsers(ctx context.Context) ([]*models.User, error)
 }
+
+// userColumns defines the columns selected for user queries.
+var userColumns = []string{"id", "username", "password", "role", "created_at", "updated_at", "last_login"}
 
 // SQLiteUserRepository provides methods to interact with the user data
 // stored in an SQLite database.
@@ -76,9 +82,16 @@ func (r *SQLiteUserRepository) CreateUser(ctx context.Context, username, passwor
 	}
 	defer tx.Rollback() // No-op if commit succeeds
 
-	// Create user
-	query := "INSERT INTO users (username, password, role) VALUES (?, ?, ?)"
-	result, err := tx.ExecContext(ctx, query, username, password, roleValue)
+	// Create user using Squirrel
+	query, args, err := querybuilder.Insert("users").
+		Columns("username", "password", "role").
+		Values(username, password, roleValue).
+		ToSql()
+	if err != nil {
+		return nil, models.WrapError(models.ErrUserCreationFailed, err)
+	}
+
+	result, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		if err.Error() == "UNIQUE constraint failed: users.username" {
 			existingUser, findErr := r.FindByUsername(ctx, username)
@@ -104,71 +117,48 @@ func (r *SQLiteUserRepository) CreateUser(ctx context.Context, username, passwor
 
 // FindByID retrieves a user by their ID from the SQLite database.
 func (r *SQLiteUserRepository) FindByID(ctx context.Context, id int) (*models.User, error) {
-	query := "SELECT id, username, password, role, created_at, updated_at, last_login FROM users WHERE id = ?"
-
-	var user models.User
-	var lastLogin sql.NullTime
-
-	err := r.db.QueryRowContext(ctx, query, id).Scan(
-		&user.ID,
-		&user.Username,
-		&user.Password,
-		&user.Role,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-		&lastLogin,
-	)
-
+	query, args, err := querybuilder.Select(userColumns...).
+		From("users").
+		Where(sq.Eq{"id": id}).
+		ToSql()
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, models.ErrUserNotFound
-		}
 		return nil, models.WrapError(models.ErrUserRetrievalFailed, err)
 	}
 
-	if lastLogin.Valid {
-		user.LastLogin = lastLogin.Time
-	}
-
-	return &user, nil
+	return r.scanUser(r.db.QueryRowContext(ctx, query, args...))
 }
 
 // FindByUsername retrieves a user from the database by their username.
 func (r *SQLiteUserRepository) FindByUsername(ctx context.Context, username string) (*models.User, error) {
-	query := "SELECT id, username, password, role, created_at, updated_at, last_login FROM users WHERE username = ?"
-
-	var user models.User
-	var lastLogin sql.NullTime
-	err := r.db.QueryRowContext(ctx, query, username).Scan(&user.ID, &user.Username, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt, &lastLogin)
+	query, args, err := querybuilder.Select(userColumns...).
+		From("users").
+		Where(sq.Eq{"username": username}).
+		ToSql()
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, models.ErrUserNotFound
-		}
 		return nil, models.WrapError(models.ErrUserRetrievalFailed, err)
 	}
 
-	if lastLogin.Valid {
-		user.LastLogin = lastLogin.Time
-	}
-
-	return &user, nil
+	return r.scanUser(r.db.QueryRowContext(ctx, query, args...))
 }
 
 // UpdateUser updates an existing user's details in the database and returns the updated user.
 func (r *SQLiteUserRepository) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	user.UpdatedAt = time.Now().UTC()
 
-	var (
-		query string
-		args  []interface{}
-	)
+	updateBuilder := querybuilder.Update("users").
+		Set("username", user.Username).
+		Set("password", user.Password).
+		Set("role", user.Role).
+		Set("updated_at", user.UpdatedAt).
+		Where(sq.Eq{"id": user.ID})
 
 	if !user.LastLogin.IsZero() {
-		query = "UPDATE users SET username = ?, password = ?, role = ?, updated_at = ?, last_login = ? WHERE id = ?"
-		args = []any{user.Username, user.Password, user.Role, user.UpdatedAt, user.LastLogin, user.ID}
-	} else {
-		query = "UPDATE users SET username = ?, password = ?, role = ?, updated_at = ? WHERE id = ?"
-		args = []any{user.Username, user.Password, user.Role, user.UpdatedAt, user.ID}
+		updateBuilder = updateBuilder.Set("last_login", user.LastLogin)
+	}
+
+	query, args, err := updateBuilder.ToSql()
+	if err != nil {
+		return nil, models.WrapError(models.ErrUserUpdateFailed, err)
 	}
 
 	result, err := r.db.ExecContext(ctx, query, args...)
@@ -190,9 +180,14 @@ func (r *SQLiteUserRepository) UpdateUser(ctx context.Context, user *models.User
 
 // DeleteUser removes a user from the database by their ID.
 func (r *SQLiteUserRepository) DeleteUser(ctx context.Context, id int) error {
-	query := "DELETE FROM users WHERE id = ?"
+	query, args, err := querybuilder.Delete("users").
+		Where(sq.Eq{"id": id}).
+		ToSql()
+	if err != nil {
+		return models.WrapError(models.ErrUserDeletionFailed, err)
+	}
 
-	_, err := r.db.ExecContext(ctx, query, id)
+	_, err = r.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		return models.WrapError(models.ErrUserDeletionFailed, err)
 	}
@@ -201,9 +196,14 @@ func (r *SQLiteUserRepository) DeleteUser(ctx context.Context, id int) error {
 
 // FindAllUsers retrieves all users from the database.
 func (r *SQLiteUserRepository) FindAllUsers(ctx context.Context) ([]*models.User, error) {
-	query := "SELECT id, username, password, role, created_at, updated_at, last_login FROM users"
+	query, args, err := querybuilder.Select(userColumns...).
+		From("users").
+		ToSql()
+	if err != nil {
+		return nil, models.WrapError(models.ErrUserListRetrievalFailed, err)
+	}
 
-	rows, err := r.db.QueryContext(ctx, query)
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, models.WrapError(models.ErrUserListRetrievalFailed, err)
 	}
@@ -211,21 +211,67 @@ func (r *SQLiteUserRepository) FindAllUsers(ctx context.Context) ([]*models.User
 
 	var users []*models.User
 	for rows.Next() {
-		var user models.User
-		var lastLogin sql.NullTime
-
-		err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt, &lastLogin)
+		user, err := r.scanUserFromRows(rows)
 		if err != nil {
 			return nil, models.WrapError(models.ErrUserListRetrievalFailed, err)
 		}
-
-		if lastLogin.Valid {
-			user.LastLogin = lastLogin.Time
-		}
-		users = append(users, &user)
+		users = append(users, user)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, models.WrapError(models.ErrUserListRetrievalFailed, err)
 	}
 	return users, nil
+}
+
+// scanUser scans a single row into a User struct.
+func (r *SQLiteUserRepository) scanUser(row *sql.Row) (*models.User, error) {
+	var user models.User
+	var lastLogin sql.NullTime
+
+	err := row.Scan(
+		&user.ID,
+		&user.Username,
+		&user.Password,
+		&user.Role,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&lastLogin,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, models.ErrUserNotFound
+		}
+		return nil, models.WrapError(models.ErrUserRetrievalFailed, err)
+	}
+
+	if lastLogin.Valid {
+		user.LastLogin = lastLogin.Time
+	}
+
+	return &user, nil
+}
+
+// scanUserFromRows scans a row from sql.Rows into a User struct.
+func (r *SQLiteUserRepository) scanUserFromRows(rows *sql.Rows) (*models.User, error) {
+	var user models.User
+	var lastLogin sql.NullTime
+
+	err := rows.Scan(
+		&user.ID,
+		&user.Username,
+		&user.Password,
+		&user.Role,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&lastLogin,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if lastLogin.Valid {
+		user.LastLogin = lastLogin.Time
+	}
+
+	return &user, nil
 }
