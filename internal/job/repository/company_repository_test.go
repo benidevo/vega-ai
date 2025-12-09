@@ -83,7 +83,7 @@ func TestSQLiteCompanyRepository_GetOrCreate(t *testing.T) {
 				WillReturnRows(rows)
 
 			if tt.expectInsert {
-				mock.ExpectExec("INSERT INTO companies \\(name, created_at, updated_at\\) VALUES \\(\\?, \\?, \\?\\)").
+				mock.ExpectExec("INSERT INTO companies \\(name,created_at,updated_at\\) VALUES \\(\\?,\\?,\\?\\)").
 					WithArgs(tt.companyName, sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 			}

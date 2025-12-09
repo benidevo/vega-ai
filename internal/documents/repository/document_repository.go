@@ -6,10 +6,18 @@ import (
 	"fmt"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/benidevo/vega/internal/cache"
 	"github.com/benidevo/vega/internal/common/logger"
+	"github.com/benidevo/vega/internal/db/querybuilder"
 	"github.com/benidevo/vega/internal/documents/models"
 )
+
+// documentColumns defines columns for document queries.
+var documentColumns = []string{
+	"id", "user_id", "job_id", "document_type", "content", "format", "size_bytes", "created_at", "updated_at",
+}
 
 type SQLiteDocumentRepository struct {
 	db    *sql.DB
@@ -39,11 +47,12 @@ func (r *SQLiteDocumentRepository) UpsertDocument(ctx context.Context, doc *mode
 	ctx, cancel := context.WithTimeout(ctx, 7*time.Second)
 	defer cancel()
 
+	// Keep UPSERT as raw SQL - Squirrel doesn't handle ON CONFLICT well
 	query := `
 		INSERT INTO documents (user_id, job_id, document_type, content, format, size_bytes, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-		ON CONFLICT(user_id, job_id, document_type) 
-		DO UPDATE SET 
+		ON CONFLICT(user_id, job_id, document_type)
+		DO UPDATE SET
 			content = excluded.content,
 			format = excluded.format,
 			size_bytes = excluded.size_bytes,
@@ -78,12 +87,15 @@ func (r *SQLiteDocumentRepository) GetDocument(ctx context.Context, docID, userI
 		}
 	}
 
-	query := `
-		SELECT id, user_id, job_id, document_type, content, format, size_bytes, created_at, updated_at
-		FROM documents
-		WHERE id = ? AND user_id = ?`
+	query, args, err := querybuilder.Select(documentColumns...).
+		From("documents").
+		Where(sq.Eq{"id": docID, "user_id": userID}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	err := r.db.QueryRowContext(ctx, query, docID, userID).Scan(
+	err = r.db.QueryRowContext(ctx, query, args...).Scan(
 		&doc.ID,
 		&doc.UserID,
 		&doc.JobID,
@@ -112,12 +124,15 @@ func (r *SQLiteDocumentRepository) GetDocument(ctx context.Context, docID, userI
 func (r *SQLiteDocumentRepository) GetDocumentByJobAndType(ctx context.Context, userID, jobID int, docType models.DocumentType) (*models.Document, error) {
 	var doc models.Document
 
-	query := `
-		SELECT id, user_id, job_id, document_type, content, format, size_bytes, created_at, updated_at
-		FROM documents
-		WHERE user_id = ? AND job_id = ? AND document_type = ?`
+	query, args, err := querybuilder.Select(documentColumns...).
+		From("documents").
+		Where(sq.Eq{"user_id": userID, "job_id": jobID, "document_type": docType}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	err := r.db.QueryRowContext(ctx, query, userID, jobID, docType).Scan(
+	err = r.db.QueryRowContext(ctx, query, args...).Scan(
 		&doc.ID,
 		&doc.UserID,
 		&doc.JobID,
@@ -140,29 +155,40 @@ func (r *SQLiteDocumentRepository) GetDocumentByJobAndType(ctx context.Context, 
 }
 
 func (r *SQLiteDocumentRepository) GetDocumentsByType(ctx context.Context, userID int, docType models.DocumentType, limit, offset int) ([]*models.DocumentSummary, int, error) {
-	var totalCount int
-	countQuery := `
-		SELECT COUNT(*)
-		FROM documents d
-		WHERE d.user_id = ? AND d.document_type = ?`
+	// Get count
+	countQuery, countArgs, err := querybuilder.Select("COUNT(*)").
+		From("documents d").
+		Where(sq.Eq{"d.user_id": userID}).
+		Where(sq.Eq{"d.document_type": docType}).
+		ToSql()
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to build count query: %w", err)
+	}
 
-	err := r.db.QueryRowContext(ctx, countQuery, userID, docType).Scan(&totalCount)
+	var totalCount int
+	err = r.db.QueryRowContext(ctx, countQuery, countArgs...).Scan(&totalCount)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get document count: %w", err)
 	}
 
-	query := `
-		SELECT 
-			d.id, d.job_id, j.title, c.name, j.status, d.document_type,
-			SUBSTR(d.content, 1, 200) as preview, d.size_bytes, d.created_at, d.updated_at
-		FROM documents d
-		JOIN jobs j ON d.job_id = j.id
-		JOIN companies c ON j.company_id = c.id
-		WHERE d.user_id = ? AND d.document_type = ?
-		ORDER BY d.updated_at DESC
-		LIMIT ? OFFSET ?`
+	query, args, err := querybuilder.Select(
+		"d.id", "d.job_id", "j.title", "c.name", "j.status", "d.document_type",
+		"SUBSTR(d.content, 1, 200) as preview", "d.size_bytes", "d.created_at", "d.updated_at",
+	).
+		From("documents d").
+		Join("jobs j ON d.job_id = j.id").
+		Join("companies c ON j.company_id = c.id").
+		Where(sq.Eq{"d.user_id": userID}).
+		Where(sq.Eq{"d.document_type": docType}).
+		OrderBy("d.updated_at DESC").
+		Limit(uint64(limit)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	rows, err := r.db.QueryContext(ctx, query, userID, docType, limit, offset)
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to query documents: %w", err)
 	}
@@ -197,29 +223,38 @@ func (r *SQLiteDocumentRepository) GetDocumentsByType(ctx context.Context, userI
 }
 
 func (r *SQLiteDocumentRepository) GetAllDocuments(ctx context.Context, userID int, limit, offset int) ([]*models.DocumentSummary, int, error) {
-	var totalCount int
-	countQuery := `
-		SELECT COUNT(*)
-		FROM documents d
-		WHERE d.user_id = ?`
+	// Get count
+	countQuery, countArgs, err := querybuilder.Select("COUNT(*)").
+		From("documents d").
+		Where(sq.Eq{"d.user_id": userID}).
+		ToSql()
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to build count query: %w", err)
+	}
 
-	err := r.db.QueryRowContext(ctx, countQuery, userID).Scan(&totalCount)
+	var totalCount int
+	err = r.db.QueryRowContext(ctx, countQuery, countArgs...).Scan(&totalCount)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get document count: %w", err)
 	}
 
-	query := `
-		SELECT 
-			d.id, d.job_id, j.title, c.name, j.status, d.document_type,
-			SUBSTR(d.content, 1, 200) as preview, d.size_bytes, d.created_at, d.updated_at
-		FROM documents d
-		JOIN jobs j ON d.job_id = j.id
-		JOIN companies c ON j.company_id = c.id
-		WHERE d.user_id = ?
-		ORDER BY d.updated_at DESC
-		LIMIT ? OFFSET ?`
+	query, args, err := querybuilder.Select(
+		"d.id", "d.job_id", "j.title", "c.name", "j.status", "d.document_type",
+		"SUBSTR(d.content, 1, 200) as preview", "d.size_bytes", "d.created_at", "d.updated_at",
+	).
+		From("documents d").
+		Join("jobs j ON d.job_id = j.id").
+		Join("companies c ON j.company_id = c.id").
+		Where(sq.Eq{"d.user_id": userID}).
+		OrderBy("d.updated_at DESC").
+		Limit(uint64(limit)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	rows, err := r.db.QueryContext(ctx, query, userID, limit, offset)
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to query documents: %w", err)
 	}
@@ -254,13 +289,17 @@ func (r *SQLiteDocumentRepository) GetAllDocuments(ctx context.Context, userID i
 }
 
 func (r *SQLiteDocumentRepository) DeleteDocument(ctx context.Context, docID, userID int) error {
-	// Add timeout to prevent indefinite blocking on SQLite locks
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	query := `DELETE FROM documents WHERE id = ? AND user_id = ?`
+	query, args, err := querybuilder.Delete("documents").
+		Where(sq.Eq{"id": docID, "user_id": userID}).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to build query: %w", err)
+	}
 
-	result, err := r.db.ExecContext(ctx, query, docID, userID)
+	result, err := r.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to delete document: %w", err)
 	}
@@ -283,20 +322,24 @@ func (r *SQLiteDocumentRepository) DeleteDocument(ctx context.Context, docID, us
 }
 
 func (r *SQLiteDocumentRepository) GetDocumentMetrics(ctx context.Context, userID int) (*models.DocumentMetrics, error) {
-	query := `
-		SELECT 
-			COUNT(*) as total_documents,
-			COUNT(CASE WHEN document_type = 'cover_letter' THEN 1 END) as cover_letter_count,
-			COUNT(CASE WHEN document_type = 'resume' THEN 1 END) as resume_count,
-			COALESCE(SUM(size_bytes), 0) as total_size_bytes,
-			MAX(created_at) as last_document_created
-		FROM documents
-		WHERE user_id = ?`
+	query, args, err := querybuilder.Select(
+		"COUNT(*) as total_documents",
+		"COUNT(CASE WHEN document_type = 'cover_letter' THEN 1 END) as cover_letter_count",
+		"COUNT(CASE WHEN document_type = 'resume' THEN 1 END) as resume_count",
+		"COALESCE(SUM(size_bytes), 0) as total_size_bytes",
+		"MAX(created_at) as last_document_created",
+	).
+		From("documents").
+		Where(sq.Eq{"user_id": userID}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
 
 	var metrics models.DocumentMetrics
 	var lastCreated sql.NullString
 
-	err := r.db.QueryRowContext(ctx, query, userID).Scan(
+	err = r.db.QueryRowContext(ctx, query, args...).Scan(
 		&metrics.TotalDocuments,
 		&metrics.CoverLetterCount,
 		&metrics.ResumeCount,
@@ -324,13 +367,16 @@ func (r *SQLiteDocumentRepository) GetDocumentMetrics(ctx context.Context, userI
 }
 
 func (r *SQLiteDocumentRepository) GetDocumentsByJob(ctx context.Context, userID, jobID int) ([]*models.Document, error) {
-	query := `
-		SELECT id, user_id, job_id, document_type, content, format, size_bytes, created_at, updated_at
-		FROM documents
-		WHERE user_id = ? AND job_id = ?
-		ORDER BY document_type`
+	query, args, err := querybuilder.Select(documentColumns...).
+		From("documents").
+		Where(sq.Eq{"user_id": userID, "job_id": jobID}).
+		OrderBy("document_type").
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	rows, err := r.db.QueryContext(ctx, query, userID, jobID)
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query documents by job: %w", err)
 	}

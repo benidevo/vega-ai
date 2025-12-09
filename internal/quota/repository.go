@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"time"
 
+	sq "github.com/Masterminds/squirrel"
+
+	"github.com/benidevo/vega/internal/db/querybuilder"
 	"github.com/benidevo/vega/internal/quota/models"
 )
 
@@ -41,17 +43,19 @@ func (r *repository) GetMonthlyUsage(ctx context.Context, userID int, monthYear 
 		UserID:       userID,
 		MonthYear:    monthYear,
 		JobsAnalyzed: 0,
-		UpdatedAt:    time.Now(),
 	}
 
-	query := `
-		SELECT user_id, month_year, jobs_analyzed, updated_at
-		FROM user_quota_usage
-		WHERE user_id = ? AND month_year = ?
-	`
+	query, args, err := querybuilder.Select("user_id", "month_year", "jobs_analyzed", "updated_at").
+		From("user_quota_usage").
+		Where(sq.Eq{"user_id": userID}).
+		Where(sq.Eq{"month_year": monthYear}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	row := r.db.QueryRowContext(ctx, query, userID, monthYear)
-	err := row.Scan(&usage.UserID, &usage.MonthYear, &usage.JobsAnalyzed, &usage.UpdatedAt)
+	row := r.db.QueryRowContext(ctx, query, args...)
+	err = row.Scan(&usage.UserID, &usage.MonthYear, &usage.JobsAnalyzed, &usage.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No usage recorded yet for this month, return zero usage
@@ -65,7 +69,6 @@ func (r *repository) GetMonthlyUsage(ctx context.Context, userID int, monthYear 
 
 // IncrementMonthlyUsage increments the monthly usage count
 func (r *repository) IncrementMonthlyUsage(ctx context.Context, userID int, monthYear string) error {
-	// Use UPSERT pattern to avoid race conditions
 	upsertQuery := `
 		INSERT INTO user_quota_usage (user_id, month_year, jobs_analyzed, updated_at)
 		VALUES (?, ?, 1, CURRENT_TIMESTAMP)
@@ -84,6 +87,7 @@ func (r *repository) IncrementMonthlyUsage(ctx context.Context, userID int, mont
 
 // IncrementMonthlyUsageWithTx increments the monthly usage count within a transaction
 func (r *repository) IncrementMonthlyUsageWithTx(ctx context.Context, tx *sql.Tx, userID int, monthYear string) error {
+	// Keep UPSERT as raw SQL - Squirrel doesn't handle ON CONFLICT well
 	upsertQuery := `
 		INSERT INTO user_quota_usage (user_id, month_year, jobs_analyzed, updated_at)
 		VALUES (?, ?, 1, CURRENT_TIMESTAMP)
@@ -104,14 +108,18 @@ func (r *repository) IncrementMonthlyUsageWithTx(ctx context.Context, tx *sql.Tx
 func (r *repository) GetDailyUsage(ctx context.Context, userID int, date string, quotaKey string) (int, error) {
 	var value int
 
-	query := `
-		SELECT value
-		FROM user_daily_quotas
-		WHERE user_id = ? AND date = ? AND quota_key = ?
-	`
+	query, args, err := querybuilder.Select("value").
+		From("user_daily_quotas").
+		Where(sq.Eq{"user_id": userID}).
+		Where(sq.Eq{"date": date}).
+		Where(sq.Eq{"quota_key": quotaKey}).
+		ToSql()
+	if err != nil {
+		return 0, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	row := r.db.QueryRowContext(ctx, query, userID, date, quotaKey)
-	err := row.Scan(&value)
+	row := r.db.QueryRowContext(ctx, query, args...)
+	err = row.Scan(&value)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No usage recorded yet, return 0
@@ -125,7 +133,6 @@ func (r *repository) GetDailyUsage(ctx context.Context, userID int, date string,
 
 // IncrementDailyUsage increments the daily usage for a specific quota key
 func (r *repository) IncrementDailyUsage(ctx context.Context, userID int, date string, quotaKey string, amount int) error {
-	// Use UPSERT pattern
 	upsertQuery := `
 		INSERT INTO user_daily_quotas (user_id, date, quota_key, value, updated_at)
 		VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -144,13 +151,16 @@ func (r *repository) IncrementDailyUsage(ctx context.Context, userID int, date s
 
 // GetAllDailyUsage gets all daily quota usage for a user on a specific date
 func (r *repository) GetAllDailyUsage(ctx context.Context, userID int, date string) (map[string]int, error) {
-	query := `
-		SELECT quota_key, value
-		FROM user_daily_quotas
-		WHERE user_id = ? AND date = ?
-	`
+	query, args, err := querybuilder.Select("quota_key", "value").
+		From("user_daily_quotas").
+		Where(sq.Eq{"user_id": userID}).
+		Where(sq.Eq{"date": date}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	rows, err := r.db.QueryContext(ctx, query, userID, date)
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query daily quota usage: %w", err)
 	}
@@ -177,14 +187,16 @@ func (r *repository) GetAllDailyUsage(ctx context.Context, userID int, date stri
 func (r *repository) GetQuotaConfig(ctx context.Context, quotaType string) (*models.QuotaConfig, error) {
 	config := &models.QuotaConfig{}
 
-	query := `
-		SELECT quota_type, free_limit, description, created_at, updated_at
-		FROM quota_configs
-		WHERE quota_type = ?
-	`
+	query, args, err := querybuilder.Select("quota_type", "free_limit", "description", "created_at", "updated_at").
+		From("quota_configs").
+		Where(sq.Eq{"quota_type": quotaType}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
 
-	row := r.db.QueryRowContext(ctx, query, quotaType)
-	err := row.Scan(&config.QuotaType, &config.FreeLimit, &config.Description, &config.CreatedAt, &config.UpdatedAt)
+	row := r.db.QueryRowContext(ctx, query, args...)
+	err = row.Scan(&config.QuotaType, &config.FreeLimit, &config.Description, &config.CreatedAt, &config.UpdatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get quota config for %s: %w", quotaType, err)
 	}
