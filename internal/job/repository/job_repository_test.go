@@ -1103,3 +1103,958 @@ func TestSQLiteJobRepository_GetRecentMatchResults(t *testing.T) {
 		})
 	}
 }
+
+func TestSQLiteJobRepository_CreateWithTx(t *testing.T) {
+	tests := []struct {
+		name        string
+		job         *models.Job
+		setupMock   func(sqlmock.Sqlmock)
+		wantErr     bool
+		expectedErr error
+	}{
+		{
+			name: "successful creation within transaction",
+			job: &models.Job{
+				Title:          "Software Engineer",
+				Description:    "Build awesome software",
+				Location:       "Remote",
+				JobType:        models.FULL_TIME,
+				RequiredSkills: []string{"Go", "SQL"},
+				CompanyID:      1,
+				Company:        models.Company{ID: 1, Name: "Acme Corp"},
+				Status:         models.INTERESTED,
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("INSERT INTO jobs").
+					WithArgs(
+						"Software Engineer", "Build awesome software", "Remote", int(models.FULL_TIME),
+						"", sqlmock.AnyArg(), "", 1,
+						int(models.INTERESTED), "",
+						sqlmock.AnyArg(), sqlmock.AnyArg(), testUserID,
+					).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			wantErr: false,
+		},
+		{
+			name: "validation error - missing title",
+			job: &models.Job{
+				Description: "Build awesome software",
+				CompanyID:   1,
+				Company:     models.Company{ID: 1, Name: "Acme Corp"},
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+			},
+			wantErr:     true,
+			expectedErr: models.ErrJobTitleRequired,
+		},
+		{
+			name: "database error during insert",
+			job: &models.Job{
+				Title:          "Software Engineer",
+				Description:    "Build awesome software",
+				CompanyID:      1,
+				Company:        models.Company{ID: 1, Name: "Acme Corp"},
+				RequiredSkills: []string{},
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("INSERT INTO jobs").
+					WillReturnError(errors.New("database error"))
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			tx, _ := repo.db.Begin()
+
+			job, err := repo.CreateWithTx(context.Background(), tx, testUserID, tt.job)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.expectedErr != nil {
+					assert.True(t, errors.Is(err, tt.expectedErr))
+				}
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, 1, job.ID)
+				assert.Equal(t, testUserID, job.UserID)
+			}
+		})
+	}
+}
+
+func TestSQLiteJobRepository_UpdateWithTx(t *testing.T) {
+	tests := []struct {
+		name         string
+		job          *models.Job
+		setupMock    func(sqlmock.Sqlmock)
+		wantErr      bool
+		expectedErr  error
+		rowsAffected int64
+	}{
+		{
+			name: "successful update within transaction",
+			job: &models.Job{
+				ID:             1,
+				Title:          "Senior Engineer",
+				Description:    "Updated description",
+				Location:       "NYC",
+				JobType:        models.FULL_TIME,
+				RequiredSkills: []string{"Go", "Kubernetes"},
+				CompanyID:      1,
+				Company:        models.Company{ID: 1, Name: "Acme Corp"},
+				Status:         models.APPLIED,
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("UPDATE jobs SET").
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			wantErr:      false,
+			rowsAffected: 1,
+		},
+		{
+			name: "job not found",
+			job: &models.Job{
+				ID:             999,
+				Title:          "Senior Engineer",
+				Description:    "Updated description",
+				CompanyID:      1,
+				Company:        models.Company{ID: 1, Name: "Acme Corp"},
+				RequiredSkills: []string{},
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("UPDATE jobs SET").
+					WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			wantErr:      true,
+			expectedErr:  models.ErrJobNotFound,
+			rowsAffected: 0,
+		},
+		{
+			name: "validation error - missing title",
+			job: &models.Job{
+				ID:          1,
+				Description: "Updated description",
+				CompanyID:   1,
+				Company:     models.Company{ID: 1, Name: "Acme Corp"},
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+			},
+			wantErr:     true,
+			expectedErr: models.ErrJobTitleRequired,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			tx, _ := repo.db.Begin()
+
+			err := repo.UpdateWithTx(context.Background(), tx, testUserID, tt.job)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.expectedErr != nil {
+					assert.True(t, errors.Is(err, tt.expectedErr))
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestSQLiteJobRepository_DeleteWithTx(t *testing.T) {
+	tests := []struct {
+		name         string
+		jobID        int
+		setupMock    func(sqlmock.Sqlmock)
+		wantErr      bool
+		expectedErr  error
+		rowsAffected int64
+	}{
+		{
+			name:  "successful deletion within transaction",
+			jobID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("DELETE FROM jobs WHERE").
+					WithArgs(1, testUserID).
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			wantErr:      false,
+			rowsAffected: 1,
+		},
+		{
+			name:  "job not found",
+			jobID: 999,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("DELETE FROM jobs WHERE").
+					WithArgs(999, testUserID).
+					WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			wantErr:      true,
+			expectedErr:  models.ErrJobNotFound,
+			rowsAffected: 0,
+		},
+		{
+			name:  "database error",
+			jobID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("DELETE FROM jobs WHERE").
+					WithArgs(1, testUserID).
+					WillReturnError(errors.New("database error"))
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			tx, _ := repo.db.Begin()
+
+			err := repo.DeleteWithTx(context.Background(), tx, testUserID, tt.jobID)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.expectedErr != nil {
+					assert.True(t, errors.Is(err, tt.expectedErr))
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+// ============================================================================
+// Utility Methods Tests
+// ============================================================================
+
+func TestSQLiteJobRepository_GetBySourceURL(t *testing.T) {
+	tests := []struct {
+		name      string
+		sourceURL string
+		setupMock func(sqlmock.Sqlmock)
+		wantErr   bool
+		wantJob   bool
+	}{
+		{
+			name:      "successful retrieval",
+			sourceURL: "https://example.com/job/123",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				now := time.Now()
+				rows := sqlmock.NewRows([]string{
+					"j.id", "j.title", "j.description", "j.location", "j.job_type",
+					"j.source_url", "j.required_skills",
+					"j.application_url", "j.company_id", "j.status", "j.match_score",
+					"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+					"c.name", "c.created_at", "c.updated_at",
+				}).AddRow(
+					1, "Software Engineer", "Build awesome software", "Remote", int(models.FULL_TIME),
+					"https://example.com/job/123", `["Go","SQL"]`,
+					"https://apply.example.com", 1, int(models.INTERESTED), 85,
+					"Great company", now.Add(-24*time.Hour), now, testUserID, nil,
+					"Acme Corp", now, now,
+				)
+				mock.ExpectQuery("SELECT.*FROM jobs.*WHERE.*source_url.*user_id").
+					WithArgs("https://example.com/job/123", testUserID).
+					WillReturnRows(rows)
+			},
+			wantErr: false,
+			wantJob: true,
+		},
+		{
+			name:      "job not found",
+			sourceURL: "https://example.com/job/nonexistent",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT.*FROM jobs.*WHERE.*source_url.*user_id").
+					WithArgs("https://example.com/job/nonexistent", testUserID).
+					WillReturnError(sql.ErrNoRows)
+			},
+			wantErr: true,
+			wantJob: false,
+		},
+		{
+			name:      "empty source URL",
+			sourceURL: "",
+			setupMock: func(mock sqlmock.Sqlmock) {},
+			wantErr:   true,
+			wantJob:   false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			job, err := repo.GetBySourceURL(context.Background(), testUserID, tt.sourceURL)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, job)
+			} else {
+				require.NoError(t, err)
+				assert.NotNil(t, job)
+				assert.Equal(t, tt.sourceURL, job.SourceURL)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSQLiteJobRepository_GetOrCreate(t *testing.T) {
+	tests := []struct {
+		name         string
+		job          *models.Job
+		setupMock    func(sqlmock.Sqlmock)
+		setupCompany func(*MinimalMockCompanyRepository)
+		wantCreated  bool
+		wantErr      bool
+	}{
+		{
+			name: "returns existing job",
+			job: &models.Job{
+				Title:          "Software Engineer",
+				Description:    "Build awesome software",
+				SourceURL:      "https://example.com/job/123",
+				RequiredSkills: []string{"Go"},
+				Company:        models.Company{Name: "Acme Corp"},
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				now := time.Now()
+				rows := sqlmock.NewRows([]string{
+					"j.id", "j.title", "j.description", "j.location", "j.job_type",
+					"j.source_url", "j.required_skills",
+					"j.application_url", "j.company_id", "j.status", "j.match_score",
+					"j.notes", "j.created_at", "j.updated_at", "j.user_id", "j.first_analyzed_at",
+					"c.name", "c.created_at", "c.updated_at",
+				}).AddRow(
+					1, "Software Engineer", "Build awesome software", "Remote", int(models.FULL_TIME),
+					"https://example.com/job/123", `["Go"]`,
+					"", 1, int(models.INTERESTED), nil,
+					"", now, now, testUserID, nil,
+					"Acme Corp", now, now,
+				)
+				mock.ExpectQuery("SELECT.*FROM jobs.*WHERE.*source_url.*user_id").
+					WithArgs("https://example.com/job/123", testUserID).
+					WillReturnRows(rows)
+			},
+			wantCreated: false,
+			wantErr:     false,
+		},
+		{
+			name: "creates new job when not found",
+			job: &models.Job{
+				Title:          "New Position",
+				Description:    "New job description",
+				SourceURL:      "https://example.com/job/new",
+				RequiredSkills: []string{"Python"},
+				Company:        models.Company{Name: "New Corp"},
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				// First query returns no rows
+				mock.ExpectQuery("SELECT.*FROM jobs.*WHERE.*source_url.*user_id").
+					WithArgs("https://example.com/job/new", testUserID).
+					WillReturnError(sql.ErrNoRows)
+
+				// Then insert
+				mock.ExpectExec("INSERT INTO jobs").
+					WillReturnResult(sqlmock.NewResult(2, 1))
+			},
+			setupCompany: func(repo *MinimalMockCompanyRepository) {
+				repo.companies["New Corp"] = &models.Company{ID: 2, Name: "New Corp"}
+			},
+			wantCreated: true,
+			wantErr:     false,
+		},
+		{
+			name: "empty source URL returns error",
+			job: &models.Job{
+				Title:          "Software Engineer",
+				Description:    "Build awesome software",
+				SourceURL:      "",
+				RequiredSkills: []string{},
+				Company:        models.Company{Name: "Acme Corp"},
+			},
+			setupMock:   func(mock sqlmock.Sqlmock) {},
+			wantCreated: false,
+			wantErr:     true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, mockCompanyRepo := setupJobRepositoryTest(t)
+
+			if tt.setupCompany != nil {
+				tt.setupCompany(mockCompanyRepo)
+			}
+			tt.setupMock(mock)
+
+			job, created, err := repo.GetOrCreate(context.Background(), testUserID, tt.job)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.NotNil(t, job)
+				assert.Equal(t, tt.wantCreated, created)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSQLiteJobRepository_Update(t *testing.T) {
+	tests := []struct {
+		name         string
+		job          *models.Job
+		setupMock    func(sqlmock.Sqlmock)
+		setupCompany func(*MinimalMockCompanyRepository)
+		wantErr      bool
+		expectedErr  error
+	}{
+		{
+			name: "successful update",
+			job: &models.Job{
+				ID:             1,
+				Title:          "Updated Title",
+				Description:    "Updated description",
+				Location:       "NYC",
+				JobType:        models.FULL_TIME,
+				RequiredSkills: []string{"Go", "Python"},
+				Company:        models.Company{Name: "Acme Corp"},
+				Status:         models.APPLIED,
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET").
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			setupCompany: func(repo *MinimalMockCompanyRepository) {
+				repo.companies["Acme Corp"] = &models.Company{ID: 1, Name: "Acme Corp"}
+			},
+			wantErr: false,
+		},
+		{
+			name: "job not found",
+			job: &models.Job{
+				ID:             999,
+				Title:          "Updated Title",
+				Description:    "Updated description",
+				RequiredSkills: []string{},
+				Company:        models.Company{Name: "Acme Corp"},
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET").
+					WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			setupCompany: func(repo *MinimalMockCompanyRepository) {
+				repo.companies["Acme Corp"] = &models.Company{ID: 1, Name: "Acme Corp"}
+			},
+			wantErr:     true,
+			expectedErr: models.ErrJobNotFound,
+		},
+		{
+			name:        "nil job returns error",
+			job:         nil,
+			setupMock:   func(mock sqlmock.Sqlmock) {},
+			wantErr:     true,
+			expectedErr: models.ErrInvalidJobID,
+		},
+		{
+			name: "zero ID returns error",
+			job: &models.Job{
+				ID:    0,
+				Title: "Updated Title",
+			},
+			setupMock:   func(mock sqlmock.Sqlmock) {},
+			wantErr:     true,
+			expectedErr: models.ErrInvalidJobID,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, mockCompanyRepo := setupJobRepositoryTest(t)
+
+			if tt.setupCompany != nil {
+				tt.setupCompany(mockCompanyRepo)
+			}
+			tt.setupMock(mock)
+
+			err := repo.Update(context.Background(), testUserID, tt.job)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.expectedErr != nil {
+					assert.True(t, errors.Is(err, tt.expectedErr))
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSQLiteJobRepository_UpdateMatchScore(t *testing.T) {
+	tests := []struct {
+		name       string
+		jobID      int
+		matchScore *int
+		setupMock  func(sqlmock.Sqlmock)
+		wantErr    bool
+	}{
+		{
+			name:       "successful update with score",
+			jobID:      1,
+			matchScore: intPtr(85),
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET match_score").
+					WithArgs(intPtr(85), sqlmock.AnyArg(), 1, testUserID).
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			wantErr: false,
+		},
+		{
+			name:       "successful update with nil score",
+			jobID:      1,
+			matchScore: nil,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET match_score").
+					WithArgs(nil, sqlmock.AnyArg(), 1, testUserID).
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			wantErr: false,
+		},
+		{
+			name:       "job not found",
+			jobID:      999,
+			matchScore: intPtr(85),
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET match_score").
+					WithArgs(intPtr(85), sqlmock.AnyArg(), 999, testUserID).
+					WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			wantErr: true,
+		},
+		{
+			name:       "invalid job ID",
+			jobID:      0,
+			matchScore: intPtr(85),
+			setupMock:  func(mock sqlmock.Sqlmock) {},
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			err := repo.UpdateMatchScore(context.Background(), testUserID, tt.jobID, tt.matchScore)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+// ============================================================================
+// Stats/Count Methods Tests
+// ============================================================================
+
+func TestSQLiteJobRepository_GetCount(t *testing.T) {
+	tests := []struct {
+		name      string
+		filter    models.JobFilter
+		setupMock func(sqlmock.Sqlmock)
+		want      int
+		wantErr   bool
+	}{
+		{
+			name:   "count all jobs",
+			filter: models.JobFilter{},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"count"}).AddRow(15)
+				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM jobs").
+					WithArgs(testUserID).
+					WillReturnRows(rows)
+			},
+			want:    15,
+			wantErr: false,
+		},
+		{
+			name: "count with status filter",
+			filter: models.JobFilter{
+				Status: func() *models.JobStatus { s := models.APPLIED; return &s }(),
+			},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"count"}).AddRow(5)
+				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM jobs").
+					WithArgs(testUserID, int(models.APPLIED)).
+					WillReturnRows(rows)
+			},
+			want:    5,
+			wantErr: false,
+		},
+		{
+			name:   "database error",
+			filter: models.JobFilter{},
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM jobs").
+					WithArgs(testUserID).
+					WillReturnError(errors.New("database error"))
+			},
+			want:    0,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			count, err := repo.GetCount(context.Background(), testUserID, tt.filter)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, count)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSQLiteJobRepository_GetStats(t *testing.T) {
+	tests := []struct {
+		name      string
+		setupMock func(sqlmock.Sqlmock)
+		want      *models.JobStats
+		wantErr   bool
+	}{
+		{
+			name: "success with jobs",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"total_jobs", "applied", "high_match"}).
+					AddRow(20, 10, 8)
+				mock.ExpectQuery("SELECT.*COUNT.*FROM jobs").
+					WithArgs(int(models.APPLIED), testUserID).
+					WillReturnRows(rows)
+			},
+			want: &models.JobStats{
+				TotalJobs:    20,
+				TotalApplied: 10,
+				HighMatch:    8,
+			},
+			wantErr: false,
+		},
+		{
+			name: "success with no jobs",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"total_jobs", "applied", "high_match"}).
+					AddRow(0, 0, 0)
+				mock.ExpectQuery("SELECT.*COUNT.*FROM jobs").
+					WithArgs(int(models.APPLIED), testUserID).
+					WillReturnRows(rows)
+			},
+			want: &models.JobStats{
+				TotalJobs:    0,
+				TotalApplied: 0,
+				HighMatch:    0,
+			},
+			wantErr: false,
+		},
+		{
+			name: "database error",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT.*COUNT.*FROM jobs").
+					WithArgs(int(models.APPLIED), testUserID).
+					WillReturnError(errors.New("database error"))
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			stats, err := repo.GetStats(context.Background(), testUserID)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, stats)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, stats)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSQLiteJobRepository_GetMonthlyAnalysisCount(t *testing.T) {
+	tests := []struct {
+		name      string
+		setupMock func(sqlmock.Sqlmock)
+		want      int
+		wantErr   bool
+	}{
+		{
+			name: "successful count",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"count"}).AddRow(12)
+				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM jobs WHERE user_id").
+					WithArgs(testUserID, sqlmock.AnyArg()).
+					WillReturnRows(rows)
+			},
+			want:    12,
+			wantErr: false,
+		},
+		{
+			name: "zero count",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
+				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM jobs WHERE user_id").
+					WithArgs(testUserID, sqlmock.AnyArg()).
+					WillReturnRows(rows)
+			},
+			want:    0,
+			wantErr: false,
+		},
+		{
+			name: "database error",
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM jobs WHERE user_id").
+					WithArgs(testUserID, sqlmock.AnyArg()).
+					WillReturnError(errors.New("database error"))
+			},
+			want:    0,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			count, err := repo.GetMonthlyAnalysisCount(context.Background(), testUserID)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, count)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+// ============================================================================
+// Match Methods Tests
+// ============================================================================
+
+func TestSQLiteJobRepository_DeleteMatchResult(t *testing.T) {
+	tests := []struct {
+		name      string
+		matchID   int
+		setupMock func(sqlmock.Sqlmock)
+		wantErr   bool
+	}{
+		{
+			name:    "successful deletion",
+			matchID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				// First query to get job_id
+				rows := sqlmock.NewRows([]string{"job_id"}).AddRow(5)
+				mock.ExpectQuery("SELECT job_id FROM match_results WHERE id = \\? AND user_id = \\?").
+					WithArgs(1, testUserID).
+					WillReturnRows(rows)
+
+				// Then delete
+				mock.ExpectExec("DELETE FROM match_results WHERE id = \\? AND user_id = \\?").
+					WithArgs(1, testUserID).
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			wantErr: false,
+		},
+		{
+			name:    "match not found",
+			matchID: 999,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT job_id FROM match_results WHERE id = \\? AND user_id = \\?").
+					WithArgs(999, testUserID).
+					WillReturnError(sql.ErrNoRows)
+			},
+			wantErr: true,
+		},
+		{
+			name:      "invalid match ID",
+			matchID:   0,
+			setupMock: func(mock sqlmock.Sqlmock) {},
+			wantErr:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			err := repo.DeleteMatchResult(context.Background(), testUserID, tt.matchID)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSQLiteJobRepository_SetFirstAnalyzedAt(t *testing.T) {
+	tests := []struct {
+		name      string
+		jobID     int
+		setupMock func(sqlmock.Sqlmock)
+		wantErr   bool
+	}{
+		{
+			name:  "successful set",
+			jobID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET first_analyzed_at = CURRENT_TIMESTAMP WHERE id = \\? AND first_analyzed_at IS NULL").
+					WithArgs(1).
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			wantErr: false,
+		},
+		{
+			name:  "already set - no rows affected",
+			jobID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET first_analyzed_at = CURRENT_TIMESTAMP WHERE id = \\? AND first_analyzed_at IS NULL").
+					WithArgs(1).
+					WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			wantErr: false,
+		},
+		{
+			name:  "database error",
+			jobID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("UPDATE jobs SET first_analyzed_at = CURRENT_TIMESTAMP WHERE id = \\? AND first_analyzed_at IS NULL").
+					WithArgs(1).
+					WillReturnError(errors.New("database error"))
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			err := repo.SetFirstAnalyzedAt(context.Background(), tt.jobID)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestSQLiteJobRepository_SetFirstAnalyzedAtWithTx(t *testing.T) {
+	tests := []struct {
+		name      string
+		jobID     int
+		setupMock func(sqlmock.Sqlmock)
+		wantErr   bool
+	}{
+		{
+			name:  "successful set within transaction",
+			jobID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("UPDATE jobs SET first_analyzed_at = CURRENT_TIMESTAMP WHERE id = \\? AND first_analyzed_at IS NULL").
+					WithArgs(1).
+					WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			wantErr: false,
+		},
+		{
+			name:  "database error",
+			jobID: 1,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec("UPDATE jobs SET first_analyzed_at = CURRENT_TIMESTAMP WHERE id = \\? AND first_analyzed_at IS NULL").
+					WithArgs(1).
+					WillReturnError(errors.New("database error"))
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo, mock, _ := setupJobRepositoryTest(t)
+			tt.setupMock(mock)
+
+			tx, _ := repo.db.Begin()
+
+			err := repo.SetFirstAnalyzedAtWithTx(context.Background(), tx, tt.jobID)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}

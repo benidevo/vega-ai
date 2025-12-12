@@ -155,46 +155,26 @@ func (r *SQLiteDocumentRepository) GetDocumentByJobAndType(ctx context.Context, 
 }
 
 func (r *SQLiteDocumentRepository) GetDocumentsByType(ctx context.Context, userID int, docType models.DocumentType, limit, offset int) ([]*models.DocumentSummary, int, error) {
-	// Get count
-	countQuery, countArgs, err := querybuilder.Select("COUNT(*)").
-		From("documents d").
-		Where(sq.Eq{"d.user_id": userID}).
-		Where(sq.Eq{"d.document_type": docType}).
-		ToSql()
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to build count query: %w", err)
-	}
+	query := `
+		SELECT d.id, d.job_id, j.title, c.name, j.status, d.document_type,
+		       SUBSTR(d.content, 1, 200) as preview, d.size_bytes, d.created_at, d.updated_at,
+		       COUNT(*) OVER() as total_count
+		FROM documents d
+		JOIN jobs j ON d.job_id = j.id
+		JOIN companies c ON j.company_id = c.id
+		WHERE d.user_id = ? AND d.document_type = ?
+		ORDER BY d.updated_at DESC
+		LIMIT ? OFFSET ?
+	`
 
-	var totalCount int
-	err = r.db.QueryRowContext(ctx, countQuery, countArgs...).Scan(&totalCount)
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to get document count: %w", err)
-	}
-
-	query, args, err := querybuilder.Select(
-		"d.id", "d.job_id", "j.title", "c.name", "j.status", "d.document_type",
-		"SUBSTR(d.content, 1, 200) as preview", "d.size_bytes", "d.created_at", "d.updated_at",
-	).
-		From("documents d").
-		Join("jobs j ON d.job_id = j.id").
-		Join("companies c ON j.company_id = c.id").
-		Where(sq.Eq{"d.user_id": userID}).
-		Where(sq.Eq{"d.document_type": docType}).
-		OrderBy("d.updated_at DESC").
-		Limit(uint64(limit)).
-		Offset(uint64(offset)).
-		ToSql()
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to build query: %w", err)
-	}
-
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.db.QueryContext(ctx, query, userID, docType, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to query documents: %w", err)
 	}
 	defer rows.Close()
 
 	var summaries []*models.DocumentSummary
+	var totalCount int
 	for rows.Next() {
 		var summary models.DocumentSummary
 		var jobStatus int
@@ -210,6 +190,7 @@ func (r *SQLiteDocumentRepository) GetDocumentsByType(ctx context.Context, userI
 			&summary.SizeBytes,
 			&summary.CreatedAt,
 			&summary.UpdatedAt,
+			&totalCount,
 		)
 		if err != nil {
 			return nil, 0, fmt.Errorf("failed to scan document summary: %w", err)
@@ -223,44 +204,26 @@ func (r *SQLiteDocumentRepository) GetDocumentsByType(ctx context.Context, userI
 }
 
 func (r *SQLiteDocumentRepository) GetAllDocuments(ctx context.Context, userID int, limit, offset int) ([]*models.DocumentSummary, int, error) {
-	// Get count
-	countQuery, countArgs, err := querybuilder.Select("COUNT(*)").
-		From("documents d").
-		Where(sq.Eq{"d.user_id": userID}).
-		ToSql()
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to build count query: %w", err)
-	}
+	query := `
+		SELECT d.id, d.job_id, j.title, c.name, j.status, d.document_type,
+		       SUBSTR(d.content, 1, 200) as preview, d.size_bytes, d.created_at, d.updated_at,
+		       COUNT(*) OVER() as total_count
+		FROM documents d
+		JOIN jobs j ON d.job_id = j.id
+		JOIN companies c ON j.company_id = c.id
+		WHERE d.user_id = ?
+		ORDER BY d.updated_at DESC
+		LIMIT ? OFFSET ?
+	`
 
-	var totalCount int
-	err = r.db.QueryRowContext(ctx, countQuery, countArgs...).Scan(&totalCount)
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to get document count: %w", err)
-	}
-
-	query, args, err := querybuilder.Select(
-		"d.id", "d.job_id", "j.title", "c.name", "j.status", "d.document_type",
-		"SUBSTR(d.content, 1, 200) as preview", "d.size_bytes", "d.created_at", "d.updated_at",
-	).
-		From("documents d").
-		Join("jobs j ON d.job_id = j.id").
-		Join("companies c ON j.company_id = c.id").
-		Where(sq.Eq{"d.user_id": userID}).
-		OrderBy("d.updated_at DESC").
-		Limit(uint64(limit)).
-		Offset(uint64(offset)).
-		ToSql()
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to build query: %w", err)
-	}
-
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.db.QueryContext(ctx, query, userID, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to query documents: %w", err)
 	}
 	defer rows.Close()
 
 	var summaries []*models.DocumentSummary
+	var totalCount int
 	for rows.Next() {
 		var summary models.DocumentSummary
 		var jobStatus int
@@ -276,6 +239,7 @@ func (r *SQLiteDocumentRepository) GetAllDocuments(ctx context.Context, userID i
 			&summary.SizeBytes,
 			&summary.CreatedAt,
 			&summary.UpdatedAt,
+			&totalCount,
 		)
 		if err != nil {
 			return nil, 0, fmt.Errorf("failed to scan document summary: %w", err)

@@ -16,7 +16,7 @@ import (
 )
 
 // Setup initializes the job package dependencies and returns a JobHandler.
-func Setup(db *sql.DB, cfg *config.Settings, cache cache.Cache) *JobHandler {
+func Setup(db *sql.DB, cfg *config.Settings, cache cache.Cache) (*JobHandler, error) {
 	service := SetupService(db, cfg, cache)
 	return NewJobHandler(service, cfg)
 }
