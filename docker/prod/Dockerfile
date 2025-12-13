@@ -1,5 +1,5 @@
 
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24-alpine3.22 AS builder
 
 RUN apk add --no-cache ca-certificates tzdata gcc musl-dev nodejs npm
 
@@ -18,7 +18,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
     -ldflags='-w -s' \
     -o vega ./cmd/vega/
 
-FROM alpine:3.20
+FROM alpine:3.22
 
 ARG CLOUD_MODE=false
 
