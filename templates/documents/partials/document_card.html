@@ -23,7 +23,7 @@
         </button>
         
         <div id="dropdown-{{.ID}}"
-             class="hidden absolute right-0 top-8 w-48 bg-slate-800 rounded-md shadow-xl border border-slate-600 z-10"
+             class="hidden absolute right-0 top-8 w-48 bg-slate-800 rounded-md shadow-xl border border-slate-600 z-30"
              role="menu"
              aria-orientation="vertical"
              aria-labelledby="document-menu-button-{{.ID}}">
@@ -37,7 +37,8 @@
             View Job
           </a>
           
-          <button onclick="toggleDropdown('{{.ID}}'); downloadDocument({{.ID}}, '{{.DocumentType}}')" 
+          <button type="button"
+                  onclick="toggleDropdown('{{.ID}}'); downloadDocument({{.ID}}, '{{.DocumentType}}')"
                   role="menuitem"
                   class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors w-full text-left">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,7 +49,8 @@
           
           <hr class="border-slate-600 my-1" role="separator">
           
-          <button class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors w-full text-left rounded-b-md"
+          <button type="button"
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors w-full text-left rounded-b-md"
                   role="menuitem"
                   onclick="toggleDropdown('{{.ID}}')"
                   _="on click 

@@ -40,7 +40,12 @@ func (h *DocumentHandler) GetDocumentsHub(c *gin.Context) {
 		alerts.RenderError(c, http.StatusUnauthorized, "Authentication required", alerts.ContextGeneral)
 		return
 	}
-	userID := userIDValue.(int)
+	userID, ok := userIDValue.(int)
+	if !ok {
+		h.log.Error().Interface("userID", userIDValue).Msg("Invalid userID type in context")
+		alerts.RenderError(c, http.StatusInternalServerError, "Internal error", alerts.ContextGeneral)
+		return
+	}
 
 	tab := c.DefaultQuery("tab", "cover-letters")
 
@@ -109,7 +114,12 @@ func (h *DocumentHandler) DeleteDocument(c *gin.Context) {
 		alerts.RenderError(c, http.StatusUnauthorized, "Authentication required", alerts.ContextGeneral)
 		return
 	}
-	userID := userIDValue.(int)
+	userID, ok := userIDValue.(int)
+	if !ok {
+		h.log.Error().Interface("userID", userIDValue).Msg("Invalid userID type in context")
+		alerts.RenderError(c, http.StatusInternalServerError, "Internal error", alerts.ContextGeneral)
+		return
+	}
 
 	docIDStr := c.Param("id")
 	docID, err := strconv.Atoi(docIDStr)
@@ -139,7 +149,12 @@ func (h *DocumentHandler) ExportDocument(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
 		return
 	}
-	userID := userIDValue.(int)
+	userID, ok := userIDValue.(int)
+	if !ok {
+		h.log.Error().Interface("userID", userIDValue).Msg("Invalid userID type in context")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
 
 	docIDStr := c.Param("id")
 	docID, err := strconv.Atoi(docIDStr)
@@ -242,7 +257,12 @@ func (h *DocumentHandler) GetDocumentPartial(c *gin.Context) {
 		alerts.RenderError(c, http.StatusUnauthorized, "Authentication required", alerts.ContextGeneral)
 		return
 	}
-	userID := userIDValue.(int)
+	userID, ok := userIDValue.(int)
+	if !ok {
+		h.log.Error().Interface("userID", userIDValue).Msg("Invalid userID type in context")
+		alerts.RenderError(c, http.StatusInternalServerError, "Internal error", alerts.ContextGeneral)
+		return
+	}
 
 	tab := c.DefaultQuery("tab", "cover-letters")
 
@@ -534,7 +554,12 @@ func (h *DocumentHandler) SaveDocument(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
 		return
 	}
-	userID := userIDValue.(int)
+	userID, ok := userIDValue.(int)
+	if !ok {
+		h.log.Error().Interface("userID", userIDValue).Msg("Invalid userID type in context")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
 
 	const maxBodySize = 2 * 1024 * 1024
 	if c.Request.ContentLength > maxBodySize {

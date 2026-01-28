@@ -224,22 +224,23 @@
           originalData.set(key, value);
         }
 
-        const inputs = form.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-          input.addEventListener('input', () => {
-            const currentData = new FormData(form);
-            let changed = false;
+        // Delegated handler prevents memory leaks when HTMX replaces forms
+        const changeHandler = () => {
+          const currentData = new FormData(form);
+          let changed = false;
 
-            for (let [key, value] of currentData.entries()) {
-              if (originalData.get(key) !== value) {
-                changed = true;
-                break;
-              }
+          for (let [key, value] of currentData.entries()) {
+            if (originalData.get(key) !== value) {
+              changed = true;
+              break;
             }
+          }
 
-            hasUnsavedChanges = changed;
-          });
-        });
+          hasUnsavedChanges = changed;
+        };
+
+        form._changeHandler = changeHandler;
+        form.addEventListener('input', changeHandler);
       });
     }
 
@@ -422,7 +423,7 @@
   {{if eq .page "settings-search-preferences"}}
   <script src="/static/js/skills-management.js"></script>
   {{end}}
-  <div id="notification-container" class="fixed right-2 sm:right-4 bottom-4 left-2 sm:left-auto z-50 flex flex-col-reverse gap-2 pointer-events-none sm:max-w-sm">
+  <div id="notification-container" class="fixed right-2 sm:right-4 bottom-4 left-2 sm:left-auto z-[9999] flex flex-col-reverse gap-2 pointer-events-none sm:max-w-sm">
   </div>
 </body>
 </html>

@@ -205,29 +205,31 @@ function togglePasswordVisibility() {
 }
 
 function validateLoginForm(event) {
-  const username = document.getElementById('username').value;
+  const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
   const clientError = document.getElementById('client-error');
   const clientErrorMessage = document.getElementById('client-error-message');
-  
+
+  // Validate username (trimmed to catch whitespace-only input)
   if (username.length < 3 || username.length > 50) {
     event.preventDefault();
-    clientErrorMessage.textContent = username.length < 3 
-      ? 'Username must be at least 3 characters long' 
+    clientErrorMessage.textContent = username.length < 3
+      ? 'Username must be at least 3 characters long'
       : 'Username must be no more than 50 characters long';
     clientError.classList.remove('hidden');
     return false;
   }
-  
+
+  // Validate password (don't trim - spaces may be intentional in passwords)
   if (password.length < 8 || password.length > 64) {
     event.preventDefault();
-    clientErrorMessage.textContent = password.length < 8 
-      ? 'Password must be at least 8 characters long' 
+    clientErrorMessage.textContent = password.length < 8
+      ? 'Password must be at least 8 characters long'
       : 'Password must be no more than 64 characters long';
     clientError.classList.remove('hidden');
     return false;
   }
-  
+
   clientError.classList.add('hidden');
   return true;
 }

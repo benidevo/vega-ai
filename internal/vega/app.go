@@ -17,6 +17,7 @@ import (
 	"github.com/benidevo/vega/internal/common/render"
 	"github.com/benidevo/vega/internal/config"
 	"github.com/benidevo/vega/internal/db"
+	localmiddleware "github.com/benidevo/vega/internal/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -26,13 +27,14 @@ import (
 // App represents the core application structure, encapsulating configuration,
 // HTTP router, database connection, cache, HTTP server, and a channel for handling OS signals.
 type App struct {
-	config   config.Settings
-	router   *gin.Engine
-	db       *sql.DB
-	cache    cache.Cache
-	server   *http.Server
-	done     chan os.Signal
-	renderer *render.HTMLRenderer
+	config      config.Settings
+	router      *gin.Engine
+	db          *sql.DB
+	cache       cache.Cache
+	server      *http.Server
+	done        chan os.Signal
+	renderer    *render.HTMLRenderer
+	authLimiter *localmiddleware.RateLimiter
 }
 
 // loadTemplates walks the templates directory and loads all HTML files
@@ -61,6 +63,12 @@ func loadTemplates(router *gin.Engine) error {
 // It initializes the router using the Gin framework and sets up a channel to handle OS signals.
 func New(cfg config.Settings) *App {
 	router := gin.Default()
+
+	if cfg.IsCloudMode {
+		router.SetTrustedProxies([]string{"10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"})
+	} else {
+		router.SetTrustedProxies(nil)
+	}
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = cfg.CORSAllowedOrigins
@@ -187,9 +195,14 @@ func (a *App) Shutdown(ctx context.Context) error {
 		}
 	}
 
+	if a.authLimiter != nil {
+		a.authLimiter.Stop()
+	}
+
 	a.server = nil
 	a.db = nil
 	a.cache = nil
+	a.authLimiter = nil
 
 	return err
 }

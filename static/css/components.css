@@ -311,15 +311,11 @@ html {
 
 /* Better touch targets for mobile */
 @media (max-width: 768px) {
-  input, 
-  button, 
-  select, 
-  textarea, 
-  label, 
-  a {
+  input:not([type="checkbox"]):not([type="radio"]),
+  button,
+  select,
+  textarea {
     min-height: 44px;
-    display: flex;
-    align-items: center;
   }
 
   input[type="checkbox"], 
@@ -329,11 +325,10 @@ html {
     margin: 4px;
   }
 
-  input:focus, 
-  textarea:focus, 
+  input:focus,
+  textarea:focus,
   select:focus {
-    transform: scale(1.02);
-    transition: transform 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   button:active, 

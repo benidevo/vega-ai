@@ -1,9 +1,16 @@
 // CV Upload functionality
 
-// Helper function to get CSRF token from meta tag
+// Track upload state to prevent race conditions
+let isUploading = false;
+
+// Helper function to get CSRF token from meta tag with validation
 function getCSRFToken() {
     const metaTag = document.querySelector('meta[name="csrf-token"]');
-    return metaTag ? metaTag.getAttribute('content') : '';
+    const token = metaTag ? metaTag.getAttribute('content') : '';
+    if (!token) {
+        console.warn('CSRF token not found - requests may fail');
+    }
+    return token;
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -58,6 +65,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function handleCVUpload(file) {
         clearError();
 
+        // Prevent multiple simultaneous uploads
+        if (isUploading) {
+            return showError('Upload already in progress. Please wait.');
+        }
+
         if (file.type !== 'application/pdf') {
             return showError('Please upload a PDF file. Other formats are not supported.');
         }
@@ -72,6 +84,13 @@ document.addEventListener('DOMContentLoaded', async function() {
             return showError('File appears to be too small to contain a valid CV.');
         }
 
+        // Validate CSRF token before proceeding
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) {
+            return showError('Security token missing. Please refresh the page and try again.');
+        }
+
+        isUploading = true;
         uploadButton.style.display = 'none';
         uploadStatus.classList.remove('hidden');
 
@@ -87,9 +106,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 return showError('The document is too long. Please upload a standard CV/Resume (typically 1-3 pages).');
             }
 
-            // Get CSRF token from meta tag
-            const csrfToken = getCSRFToken();
-            
             const response = await fetch('/settings/profile/parse-cv', {
                 method: 'POST',
                 headers: { 
@@ -109,6 +125,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.error('CV upload error:', error);
             showError(error.message || 'Failed to process CV. Please try again or fill manually.');
         } finally {
+            isUploading = false;
             uploadButton.style.display = 'inline-flex';
             uploadStatus.classList.add('hidden');
             fileInput.value = '';

@@ -342,6 +342,11 @@ func (r *SQLiteJobRepository) GetOrCreate(ctx context.Context, userID int, jobMo
 	jobModel.UserID = userID
 	jobModel.Company = *company
 
+	r.invalidateCache(ctx,
+		fmt.Sprintf("stats:u%d:summary", userID),
+		fmt.Sprintf("stats:u%d:by-status", userID),
+	)
+
 	return jobModel, true, nil
 }
 

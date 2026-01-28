@@ -8,11 +8,21 @@ const buttonStates = new Map();
  * @param {HTMLElement} button The button element that triggered the operation
  * @param {string} loadingText Text to display during loading (e.g., "Analyzing...", "Generating...")
  */
+// Track if an AI operation is currently in progress to prevent race conditions
+let aiOperationInProgress = false;
+
 window.handleAIOperationStart = function(button, loadingText) {
+    // Prevent multiple simultaneous AI operations
+    if (aiOperationInProgress) {
+        console.warn('AI operation already in progress');
+        return false;
+    }
+    aiOperationInProgress = true;
+
     const aiButtons = ['analyze-button', 'cover-letter-button', 'cv-button'];
     aiButtons.forEach(buttonId => {
         const btn = document.getElementById(buttonId);
-        if (btn && !btn.disabled) {
+        if (btn != null && !btn.disabled) {
             if (!buttonStates.has(buttonId)) {
                 buttonStates.set(buttonId, {
                     html: btn.innerHTML,
@@ -36,11 +46,13 @@ window.handleAIOperationStart = function(button, loadingText) {
  * @param {HTMLElement} button The button element that triggered the operation
  */
 window.handleAIOperationEnd = function(button) {
+    aiOperationInProgress = false;
+
     const aiButtons = ['analyze-button', 'cover-letter-button', 'cv-button'];
     aiButtons.forEach(buttonId => {
         const btn = document.getElementById(buttonId);
         const originalState = buttonStates.get(buttonId);
-        if (btn && originalState) {
+        if (btn != null && originalState) {
             // Use textContent instead of innerHTML when possible
             if (originalState.html && !originalState.html.includes('<')) {
                 btn.textContent = originalState.html;
