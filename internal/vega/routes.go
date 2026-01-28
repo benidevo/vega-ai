@@ -75,8 +75,9 @@ func SetupRoutes(a *App) {
 
 	// Register auth routes
 	if !a.config.IsCloudMode {
-		// In non-cloud mode, register all password-based auth routes
-		auth.RegisterPublicRoutes(authGroup, authHandler)
+		authLimiter := localmiddleware.NewAuthRateLimiter()
+		a.authLimiter = authLimiter
+		auth.RegisterPublicRoutes(authGroup, authHandler, authLimiter)
 	} else {
 		// In cloud mode, only register the login page route which will redirect to Google OAuth
 		authGroup.GET("/login", authHandler.GetLoginPage)

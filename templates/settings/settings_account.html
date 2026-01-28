@@ -389,7 +389,7 @@
 </div>
 
 <!-- Delete Account Modal -->
-<div id="deleteAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+<div id="deleteAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[70] flex items-center justify-center p-4">
   <div class="bg-slate-800 rounded-lg p-4 sm:p-6 max-w-md w-full">
     <h3 class="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Confirm Account Deletion</h3>
 
@@ -426,7 +426,8 @@
                 class="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-slate-600 hover:bg-slate-700 text-white rounded-md transition-colors">
           Cancel
         </button>
-        <button id="delete-btn"
+        <button type="button"
+                id="delete-btn"
                 disabled
                 hx-delete="/settings/account/delete"
                 hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'

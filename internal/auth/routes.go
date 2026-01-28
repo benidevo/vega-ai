@@ -1,13 +1,17 @@
 package auth
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/benidevo/vega/internal/middleware"
+	"github.com/gin-gonic/gin"
+)
 
 // RegisterPublicRoutes registers public authentication routes (login page and login action)
 // to the provided Gin router group using the specified AuthHandler.
-func RegisterPublicRoutes(router *gin.RouterGroup, handler *AuthHandler) {
+// Rate limiting is applied to login and refresh endpoints to prevent brute force attacks.
+func RegisterPublicRoutes(router *gin.RouterGroup, handler *AuthHandler, authLimiter *middleware.RateLimiter) {
 	router.GET("/login", handler.GetLoginPage)
-	router.POST("/login", handler.Login)
-	router.POST("/refresh", handler.RefreshToken)
+	router.POST("/login", authLimiter.Middleware(), handler.Login)
+	router.POST("/refresh", authLimiter.Middleware(), handler.RefreshToken)
 }
 
 // RegisterPrivateRoutes registers private authentication-related routes to the provided router group.

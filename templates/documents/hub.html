@@ -30,7 +30,8 @@
 
     <div class="border-b border-slate-700">
       <nav class="flex -mb-px" aria-label="Document type tabs">
-        <button 
+        <button
+          type="button"
           class="tab-button flex-1 md:flex-none px-4 md:px-6 py-3 text-sm font-medium border-b-2 transition-colors
                  {{if eq .ActiveTab "cover-letters"}}
                    text-primary border-primary bg-slate-700 bg-opacity-50
@@ -54,7 +55,8 @@
           </div>
         </button>
         
-        <button 
+        <button
+          type="button"
           class="tab-button flex-1 md:flex-none px-4 md:px-6 py-3 text-sm font-medium border-b-2 transition-colors
                  {{if eq .ActiveTab "resumes"}}
                    text-primary border-primary bg-slate-700 bg-opacity-50

@@ -14,7 +14,8 @@
         <div id="job-header-display">
           <div class="flex items-center">
             <h2 class="text-xl md:text-2xl font-semibold text-white mr-2">{{.job.Title | html}}</h2>
-            <button _="on click toggle .hidden on #job-header-display then toggle .hidden on #job-header-edit"
+            <button type="button"
+                    _="on click toggle .hidden on #job-header-display then toggle .hidden on #job-header-edit"
                     class="text-gray-400 hover:text-white flex items-center justify-center p-2.5 sm:p-2 min-w-[44px] min-h-[44px] -m-2.5 sm:-m-2"
                     aria-label="Edit job title and details">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -60,6 +61,7 @@
           </div>
           <div class="flex gap-2">
             <button
+              type="button"
               class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-primary hover:bg-primary-dark text-white text-sm rounded-md"
               hx-put="/jobs/{{.jobID}}/basic"
               hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
@@ -70,6 +72,7 @@
               Save Changes
             </button>
             <button
+              type="button"
               class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md"
               _="on click toggle .hidden on #job-header-display then toggle .hidden on #job-header-edit"
               aria-label="Cancel editing job details">
@@ -96,7 +99,8 @@
         <div>
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-lg font-medium text-primary">Skills</h3>
-            <button id="edit-skills-btn"
+            <button type="button"
+              id="edit-skills-btn"
               class="px-4 py-2 sm:px-3 sm:py-1.5 bg-primary hover:bg-primary-dark text-white text-sm rounded-md flex items-center gap-2 min-h-[44px] sm:min-h-0"
               aria-label="Edit job skills"
               aria-expanded="false"
@@ -138,6 +142,7 @@
             </div>
             <div class="flex gap-2">
               <button
+                type="button"
                 class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-primary hover:bg-primary-dark text-white text-sm rounded-md"
                 hx-put="/jobs/{{.jobID}}/skills"
                 hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
@@ -173,6 +178,7 @@
                 Save
               </button>
               <button
+                type="button"
                 class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md"
                 _="on click trigger click on #edit-skills-btn">
                 Cancel
@@ -187,7 +193,8 @@
         <div>
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-lg font-medium text-primary">Your Notes</h3>
-            <button id="save-notes-btn"
+            <button type="button"
+              id="save-notes-btn"
               class="px-4 py-2 sm:px-3 sm:py-1.5 bg-primary hover:bg-primary-dark text-white text-sm rounded-md hidden min-h-[44px] sm:min-h-0"
               aria-label="Save your notes about this job"
               hx-put="/jobs/{{.jobID}}/notes"
