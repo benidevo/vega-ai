@@ -30,13 +30,18 @@ jobs:
       
       - name: Set deployment tag
         id: set-tag
+        env:
+          INPUT_SHA: ${{ github.event.inputs.commit_sha }}
         run: |
-          if [ -n "${{ github.event.inputs.commit_sha }}" ]; then
-            echo "tag=${{ github.event.inputs.commit_sha }}" >> $GITHUB_OUTPUT
+          if [ -n "$INPUT_SHA" ]; then
+            if ! echo "$INPUT_SHA" | grep -qE '^[a-f0-9]{7,40}$'; then
+              echo "Error: Invalid commit SHA format"
+              exit 1
+            fi
+            echo "tag=$INPUT_SHA" >> $GITHUB_OUTPUT
           else
             echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           fi
-          echo "Deployment tag: $(cat $GITHUB_OUTPUT)"
       
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -78,16 +83,18 @@ jobs:
     steps:
       - name: Deploy to Hetzner VM
         uses: appleboy/ssh-action@v1.0.0
+        env:
+          DEPLOY_TAG: ${{ needs.build-and-push.outputs.tag }}
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USERNAME }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           port: ${{ secrets.HETZNER_SSH_PORT }}
+          envs: DEPLOY_TAG
           script: |
             cd /opt/vega-ai
-            export IMAGE_TAG=cloud-${{ needs.build-and-push.outputs.tag }}
+            export IMAGE_TAG=cloud-${DEPLOY_TAG}
             docker compose pull -q
-            docker compose down --remove-orphans
-            docker compose up -d --quiet-pull
+            docker compose up -d --remove-orphans --quiet-pull
             docker image prune -f
-            echo "✅ Deployment completed"
+            echo "Deployment completed successfully"

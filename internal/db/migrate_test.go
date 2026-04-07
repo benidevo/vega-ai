@@ -37,12 +37,12 @@ func TestMigrateDatabase(t *testing.T) {
 	err = MigrateDatabase(dbFile, migrationsDir)
 	require.NoError(t, err)
 
-	db, err := sql.Open("sqlite", dbFile)
+	database, err := sql.Open("sqlite", dbFile)
 	require.NoError(t, err)
-	defer db.Close()
+	defer database.Close()
 
 	var tableName string
-	err = db.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='test_users'").Scan(&tableName)
+	err = database.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='test_users'").Scan(&tableName)
 	require.NoError(t, err)
 	assert.Equal(t, "test_users", tableName)
 

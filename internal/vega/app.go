@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"html/template"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -259,6 +260,13 @@ func templateFuncMap() template.FuncMap {
 	return template.FuncMap{
 		"safeHTML": func(s string) template.HTML {
 			return template.HTML(s)
+		},
+		"safeURL": func(s string) template.URL {
+			u, err := url.Parse(s)
+			if err != nil || (u.Scheme != "http" && u.Scheme != "https") {
+				return template.URL("#")
+			}
+			return template.URL(s)
 		},
 		"dict": func(values ...interface{}) (map[string]interface{}, error) {
 			if len(values)%2 != 0 {

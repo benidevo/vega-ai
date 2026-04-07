@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-// Settings holds the configuration settings for the application.
 type Settings struct {
 	AppName            string
 	ServerPort         string
@@ -67,18 +66,14 @@ type Settings struct {
 	EnableCSRF            bool
 }
 
-// NewSettings initializes and returns a Settings struct with default values
-// populated from environment variables. If an environment variable is
-// not set, a predefined default value is used.
 func NewSettings() Settings {
 	isDevelopment := getEnv("IS_DEVELOPMENT", "false") == "true"
 	isTest := getEnv("GO_ENV", "") == "test"
 	isCloudMode := getEnv("CLOUD_MODE", "false") == "true"
 
-	// Production-optimized defaults
 	accessTokenExpiry := 60 * time.Minute
 	refreshTokenExpiry := 72 * time.Hour
-	dbMaxOpenConns := 25
+	dbMaxOpenConns := 10
 	dbMaxIdleConns := 5
 	dbConnMaxLifetime := 5 * time.Minute
 
@@ -250,7 +245,6 @@ func getEnv(key string, defaultValue string) (value string) {
 	return
 }
 
-// getDefaultLogLevel returns appropriate log level based on environment
 func getDefaultLogLevel(isDevelopment bool) string {
 	if isDevelopment {
 		return "debug"
@@ -258,22 +252,20 @@ func getDefaultLogLevel(isDevelopment bool) string {
 	return "info"
 }
 
-// getCacheMaxMemoryMB returns the max memory for cache in MB
 func getCacheMaxMemoryMB() int {
 	if envVal := getEnv("CACHE_MAX_MEMORY_MB", ""); envVal != "" {
 		if mb, err := strconv.Atoi(envVal); err == nil {
 			return mb
 		}
 	}
-	return 256 // Default 256MB
+	return 256
 }
 
-// getCacheDefaultTTL returns the default TTL for cache entries
 func getCacheDefaultTTL() time.Duration {
 	if envVal := getEnv("CACHE_DEFAULT_TTL", ""); envVal != "" {
 		if duration, err := time.ParseDuration(envVal); err == nil {
 			return duration
 		}
 	}
-	return time.Hour // Default 1 hour
+	return time.Hour
 }

@@ -73,10 +73,12 @@ func SetupRoutes(a *App) {
 
 	authGroup := a.router.Group("/auth")
 
+	// Always initialize rate limiter for auth endpoints (API + page routes)
+	authLimiter := localmiddleware.NewAuthRateLimiter()
+	a.authLimiter = authLimiter
+
 	// Register auth routes
 	if !a.config.IsCloudMode {
-		authLimiter := localmiddleware.NewAuthRateLimiter()
-		a.authLimiter = authLimiter
 		auth.RegisterPublicRoutes(authGroup, authHandler, authLimiter)
 	} else {
 		// In cloud mode, only register the login page route which will redirect to Google OAuth
@@ -96,10 +98,7 @@ func SetupRoutes(a *App) {
 	authGroup.Use(authHandler.AuthMiddleware())
 	auth.RegisterPrivateRoutes(authGroup, authHandler)
 
-	// Homepage route - register different handlers based on mode
 	a.router.GET("/", authHandler.OptionalAuthMiddleware(), homeHandler.GetHomePage)
-
-	// Dashboard route - always shows dashboard
 	a.router.GET("/dashboard", authHandler.OptionalAuthMiddleware(), homeHandler.GetHomePage)
 
 	jobGroup := a.router.Group("/jobs")
@@ -110,11 +109,10 @@ func SetupRoutes(a *App) {
 	settingsGroup.Use(authHandler.AuthMiddleware())
 	settings.RegisterRoutes(settingsGroup, settingsHandler)
 
-	// Register document routes
-	csrfMiddleware := middleware.CSRF(&a.config)
-	documents.RegisterRoutes(&a.router.RouterGroup, documentHandler, authHandler.AuthMiddleware(), csrfMiddleware)
+	documents.RegisterRoutes(&a.router.RouterGroup, documentHandler, authHandler.AuthMiddleware())
 
 	authAPIGroup := a.router.Group("/api/auth")
+	authAPIGroup.Use(a.authLimiter.Middleware())
 	authapi.RegisterRoutes(authAPIGroup, authAPIHandler)
 
 	jobAPIGroup := a.router.Group("/api/jobs")
@@ -132,11 +130,7 @@ func SetupRoutes(a *App) {
 	})
 }
 
-// globalErrorHandler is a Gin middleware that recovers from panics and handles internal server errors
-// by rendering a generic 500 error page.
-//
-// It ensures that any unhandled errors or panics result in a
-// consistent error response to the client.
+// globalErrorHandler recovers from panics and renders a 500 page for unhandled errors.
 func globalErrorHandler(renderer *render.HTMLRenderer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
