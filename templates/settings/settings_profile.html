@@ -371,7 +371,7 @@
                   {{end}}
                   {{if .CredentialURL}}
                     <p class="text-gray-300">
-                      <a href="{{.CredentialURL}}" target="_blank" class="text-primary hover:text-primary-light">View Credential</a>
+                      <a href="{{safeURL .CredentialURL}}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-light">View Credential</a>
                     </p>
                   {{end}}
                 </div>

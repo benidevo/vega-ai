@@ -22,7 +22,7 @@ FROM alpine:3.22
 
 ARG CLOUD_MODE=false
 
-RUN apk --no-cache add ca-certificates tzdata wget && \
+RUN apk --no-cache add ca-certificates tzdata && \
     addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 

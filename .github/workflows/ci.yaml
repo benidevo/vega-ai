@@ -22,7 +22,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.0'
+          go-version-file: go.mod
 
       - name: Build application
         run: go build ./cmd/vega
@@ -37,7 +37,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version-file: go.mod
 
       - name: Check code formatting
         run: |
@@ -60,7 +60,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version-file: go.mod
 
       - name: Run tests with coverage
         run: |
@@ -69,10 +69,11 @@ jobs:
           go tool cover -func=coverage.filtered.out
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.filtered.out
+          files: ./coverage.filtered.out
           flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   summary:
     name: CI Summary

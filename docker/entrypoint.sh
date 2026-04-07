@@ -1,10 +1,6 @@
 #!/bin/sh
 set -e
 
-generate_token() {
-    head -c 32 /dev/urandom | base64 | tr -d '\n'
-}
-
 # Set COOKIE_SECURE based on mode
 if [ "$CLOUD_MODE" = "true" ]; then
     # Cloud mode MUST use secure cookies for security

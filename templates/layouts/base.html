@@ -18,9 +18,9 @@
   <link href="/static/css/components.css" rel="stylesheet">
   <link href="/static/css/utilities.css" rel="stylesheet">
   <link href="/static/css/print.css" rel="stylesheet" media="print">
-  <script src="https://unpkg.com/htmx.org@1.9.4"></script>
-  <script src="https://unpkg.com/htmx.org@1.9.4/dist/ext/response-targets.js"></script>
-  <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.4" integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.4/dist/ext/response-targets.js" integrity="sha384-Y1ICOa9aa1Ms7kkIJauP2Qeqw8JF0ygqHQPZ1xJgNra7uS5rAC4ywTk3voPppm+W" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/hyperscript.org@0.9.12" integrity="sha384-+Uth1QzYJsTjnS5SXVN3fFO4I32Y571xIuv53WJ2SA7y5/36tKU1VCutONAmg5eH" crossorigin="anonymous"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       htmx.config.responseTargetUnsetsError = true;
@@ -354,16 +354,22 @@
           } else if (event.detail.xhr.status >= 500) {
             event.detail.shouldSwap = false;
             if (event.detail.target) {
-              event.detail.target.innerHTML = `
-                <div class="bg-red-900 bg-opacity-50 border border-red-700 text-red-200 p-3 rounded-md mb-3 text-sm" _="on load wait 5s then transition opacity to 0 over 0.5s then remove me">
-                  <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Something went wrong. Please try again later.</span>
-                  </div>
+              const errDiv = document.createElement('div');
+              errDiv.className = 'bg-red-900 bg-opacity-50 border border-red-700 text-red-200 p-3 rounded-md mb-3 text-sm';
+              errDiv.innerHTML = `
+                <div class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Something went wrong. Please try again later.</span>
                 </div>
               `;
+              event.detail.target.prepend(errDiv);
+              setTimeout(() => {
+                errDiv.style.transition = 'opacity 0.5s';
+                errDiv.style.opacity = '0';
+                setTimeout(() => errDiv.remove(), 500);
+              }, 5000);
             }
           }
         });

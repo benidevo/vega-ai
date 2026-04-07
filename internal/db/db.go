@@ -21,7 +21,7 @@ type DBConfig struct {
 // DefaultDBConfig returns a DBConfig with recommended default values for SQLite.
 func DefaultDBConfig() DBConfig {
 	return DBConfig{
-		MaxOpenConns:    25,
+		MaxOpenConns:    10,
 		MaxIdleConns:    5,
 		ConnMaxLifetime: 5 * time.Minute,
 		ConnMaxIdleTime: 1 * time.Minute,
