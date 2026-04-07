@@ -31,9 +31,9 @@ func (m *MockProvider) SetupCVParsingMock(result models.CVParsingResult, err err
 		Tokens:   0,
 		Metadata: map[string]interface{}{
 			"temperature": float32(0.1),
-			"model":       "gemini-1.5-flash",
+			"model":       "gpt-4o-mini",
 			"task_type":   "cv_parsing",
-			"method":      "gemini_cv_parsing",
+			"method":      "openai_cv_parsing",
 		},
 	}
 
@@ -51,7 +51,7 @@ func (m *MockProvider) SetupJobAnalysisMock(result models.MatchResult, err error
 		Metadata: map[string]interface{}{
 			"temperature": float32(0.4),
 			"enhanced":    false,
-			"model":       "gemini-2.5-flash",
+			"model":       "gpt-4o-mini",
 			"task_type":   "job_analysis",
 		},
 	}
@@ -70,7 +70,7 @@ func (m *MockProvider) SetupCoverLetterMock(result models.CoverLetter, err error
 		Metadata: map[string]interface{}{
 			"temperature": float32(0.6),
 			"enhanced":    false,
-			"model":       "gemini-2.5-flash",
+			"model":       "gpt-4o-mini",
 			"task_type":   "cover_letter",
 		},
 	}
@@ -89,9 +89,9 @@ func (m *MockProvider) SetupCVGenerationMock(result models.CVParsingResult, err 
 		Metadata: map[string]interface{}{
 			"temperature": float32(0.55),
 			"enhanced":    false,
-			"model":       "gemini-2.5-flash",
+			"model":       "gpt-4o-mini",
 			"task_type":   "cv_generation",
-			"method":      "gemini_cv_generation",
+			"method":      "openai_cv_generation",
 		},
 	}
 

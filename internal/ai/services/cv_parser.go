@@ -61,7 +61,7 @@ func (c *CVParserService) ParseCV(ctx context.Context, cvText string) (*models.C
 	}
 
 	metadata := c.helper.CreateOperationMetadata(0.1, false, map[string]interface{}{
-		"method":    "gemini_cv_parsing",
+		"method":    "openai_cv_parsing",
 		"model":     response.Metadata["model"],
 		"task_type": response.Metadata["task_type"],
 	})

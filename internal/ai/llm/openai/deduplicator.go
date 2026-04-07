@@ -1,4 +1,4 @@
-package gemini
+package openai
 
 import (
 	"context"
@@ -30,7 +30,7 @@ func NewRequestDeduplicator() *RequestDeduplicator {
 	}
 }
 
-// Do executes the function, deduplicating concurrent identical requests.
+// Do executes fn, deduplicating concurrent identical requests by key.
 func (rd *RequestDeduplicator) Do(
 	ctx context.Context,
 	key string,
@@ -93,7 +93,7 @@ func (rd *RequestDeduplicator) GetStats() DeduplicatorStats {
 	}
 }
 
-// DeduplicatorStats contains metrics about request deduplication.
+// DeduplicatorStats contains request deduplication metrics.
 type DeduplicatorStats struct {
 	TotalRequests     int64
 	DeduplicatedCount int64

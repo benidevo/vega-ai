@@ -46,12 +46,14 @@ type Settings struct {
 	AdminPassword      string
 	ResetAdminPassword bool
 
-	AIProvider             string
-	GeminiAPIKey           string
-	GeminiModel            string
-	GeminiModelCVParsing   string // Fast model for CV parsing
-	GeminiModelJobAnalysis string // Advanced model for job analysis
-	GeminiModelCoverLetter string // Advanced model for cover letter generation
+	AIProvider string
+
+	OpenAIAPIKey           string // OPENAI_API_KEY
+	OpenAIBaseURL          string // OPENAI_BASE_URL — empty uses OpenAI default; set to http://localhost:11434/v1 for Ollama
+	OpenAIModel            string // OPENAI_MODEL
+	OpenAIModelCVParsing   string // OPENAI_MODEL_CV_PARSING
+	OpenAIModelJobAnalysis string // OPENAI_MODEL_JOB_ANALYSIS
+	OpenAIModelCoverLetter string // OPENAI_MODEL_COVER_LETTER
 
 	// Cloud mode - enables multi-tenant deployment with OAuth-only authentication
 	IsCloudMode bool
@@ -150,12 +152,13 @@ func NewSettings() Settings {
 		AdminPassword:      getEnv("ADMIN_PASSWORD", "VegaAdmin"),
 		ResetAdminPassword: getEnv("RESET_ADMIN_PASSWORD", "false") == "true",
 
-		AIProvider:             "gemini",
-		GeminiAPIKey:           getEnv("GEMINI_API_KEY", ""),
-		GeminiModel:            getEnv("GEMINI_MODEL", "gemini-2.5-flash"),
-		GeminiModelCVParsing:   getEnv("GEMINI_MODEL_CV_PARSING", "gemini-2.5-flash"),
-		GeminiModelJobAnalysis: getEnv("GEMINI_MODEL_JOB_ANALYSIS", "gemini-2.5-flash"),
-		GeminiModelCoverLetter: getEnv("GEMINI_MODEL_COVER_LETTER", "gemini-2.5-flash"),
+		AIProvider:             getEnv("AI_PROVIDER", "gemini"),
+		OpenAIAPIKey:           getEnv("AI_KEY", getEnv("GEMINI_API_KEY", "")),
+		OpenAIBaseURL:          getEnv("AI_BASE_URL", resolveDefaultBaseURL(getEnv("AI_PROVIDER", "gemini"))),
+		OpenAIModel:            getEnv("AI_MODEL", getEnv("GEMINI_MODEL", resolveDefaultModel(getEnv("AI_PROVIDER", "gemini")))),
+		OpenAIModelCVParsing:   getEnv("AI_MODEL_CV_PARSING", getEnv("GEMINI_MODEL_CV_PARSING", "")),
+		OpenAIModelJobAnalysis: getEnv("AI_MODEL_JOB_ANALYSIS", getEnv("GEMINI_MODEL_JOB_ANALYSIS", "")),
+		OpenAIModelCoverLetter: getEnv("AI_MODEL_COVER_LETTER", getEnv("GEMINI_MODEL_COVER_LETTER", "")),
 
 		IsCloudMode: isCloudMode,
 
@@ -243,6 +246,24 @@ func getEnv(key string, defaultValue string) (value string) {
 		value = defaultValue
 	}
 	return
+}
+
+// resolveDefaultBaseURL returns the default OpenAI-compatible base URL for the given provider.
+// When provider is "gemini", points to Google's OpenAI-compatible endpoint so existing
+// GEMINI_API_KEY users work without any config changes.
+func resolveDefaultBaseURL(provider string) string {
+	if provider == "gemini" {
+		return "https://generativelanguage.googleapis.com/v1beta/openai/"
+	}
+	return "" // empty = official OpenAI endpoint
+}
+
+// resolveDefaultModel returns a sensible default model for the given provider.
+func resolveDefaultModel(provider string) string {
+	if provider == "gemini" {
+		return "gemini-2.5-flash"
+	}
+	return "gpt-4o-mini"
 }
 
 func getDefaultLogLevel(isDevelopment bool) string {

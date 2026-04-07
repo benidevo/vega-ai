@@ -19,20 +19,29 @@ func TestSetup(t *testing.T) {
 		errorType   error
 	}{
 		{
-			name: "successful Gemini setup",
+			name: "successful openai setup",
 			config: &config.Settings{
-				AIProvider:   ProviderGemini,
-				GeminiAPIKey: "valid-api-key",
-				GeminiModel:  "gemini-2.5-flash",
+				AIProvider:   ProviderOpenAI,
+				OpenAIAPIKey: "valid-api-key",
+				OpenAIModel:  "gpt-4o-mini",
 			},
 			expectError: false,
 		},
 		{
-			name: "missing Gemini API key",
+			name: "successful gemini setup via openai-compat",
 			config: &config.Settings{
-				AIProvider:   ProviderGemini,
-				GeminiAPIKey: "",
-				GeminiModel:  "gemini-2.5-flash",
+				AIProvider:    ProviderGemini,
+				OpenAIAPIKey:  "valid-api-key",
+				OpenAIBaseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+				OpenAIModel:   "gemini-2.5-flash",
+			},
+			expectError: false,
+		},
+		{
+			name: "missing API key",
+			config: &config.Settings{
+				AIProvider:   ProviderOpenAI,
+				OpenAIAPIKey: "",
 			},
 			expectError: true,
 			errorType:   models.ErrMissingAPIKey,
@@ -40,7 +49,7 @@ func TestSetup(t *testing.T) {
 		{
 			name: "unsupported provider",
 			config: &config.Settings{
-				AIProvider: "openai",
+				AIProvider: "anthropic",
 			},
 			expectError: true,
 			errorType:   models.ErrUnsupportedProvider,
@@ -83,19 +92,28 @@ func TestCreateProvider(t *testing.T) {
 		errorType   error
 	}{
 		{
-			name: "valid Gemini provider",
+			name: "valid openai provider",
 			config: &config.Settings{
-				AIProvider:   ProviderGemini,
-				GeminiAPIKey: "test-key",
-				GeminiModel:  "gemini-2.5-flash",
+				AIProvider:   ProviderOpenAI,
+				OpenAIAPIKey: "test-key",
+				OpenAIModel:  "gpt-4o-mini",
 			},
 			expectError: false,
 		},
 		{
-			name: "Gemini missing API key",
+			name: "valid gemini via openai-compat",
 			config: &config.Settings{
 				AIProvider:   ProviderGemini,
-				GeminiAPIKey: "",
+				OpenAIAPIKey: "test-key",
+				OpenAIModel:  "gemini-2.5-flash",
+			},
+			expectError: false,
+		},
+		{
+			name: "missing API key",
+			config: &config.Settings{
+				AIProvider:   ProviderOpenAI,
+				OpenAIAPIKey: "",
 			},
 			expectError: true,
 			errorType:   models.ErrMissingAPIKey,

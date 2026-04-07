@@ -1,4 +1,4 @@
-package gemini
+package openai
 
 import (
 	"crypto/sha256"
@@ -13,14 +13,14 @@ import (
 	"github.com/benidevo/vega/internal/ai/models"
 )
 
-// CacheEntry represents a cached response with expiration time and hit tracking.
+// CacheEntry represents a cached response with expiration and hit tracking.
 type CacheEntry struct {
 	Response  llm.GenerateResponse
 	ExpiresAt time.Time
 	HitCount  int
 }
 
-// ResponseCache implements an LRU cache for LLM responses with TTL expiration.
+// ResponseCache is an LRU cache for LLM responses with TTL expiration.
 type ResponseCache struct {
 	mu         sync.RWMutex
 	entries    map[string]*CacheEntry
@@ -34,7 +34,7 @@ type ResponseCache struct {
 	evictions   int64
 }
 
-// NewResponseCache creates a new response cache with the specified capacity and TTL.
+// NewResponseCache creates a cache with the given capacity and TTL.
 func NewResponseCache(maxEntries int, ttl time.Duration) *ResponseCache {
 	return &ResponseCache{
 		entries:     make(map[string]*CacheEntry),
@@ -96,7 +96,6 @@ func (rc *ResponseCache) Set(request llm.GenerateRequest, response llm.GenerateR
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
 
-	// Check if this is a new entry that would exceed capacity
 	_, existingEntry := rc.entries[key]
 	if !existingEntry && len(rc.entries) >= rc.maxEntries {
 		rc.evictLRU()
@@ -117,7 +116,6 @@ func (rc *ResponseCache) evictLRU() {
 	}
 
 	lruKey := rc.accessOrder[0]
-
 	delete(rc.entries, lruKey)
 	rc.removeFromAccessOrder(lruKey)
 	rc.evictions++
@@ -159,7 +157,7 @@ func (rc *ResponseCache) removeFromAccessOrder(key string) {
 	}
 }
 
-// GetStats returns current cache performance metrics.
+// GetStats returns cache performance metrics.
 func (rc *ResponseCache) GetStats() CacheStats {
 	rc.mu.RLock()
 	defer rc.mu.RUnlock()
@@ -178,7 +176,7 @@ func (rc *ResponseCache) GetStats() CacheStats {
 	}
 }
 
-// CacheStats contains metrics about cache performance.
+// CacheStats contains cache performance metrics.
 type CacheStats struct {
 	Hits      int64
 	Misses    int64
@@ -187,7 +185,7 @@ type CacheStats struct {
 	HitRate   float64
 }
 
-// Clear removes all entries from the cache and resets statistics.
+// Clear removes all entries and resets stats.
 func (rc *ResponseCache) Clear() {
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
@@ -200,13 +198,11 @@ func (rc *ResponseCache) Clear() {
 	rc.evictions = 0
 }
 
-// ShouldCache determines if a response type should be cached.
+// ShouldCache reports whether a response type should be cached.
 func ShouldCache(responseType llm.ResponseType) bool {
 	switch responseType {
 	case llm.ResponseTypeCVParsing, llm.ResponseTypeMatchResult:
 		return true
-	case llm.ResponseTypeCoverLetter, llm.ResponseTypeCV:
-		return false
 	default:
 		return false
 	}
