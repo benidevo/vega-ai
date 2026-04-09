@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/benidevo/vega/internal/ai/llm"
-	"github.com/benidevo/vega/internal/ai/models"
 )
 
 // CacheEntry represents a cached response with expiration and hit tracking.
@@ -205,21 +204,5 @@ func ShouldCache(responseType llm.ResponseType) bool {
 		return true
 	default:
 		return false
-	}
-}
-
-// CacheKeyPrefix returns a cache key prefix for the given task type.
-func CacheKeyPrefix(taskType models.AITaskType) string {
-	switch taskType {
-	case models.TaskTypeCVParsing:
-		return "cv_parse:"
-	case models.TaskTypeJobAnalysis:
-		return "job_match:"
-	case models.TaskTypeCoverLetter:
-		return "cover_letter:"
-	case models.TaskTypeCVGeneration:
-		return "cv_gen:"
-	default:
-		return "unknown:"
 	}
 }

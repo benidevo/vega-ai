@@ -24,6 +24,7 @@ var (
 	// Generation errors
 	ErrCoverLetterGenFailed = commonerrors.New("cover letter generation failed")
 	ErrCVGenFailed          = commonerrors.New("CV generation failed")
+	ErrCVParsingFailed      = commonerrors.New("CV parsing failed")
 	ErrMatchAnalysisFailed  = commonerrors.New("job match analysis failed")
 
 	// Infrastructure errors
@@ -76,12 +77,13 @@ func IsRetryableError(err error) bool {
 		return false
 	}
 
-	// Retry on rate limits and transient server errors
+	// Retry on rate limits and transient gateway errors only.
+	// 500 is excluded: it indicates a model-side failure for this specific request
+	// and retrying the same payload will produce the same result.
 	if strings.Contains(msg, "rate limit") ||
-		strings.Contains(msg, "429") ||
-		strings.Contains(msg, "500") ||
-		strings.Contains(msg, "502") ||
-		strings.Contains(msg, "503") ||
+		strings.Contains(msg, "error 429") ||
+		strings.Contains(msg, "error 502") ||
+		strings.Contains(msg, "error 503") ||
 		strings.Contains(msg, "service unavailable") {
 		return true
 	}

@@ -13,23 +13,61 @@ Just as ancient navigators used the star Vega to find their way, Vega AI helps y
 
 ## Self-Hosted Quick Start
 
-Self-hosting Vega AI gives you complete control over your data. You only need a Gemini API key to get started.
+Self-hosting Vega AI gives you complete control over your data. Choose any supported AI provider, including fully local free options.
 
-### 1. Get Your API Key
+### 1. Choose Your AI Provider
 
-Get your [free Gemini API key](https://aistudio.google.com/app/apikey) from Google AI Studio.
+Vega AI works with any OpenAI-compatible provider. Pick one:
+
+| Provider | Cost | Privacy | Setup |
+|---|---|---|---|
+| **Gemini** (default) | Free tier available | Cloud | [Get API key](https://aistudio.google.com/app/apikey) |
+| **OpenAI** | Paid | Cloud | [Get API key](https://platform.openai.com/api-keys) |
+| **Ollama** | Free | 100% local | [Install Ollama](https://ollama.com) |
+| **LM Studio** | Free | 100% local | [Install LM Studio](https://lmstudio.ai) |
 
 ### 2. Create Configuration
 
-```bash
-# Create a directory for Vega AI
-mkdir vega-ai && cd vega-ai
+**Gemini (quickest cloud start):**
 
-# Create a config file with your Gemini API key
-echo "GEMINI_API_KEY=your-gemini-api-key" > config
+```bash
+mkdir vega-ai && cd vega-ai
+echo "AI_KEY=your-gemini-api-key" > config
 ```
 
-That's it! No complex setup required.
+> `GEMINI_API_KEY` still works but is deprecated. Use `AI_KEY` instead.
+
+**OpenAI:**
+
+```bash
+mkdir vega-ai && cd vega-ai
+cat > config <<EOF
+AI_PROVIDER=openai
+AI_KEY=sk-your-openai-key
+AI_MODEL=gpt-4o-mini
+EOF
+```
+
+**Ollama (fully local, no API key):**
+
+```bash
+# First install and pull a model
+ollama pull llama3.2
+
+mkdir vega-ai && cd vega-ai
+cat > config <<EOF
+AI_PROVIDER=openai
+AI_KEY=ollama
+AI_BASE_URL=http://host.docker.internal:11434/v1
+AI_MODEL=llama3.2
+EOF
+```
+
+### Supported Models
+
+Any model served via an OpenAI-compatible API works. As a general guide, instruct-tuned models released from 2025 onwards are reliable. For example `gemini-2.5-flash`, `gpt-4o-mini`, or `llama3.2` via Ollama. Newer models work too.
+
+> **Note:** Models under ~3B parameters may produce inconsistent JSON output. 7B+ instruct-tuned models are recommended for reliable results.
 
 ### 3. Run with Docker
 
@@ -67,7 +105,8 @@ docker run --pull always -d \
 
 Download the **Vega AI Job Capture** extension from [GitHub Releases](https://github.com/benidevo/vega-ai-extension/releases/latest) for one-click job capture from LinkedIn.
 
-### Installation Steps:
+### Installation Steps
+
 1. Download the latest `.zip` file from the [releases page](https://github.com/benidevo/vega-ai-extension/releases/latest)
 2. Extract the ZIP file to a folder on your computer
 3. Open Chrome and navigate to `chrome://extensions/`

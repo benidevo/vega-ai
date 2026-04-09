@@ -39,7 +39,7 @@ func createProvider(cfg *config.Settings) (llm.Provider, error) {
 	switch cfg.AIProvider {
 	case ProviderGemini, ProviderOpenAI:
 		if cfg.OpenAIAPIKey == "" {
-			return nil, models.WrapError(models.ErrMissingAPIKey, fmt.Errorf("OPENAI_API_KEY (or GEMINI_API_KEY) is required"))
+			return nil, models.WrapError(models.ErrMissingAPIKey, fmt.Errorf("AI_KEY is required"))
 		}
 		providerCfg := openaiProvider.NewConfig(cfg)
 		provider, err := openaiProvider.New(providerCfg)

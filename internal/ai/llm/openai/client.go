@@ -228,7 +228,7 @@ If the document is NOT a valid CV set isValid to false and explain in reason.`
 
 	raw, tokens, err := c.callChat(ctx, systemPrompt, userPrompt, temperature, model)
 	if err != nil {
-		return llm.GenerateResponse{}, WrapError(ErrCoverLetterGenFailed, err)
+		return llm.GenerateResponse{}, WrapError(ErrCVParsingFailed, err)
 	}
 
 	cvResult, err := c.parseCVJSON(raw)
@@ -333,41 +333,27 @@ func (c *Client) executeWithRetry(ctx context.Context, operation func() (string,
 		}
 	}
 
-	if lastErr != nil {
-		return "", 0, WrapError(ErrMaxRetriesExceeded, lastErr)
-	}
-	return "", 0, lastErr
+	return "", 0, WrapError(ErrMaxRetriesExceeded, lastErr)
 }
 
-// extractJSON extracts the first complete JSON object from a response string.
+// extractJSON extracts the outermost JSON object from a response string.
+// Uses LastIndex so that lone `}` characters inside string values don't
+// truncate the result prematurely.
 func (c *Client) extractJSON(response string) string {
 	response = strings.TrimSpace(response)
 
-	startIdx := strings.Index(response, "{")
-	if startIdx == -1 {
+	start := strings.Index(response, "{")
+	end := strings.LastIndex(response, "}")
+	if start == -1 || end == -1 || end <= start {
 		return response
 	}
 
-	braceCount := 0
-	endIdx := -1
-
-	for i := startIdx; i < len(response) && endIdx == -1; i++ {
-		switch response[i] {
-		case '{':
-			braceCount++
-		case '}':
-			braceCount--
-			if braceCount == 0 {
-				endIdx = i
-			}
-		}
+	candidate := response[start : end+1]
+	if json.Valid([]byte(candidate)) {
+		return candidate
 	}
 
-	if endIdx == -1 {
-		return response
-	}
-
-	return response[startIdx : endIdx+1]
+	return response
 }
 
 func (c *Client) parseCoverLetterJSON(raw string) (models.CoverLetter, error) {

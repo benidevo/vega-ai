@@ -55,13 +55,19 @@
           <!-- FAQ 4 -->
           <details class="bg-slate-800 rounded-lg border border-slate-700 group">
             <summary class="flex items-center justify-between p-4 sm:p-6 cursor-pointer list-none">
-              <h3 class="text-base sm:text-lg font-semibold text-white pr-4">What's a Google Gemini API key and how do I get one?</h3>
+              <h3 class="text-base sm:text-lg font-semibold text-white pr-4">Which AI models and providers are supported?</h3>
               <svg class="h-5 w-5 text-primary transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
             <div class="px-4 sm:px-6 pb-4 sm:pb-6">
-              <p class="text-gray-300 text-sm sm:text-base">Google Gemini provides the AI capabilities for job matching and document generation. You can get a free API key from <a href="https://makersuite.google.com/app/apikey" class="text-primary hover:text-primary-dark" target="_blank" rel="noopener">Google AI Studio</a>. The free tier is generous enough for personal job searching. You get 60 requests per minute for free.</p>
+              <p class="text-gray-300 text-sm sm:text-base mb-3">Vega AI works with any OpenAI-compatible provider. You can use:</p>
+              <ul class="space-y-2 text-gray-300 text-sm sm:text-base mb-3">
+                <li><strong class="text-white">Gemini</strong> (default): free tier available, get a key from <a href="https://aistudio.google.com/app/apikey" class="text-primary hover:text-primary-dark" target="_blank" rel="noopener">Google AI Studio</a>. Set <code class="bg-slate-700 px-1 rounded text-xs">AI_KEY=your-key</code>.</li>
+                <li><strong class="text-white">OpenAI</strong>: GPT-4o, GPT-4o-mini, and others. Set <code class="bg-slate-700 px-1 rounded text-xs">AI_PROVIDER=openai</code> and <code class="bg-slate-700 px-1 rounded text-xs">AI_KEY=sk-...</code>.</li>
+                <li><strong class="text-white">Ollama (fully local, no API key)</strong>: run models like Llama 3.2, Qwen 2.5, or Mistral on your own hardware. Set <code class="bg-slate-700 px-1 rounded text-xs">AI_BASE_URL=http://host.docker.internal:11434/v1</code> and <code class="bg-slate-700 px-1 rounded text-xs">AI_KEY=ollama</code>.</li>
+              </ul>
+              <p class="text-gray-400 text-xs">Any instruct-tuned model from 2025 onwards works reliably. Newer models work too. Models under ~3B parameters may produce inconsistent output.</p>
             </div>
           </details>
 

@@ -7,7 +7,7 @@ This guide covers development setup, testing, and contributing to Vega AI.
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Docker Compose](https://docs.docker.com/compose/)
 - [Go 1.24+](https://golang.org/) (for local development)
-- [Google Gemini API key](https://aistudio.google.com/app/apikey)
+- AI provider key: [Gemini](https://aistudio.google.com/app/apikey) (free), [OpenAI](https://platform.openai.com/api-keys), or [Ollama](https://ollama.com) for fully local
 
 ## Development Setup
 
@@ -25,8 +25,9 @@ This guide covers development setup, testing, and contributing to Vega AI.
    ```bash
    # Create .env file
    cat > .env << EOF
-   # Required
-   GEMINI_API_KEY=your-gemini-api-key
+   # Required — works with Gemini, OpenAI, or any OpenAI-compatible provider
+   # GEMINI_API_KEY is deprecated but still works for backward compatibility
+   AI_KEY=your-api-key
    TOKEN_SECRET=your-jwt-secret
 
    # Optional - for cloud mode
@@ -171,7 +172,7 @@ go test -cover ./...
 ├── internal/           # Private application code
 │   ├── auth/          # Authentication & authorization
 │   ├── job/           # Job management
-│   ├── ai/            # AI integration (Gemini)
+│   ├── ai/            # AI integration (OpenAI-compatible)
 │   ├── settings/      # User settings & profiles
 │   └── common/        # Shared utilities
 ├── templates/         # HTML templates
@@ -191,7 +192,7 @@ go test -cover ./...
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `TOKEN_SECRET` | Yes | JWT secret for user sessions |
-| `GEMINI_API_KEY` | Yes | Google AI API key |
+| `AI_KEY` | Yes | API key for your AI provider (Gemini, OpenAI, etc). `GEMINI_API_KEY` is deprecated but still works. |
 | `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
 
@@ -354,7 +355,7 @@ docker run -d \
   -e CLOUD_MODE=true \
   -e GOOGLE_CLIENT_ID=your-client-id \
   -e GOOGLE_CLIENT_SECRET=your-client-secret \
-  -e GEMINI_API_KEY=your-gemini-key \
+  -e AI_KEY=your-api-key \
   -e TOKEN_SECRET=your-jwt-secret \
   ghcr.io/benidevo/vega-ai:latest
 ```
@@ -366,7 +367,7 @@ docker run -d \
 CLOUD_MODE=true \
 GOOGLE_CLIENT_ID=your-dev-client-id \
 GOOGLE_CLIENT_SECRET=your-dev-secret \
-GEMINI_API_KEY=your-gemini-key \
+AI_KEY=your-api-key \
 TOKEN_SECRET=your-jwt-secret \
 docker compose up
 

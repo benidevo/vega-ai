@@ -59,19 +59,18 @@ func (rd *RequestDeduplicator) Do(
 	rd.inFlight[key] = req
 	rd.mu.Unlock()
 
-	response, err := fn()
+	defer func() {
+		rd.mu.Lock()
+		if rd.inFlight[key] == req {
+			delete(rd.inFlight, key)
+		}
+		rd.mu.Unlock()
+		close(req.done)
+	}()
 
+	response, err := fn()
 	req.response = response
 	req.err = err
-
-	rd.mu.Lock()
-	if rd.inFlight[key] == req {
-		delete(rd.inFlight, key)
-	}
-	rd.mu.Unlock()
-
-	close(req.done)
-
 	return response, err
 }
 

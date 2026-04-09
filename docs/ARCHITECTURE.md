@@ -48,7 +48,7 @@ graph TB
 
     subgraph "External Services"
         OAUTH[Google OAuth<br/>Authentication]
-        GEMINI[Google Gemini API<br/>AI Processing]
+        LLMAPI[LLM Provider API<br/>AI Processing]
     end
 
     %% Client connections
@@ -78,9 +78,9 @@ graph TB
     SETTINGS --> AIPARSE
 
     %% AI to External
-    AIMATCH --> GEMINI
-    AIGEN --> GEMINI
-    AIPARSE --> GEMINI
+    AIMATCH --> LLMAPI
+    AIGEN --> LLMAPI
+    AIPARSE --> LLMAPI
 
     %% Infrastructure
     JOB --> QUOTA
@@ -111,7 +111,7 @@ graph TB
     class AIMATCH,AIGEN,AIPARSE ai
     class QUOTA,CACHE infra
     class DB,USR,REF data
-    class OAUTH,GEMINI external
+    class OAUTH,LLMAPI external
 ```
 
 **Tech Stack:**
@@ -120,7 +120,7 @@ graph TB
 - **Database:** SQLite with WAL mode and multi-tenant support
 - **Authentication:** JWT sessions with username/password + Google OAuth
 - **Frontend:** Go templates + HTMX + Hyperscript + Tailwind CSS (CDN)
-- **AI:** Google Gemini API for analysis, generation, and parsing
+- **AI:** OpenAI-compatible provider (Gemini, OpenAI, Ollama, etc.) for analysis, generation, and parsing
 - **Caching:** Badger embedded database with user-scoped keys
 - **Infrastructure:** Docker, GitHub Actions CI/CD
 
@@ -283,13 +283,13 @@ GET    /health             # Health check
 - **LetterGeneratorService:** Creates personalized cover letters
 - **CVGeneratorService:** Generates professional CVs from profiles
 - **CVParserService:** Extracts profile data from uploaded CVs
-- **LLM Interface:** Pluggable design with Gemini implementation
+- **LLM Interface:** Pluggable design with OpenAI-compatible client (supports Gemini, OpenAI, Ollama, vLLM, LM Studio)
 
 ### AI Flow
 
 1. User profile and job data retrieved
 2. Structured prompts generated using templates
-3. Gemini API processes the request
+3. LLM provider API processes the request
 4. Results validated and sanitized
 5. Match results stored in database for history
 
@@ -329,7 +329,7 @@ err = quotaService.RecordJobAnalysis(ctx, userID, jobID)
 ```bash
 # Core
 TOKEN_SECRET=your-jwt-secret
-GEMINI_API_KEY=your-gemini-key
+AI_KEY=your-api-key
 
 # Database
 DB_CONNECTION_STRING=/app/data/vega.db?_journal_mode=WAL
@@ -394,7 +394,7 @@ docker run -p 8765:8765 \
   -e GOOGLE_CLIENT_ID=xxx \
   -e GOOGLE_CLIENT_SECRET=xxx \
   -e TOKEN_SECRET=xxx \
-  -e GEMINI_API_KEY=xxx \
+  -e AI_KEY=xxx \
   ghcr.io/benidevo/vega-ai:cloud-latest
 ```
 

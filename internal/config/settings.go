@@ -48,7 +48,7 @@ type Settings struct {
 
 	AIProvider string
 
-	OpenAIAPIKey           string // OPENAI_API_KEY
+	OpenAIAPIKey           string // AI_KEY
 	OpenAIBaseURL          string // OPENAI_BASE_URL — empty uses OpenAI default; set to http://localhost:11434/v1 for Ollama
 	OpenAIModel            string // OPENAI_MODEL
 	OpenAIModelCVParsing   string // OPENAI_MODEL_CV_PARSING
@@ -72,6 +72,7 @@ func NewSettings() Settings {
 	isDevelopment := getEnv("IS_DEVELOPMENT", "false") == "true"
 	isTest := getEnv("GO_ENV", "") == "test"
 	isCloudMode := getEnv("CLOUD_MODE", "false") == "true"
+	aiProvider := getEnv("AI_PROVIDER", "gemini")
 
 	accessTokenExpiry := 60 * time.Minute
 	refreshTokenExpiry := 72 * time.Hour
@@ -152,10 +153,10 @@ func NewSettings() Settings {
 		AdminPassword:      getEnv("ADMIN_PASSWORD", "VegaAdmin"),
 		ResetAdminPassword: getEnv("RESET_ADMIN_PASSWORD", "false") == "true",
 
-		AIProvider:             getEnv("AI_PROVIDER", "gemini"),
+		AIProvider:             aiProvider,
 		OpenAIAPIKey:           getEnv("AI_KEY", getEnv("GEMINI_API_KEY", "")),
-		OpenAIBaseURL:          getEnv("AI_BASE_URL", resolveDefaultBaseURL(getEnv("AI_PROVIDER", "gemini"))),
-		OpenAIModel:            getEnv("AI_MODEL", getEnv("GEMINI_MODEL", resolveDefaultModel(getEnv("AI_PROVIDER", "gemini")))),
+		OpenAIBaseURL:          getEnv("AI_BASE_URL", resolveDefaultBaseURL(aiProvider)),
+		OpenAIModel:            getEnv("AI_MODEL", getEnv("GEMINI_MODEL", resolveDefaultModel(aiProvider))),
 		OpenAIModelCVParsing:   getEnv("AI_MODEL_CV_PARSING", getEnv("GEMINI_MODEL_CV_PARSING", "")),
 		OpenAIModelJobAnalysis: getEnv("AI_MODEL_JOB_ANALYSIS", getEnv("GEMINI_MODEL_JOB_ANALYSIS", "")),
 		OpenAIModelCoverLetter: getEnv("AI_MODEL_COVER_LETTER", getEnv("GEMINI_MODEL_COVER_LETTER", "")),

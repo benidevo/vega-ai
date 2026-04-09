@@ -110,7 +110,7 @@
               <svg class="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-300 text-sm">Requires Docker & Gemini API key</span>
+              <span class="text-gray-300 text-sm">Requires Docker & an AI provider (Gemini, OpenAI, or local models via Ollama)</span>
             </li>
           </ul>
 
@@ -141,14 +141,15 @@
                 <h4 class="font-semibold text-white">Create a config file</h4>
               </div>
               <div class="pl-0 sm:pl-13">
-                <p class="text-gray-400 text-sm mb-3">First, get your <a href="https://aistudio.google.com/app/apikey" class="text-primary hover:text-primary-dark" target="_blank" rel="noopener">free Gemini API key</a>. Then create a file named <code class="bg-slate-700 text-primary px-1 py-0.5 rounded text-xs font-mono">config</code> with:</p>
+                <p class="text-gray-400 text-sm mb-3">Choose an AI provider and create a file named <code class="bg-slate-700 text-primary px-1 py-0.5 rounded text-xs font-mono">config</code>. The simplest option is a <a href="https://aistudio.google.com/app/apikey" class="text-primary hover:text-primary-dark" target="_blank" rel="noopener">free Gemini API key</a>:</p>
                 <div class="bg-slate-900 rounded-lg p-3 overflow-x-auto relative group mb-2">
-                  <code class="text-gray-300 block text-xs font-mono">GEMINI_API_KEY=your-api-key-here</code>
-                  <button onclick="copyToClipboard(this)" data-text="GEMINI_API_KEY=your-api-key-here" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-xs text-gray-300">
+                  <code class="text-gray-300 block text-xs font-mono">AI_KEY=your-api-key-here</code>
+                  <button onclick="copyToClipboard(this)" data-text="AI_KEY=your-api-key-here" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-xs text-gray-300">
                     Copy
                   </button>
                 </div>
-                <p class="text-xs text-gray-500">Replace <code class="font-mono text-xs">your-api-key-here</code> with your actual key.</p>
+                <p class="text-xs text-gray-500 mb-3">Replace <code class="font-mono text-xs">your-api-key-here</code> with your actual key. Works with Gemini, OpenAI, or any OpenAI-compatible provider.</p>
+                <p class="text-xs text-gray-500">Want to run fully locally with no API key? Use <a href="https://ollama.com" class="text-primary hover:text-primary-dark" target="_blank" rel="noopener">Ollama</a> — see the <a href="https://github.com/benidevo/vega-ai#self-hosted-quick-start" class="text-primary hover:text-primary-dark" target="_blank" rel="noopener">README</a> for setup.</p>
               </div>
             </div>
 
@@ -270,7 +271,7 @@
                 <svg class="h-4 w-4 text-primary mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Google Gemini API key (free tier available)
+                AI provider: Gemini or OpenAI API key, or Ollama for fully local (free)
               </li>
               <li class="flex items-center">
                 <svg class="h-4 w-4 text-primary mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
