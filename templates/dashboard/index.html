@@ -1,11 +1,3 @@
-{{define "dashboard-content"}}
-  {{template "dashboard-layout" .}}
-{{end}}
-
-{{define "dashboard-page-content"}}
-  {{template "dashboard-jobs-content" .}}
-{{end}}
-
 {{define "dashboard-jobs-content"}}
 <div class="flex flex-col flex-1 overflow-hidden">
   {{if .error}}

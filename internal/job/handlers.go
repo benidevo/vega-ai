@@ -387,7 +387,7 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 	}
 
 	templateData := gin.H{
-		"title":        "Dashboard",
+		"title":        "Jobs",
 		"page":         "dashboard",
 		"activeNav":    "jobs",
 		"pageTitle":    "Jobs",

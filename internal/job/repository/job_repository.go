@@ -865,6 +865,48 @@ func (r *SQLiteJobRepository) GetRecentJobsByUserID(ctx context.Context, userID 
 	return jobs, nil
 }
 
+// GetTopMatchesByUserID returns jobs with the highest match scores for a specific user.
+func (r *SQLiteJobRepository) GetTopMatchesByUserID(ctx context.Context, userID int, limit int) ([]*models.Job, error) {
+	if limit <= 0 {
+		limit = 10
+	}
+
+	// Use squirrel to build the query manually since GetAll has hardcoded sorting
+	query := sq.Select(jobColumns...).
+		From("jobs j").
+		LeftJoin("companies c ON j.company_id = c.id").
+		Where(sq.Eq{"j.user_id": userID}).
+		Where(sq.GtOrEq{"j.match_score": 70}).
+		OrderBy("j.match_score DESC", "j.updated_at DESC").
+		Limit(uint64(limit))
+
+	sqlStr, args, err := query.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build top matches query: %w", err)
+	}
+
+	rows, err := r.db.QueryContext(ctx, sqlStr, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query top matches: %w", err)
+	}
+	defer rows.Close()
+
+	var jobs []*models.Job
+	for rows.Next() {
+		job, err := r.scanJob(rows)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan job: %w", err)
+		}
+		jobs = append(jobs, job)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate top matches: %w", err)
+	}
+
+	return jobs, nil
+}
+
 // GetJobStatsByStatus returns job counts grouped by status for a specific user.
 // This is useful for homepage pipeline visualization.
 func (r *SQLiteJobRepository) GetJobStatsByStatus(ctx context.Context, userID int) (map[models.JobStatus]int, error) {

@@ -5,18 +5,19 @@ import (
 	"fmt"
 
 	"github.com/benidevo/vega/internal/job"
+	"github.com/benidevo/vega/internal/job/interfaces"
 	"github.com/benidevo/vega/internal/job/models"
-	"github.com/benidevo/vega/internal/job/repository"
+	"github.com/rs/zerolog/log"
 )
 
 // Service handles business logic for homepage data aggregation
 type Service struct {
-	jobRepository *repository.SQLiteJobRepository
+	jobRepository interfaces.JobRepository
 	jobService    *job.JobService
 }
 
 // NewService creates a new homepage service instance
-func NewService(jobRepository *repository.SQLiteJobRepository, jobService *job.JobService) *Service {
+func NewService(jobRepository interfaces.JobRepository, jobService *job.JobService) *Service {
 	return &Service{
 		jobRepository: jobRepository,
 		jobService:    jobService,
@@ -37,10 +38,15 @@ func (s *Service) GetHomePageData(ctx context.Context, userID int, username stri
 		return nil, fmt.Errorf("failed to get job status counts: %w", err)
 	}
 
-	// Get recent jobs for activity display (last 3)
 	recentJobs, err := s.jobRepository.GetRecentJobsByUserID(ctx, userID, 3)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get recent jobs: %w", err)
+	}
+
+	topMatches, err := s.jobRepository.GetTopMatchesByUserID(ctx, userID, 3)
+	if err != nil {
+		// Non-fatal: insights card degrades gracefully
+		log.Warn().Err(err).Msg("failed to get top matches")
 	}
 
 	homeData.Stats = JobStatsSummary{
@@ -55,6 +61,11 @@ func (s *Service) GetHomePageData(ctx context.Context, userID int, username stri
 	homeData.RecentJobs = make([]JobSummary, 0, len(recentJobs))
 	for _, job := range recentJobs {
 		homeData.RecentJobs = append(homeData.RecentJobs, ToJobSummary(job))
+	}
+
+	homeData.TopMatches = make([]JobSummary, 0, len(topMatches))
+	for _, job := range topMatches {
+		homeData.TopMatches = append(homeData.TopMatches, ToJobSummary(job))
 	}
 
 	homeData.HasJobs = jobStats.TotalJobs > 0

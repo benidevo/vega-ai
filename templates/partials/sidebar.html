@@ -1,12 +1,26 @@
 {{define "sidebar"}}
 <!-- Sidebar Navigation - hidden on mobile by default -->
-<div id="sidebar" class="hidden md:flex w-full md:w-48 lg:w-56 bg-gray-50 border-r border-gray-200 text-gray-700 shadow-sm py-4 md:py-8 px-4 flex-col justify-between fixed md:sticky top-0 left-0 bottom-0 right-0 md:right-auto md:h-screen z-[60] overflow-y-auto transition-all duration-300 transform -translate-x-full md:translate-x-0">
+<div id="sidebar" class="hidden md:flex w-64 bg-white border-r border-gray-200 text-gray-700 shadow-sm py-4 md:py-8 px-4 flex-col justify-between fixed md:sticky top-0 left-0 bottom-0 right-0 md:right-auto md:h-screen z-[60] overflow-y-auto transition-all duration-300 transform -translate-x-full md:translate-x-0 group/sidebar">
+  <!-- Collapse/Expand Toggle (Desktop only) -->
+  <button id="toggle-sidebar" class="hidden md:flex absolute -right-3 top-20 bg-white border border-gray-200 rounded-full p-1 shadow-sm text-gray-400 hover:text-teal-600 transition-all z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-300" id="toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
+
   <!-- Logo and Nav -->
-  <div>
-    <!-- Logo - hidden on mobile as it's in the top bar -->
-    <div class="mb-8 px-4 hidden md:block">
-      <a href="/" class="text-teal-600 hover:text-teal-700 transition-colors">
-        {{template "partials/logo_component.html" "sm"}}
+  <div class="space-y-8">
+    <!-- Logo - hidden on mobile -->
+    <div class="px-4 hidden md:block overflow-hidden transition-all duration-300 sidebar-content">
+      <a href="/" class="text-teal-600 hover:text-teal-700 transition-colors flex items-center">
+        <div class="logo-full">
+          {{template "partials/logo_component.html" "sm"}}
+        </div>
+        <div class="logo-mini hidden">
+          <svg class="w-8 h-8 text-teal-600" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
       </a>
     </div>
 
@@ -19,69 +33,66 @@
       </button>
     </div>
 
-    <nav class="space-y-1 px-2">
-      <a href="/dashboard" class="{{if eq .activeNav "dashboard"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "dashboard"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <nav class="space-y-1.5 px-2">
+      <a href="/dashboard" class="{{if eq .activeNav "dashboard"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-50 hover:text-gray-900{{end}} group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out nav-link" title="Dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 {{if eq .activeNav "dashboard"}}text-teal-600{{else}}text-gray-400 group-hover:text-teal-600{{end}} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
-        Dashboard
+        <span class="ml-3 sidebar-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">Dashboard</span>
       </a>
 
-      <a href="/jobs" class="{{if eq .activeNav "jobs"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "jobs"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/jobs" class="{{if eq .activeNav "jobs"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-50 hover:text-gray-900{{end}} group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out nav-link" title="Jobs">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 {{if eq .activeNav "jobs"}}text-teal-600{{else}}text-gray-400 group-hover:text-teal-600{{end}} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
         </svg>
-        Jobs
+        <span class="ml-3 sidebar-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">Jobs</span>
       </a>
 
-      <a href="/jobs/new" class="{{if eq .activeNav "newjob"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "newjob"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        New Job
-      </a>
-
-      <a href="/documents" class="{{if eq .activeNav "documents"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "documents"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/documents" class="{{if eq .activeNav "documents"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-50 hover:text-gray-900{{end}} group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out nav-link" title="Documents">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 {{if eq .activeNav "documents"}}text-teal-600{{else}}text-gray-400 group-hover:text-teal-600{{end}} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
         </svg>
-        Documents
+        <span class="ml-3 sidebar-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">Documents</span>
       </a>
 
-      <a href="/settings/profile" class="{{if eq .activeNav "profile"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "profile"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="pt-4 pb-2 px-3 sidebar-text transition-all duration-300 opacity-100">
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Settings</span>
+      </div>
+
+      <a href="/settings/profile" class="{{if eq .activeNav "profile"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-50 hover:text-gray-900{{end}} group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out nav-link" title="Profile">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 {{if eq .activeNav "profile"}}text-teal-600{{else}}text-gray-400 group-hover:text-teal-600{{end}} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
-        Profile
+        <span class="ml-3 sidebar-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">Profile</span>
       </a>
 
-      <a href="/settings/quotas" class="{{if eq .activeNav "quotas"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "quotas"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/settings/quotas" class="{{if eq .activeNav "quotas"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-50 hover:text-gray-900{{end}} group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out nav-link" title="Quotas">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 {{if eq .activeNav "quotas"}}text-teal-600{{else}}text-gray-400 group-hover:text-teal-600{{end}} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
-        Usage & Quotas
+        <span class="ml-3 sidebar-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">Usage</span>
       </a>
 
-      <a href="/settings/account" class="{{if eq .activeNav "account"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "account"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/settings/account" class="{{if eq .activeNav "account"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-50 hover:text-gray-900{{end}} group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out nav-link" title="Account">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 {{if eq .activeNav "account"}}text-teal-600{{else}}text-gray-400 group-hover:text-teal-600{{end}} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-        Account
+        <span class="ml-3 sidebar-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">Account</span>
       </a>
     </nav>
   </div>
 
   <!-- Logout Button -->
-  <div class="px-4 mt-4 md:mt-8">
+  <div class="px-2 mt-4 md:mt-8">
     <form action="/auth/logout" method="POST">
       <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
-      <button type="submit" class="w-full group bg-white hover:bg-gray-50 py-3 sm:py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-200 ease-in-out min-h-[48px] sm:min-h-0 touch-manipulation">
-        <div class="flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 group-hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button type="submit" class="w-full group bg-gray-50 hover:bg-red-50 py-2.5 px-3 rounded-xl text-sm font-medium text-gray-600 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200 ease-in-out nav-link" title="Logout">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          Logout
+          <span class="ml-3 sidebar-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">Logout</span>
         </div>
       </button>
     </form>
@@ -110,50 +121,113 @@
   document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const closeSidebarButton = document.getElementById('close-sidebar');
+    const toggleSidebarButton = document.getElementById('toggle-sidebar');
     const sidebar = document.getElementById('sidebar');
+    const toggleIcon = document.getElementById('toggle-icon');
     const overlay = document.createElement('div');
+
+    // Desktop Sidebar Toggle Logic
+    if (toggleSidebarButton) {
+      const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+      if (isCollapsed) {
+        setSidebarCollapsed(true);
+      }
+
+      toggleSidebarButton.addEventListener('click', function() {
+        const currentlyCollapsed = sidebar.classList.contains('w-20');
+        setSidebarCollapsed(!currentlyCollapsed);
+      });
+    }
+
+    function setSidebarCollapsed(collapsed) {
+      if (collapsed) {
+        sidebar.classList.remove('w-64');
+        sidebar.classList.add('w-20');
+        toggleIcon.classList.add('rotate-180');
+        
+        document.querySelectorAll('.sidebar-text').forEach(el => el.classList.add('hidden', 'opacity-0'));
+        document.querySelector('.logo-full').classList.add('hidden');
+        document.querySelector('.logo-mini').classList.remove('hidden');
+        document.querySelectorAll('.nav-link').forEach(el => {
+          el.classList.add('justify-center');
+          el.classList.remove('px-3');
+          el.classList.add('px-0');
+        });
+
+        localStorage.setItem('sidebarCollapsed', 'true');
+      } else {
+        sidebar.classList.remove('w-20');
+        sidebar.classList.add('w-64');
+        toggleIcon.classList.remove('rotate-180');
+        
+        document.querySelectorAll('.sidebar-text').forEach(el => el.classList.remove('hidden', 'opacity-0'));
+        document.querySelector('.logo-full').classList.remove('hidden');
+        document.querySelector('.logo-mini').classList.add('hidden');
+        document.querySelectorAll('.nav-link').forEach(el => {
+          el.classList.remove('justify-center');
+          el.classList.remove('px-0');
+          el.classList.add('px-3');
+        });
+
+        localStorage.setItem('sidebarCollapsed', 'false');
+      }
+    }
 
     // Setup overlay
     overlay.classList.add('fixed', 'inset-0', 'bg-gray-900', 'bg-opacity-50', 'z-[55]', 'hidden', 'backdrop-blur-sm');
     document.body.appendChild(overlay);
 
-    // Open sidebar
-    mobileMenuButton.addEventListener('click', function() {
-      sidebar.classList.remove('hidden', '-translate-x-full');
-      sidebar.classList.add('flex', 'translate-x-0');
-      if (window.innerWidth >= 768) {
+    // Open sidebar (Mobile)
+    if (mobileMenuButton) {
+      mobileMenuButton.addEventListener('click', function() {
+        sidebar.classList.remove('hidden', '-translate-x-full');
+        sidebar.classList.add('flex', 'translate-x-0');
+        if (window.innerWidth < 768) {
+          // Ensure full width on mobile
+          sidebar.classList.remove('w-20');
+          sidebar.classList.add('w-64');
+          document.querySelectorAll('.sidebar-text').forEach(el => el.classList.remove('hidden', 'opacity-0'));
+          document.querySelector('.logo-full').classList.remove('hidden');
+          document.querySelector('.logo-mini').classList.add('hidden');
+        }
         overlay.classList.remove('hidden');
-      }
-      document.body.classList.add('overflow-hidden');
-    });
+        document.body.classList.add('overflow-hidden');
+      });
+    }
 
     // Close sidebar function
     function closeSidebar() {
       sidebar.classList.add('-translate-x-full');
       overlay.classList.add('hidden');
       document.body.classList.remove('overflow-hidden');
-      // Add a small delay before hiding completely to allow for animation
       setTimeout(() => {
-        if (window.innerWidth < 768) { // Only hide on mobile
+        if (window.innerWidth < 768) {
           sidebar.classList.add('hidden');
           sidebar.classList.remove('flex');
         }
       }, 300);
     }
 
-    // Close sidebar events
-    closeSidebarButton.addEventListener('click', closeSidebar);
+    if (closeSidebarButton) {
+      closeSidebarButton.addEventListener('click', closeSidebar);
+    }
     overlay.addEventListener('click', closeSidebar);
 
-    // Handle window resize
     window.addEventListener('resize', function() {
       if (window.innerWidth >= 768) {
         sidebar.classList.remove('hidden', '-translate-x-full');
         sidebar.classList.add('flex', 'translate-x-0');
         overlay.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
-      } else if (!sidebar.classList.contains('flex')) {
+        
+        // Restore desktop state
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        setSidebarCollapsed(isCollapsed);
+      } else {
         sidebar.classList.add('hidden', '-translate-x-full');
+        // Reset to full width for mobile next time it opens
+        sidebar.classList.remove('w-20');
+        sidebar.classList.add('w-64');
       }
     });
   });
@@ -179,7 +253,9 @@
 
     <!-- Content -->
     <main class="px-0 py-4 md:px-6 lg:px-8">
-      {{if eq .page "job-new"}}
+      {{if eq .page "dashboard-home"}}
+        {{template "home-content" .}}
+      {{else if eq .page "job-new"}}
         {{template "job-content" .}}
       {{else if eq .page "job-details"}}
         {{template "job-details" .}}
@@ -189,6 +265,14 @@
         {{template "dashboard-jobs-content" .}}
       {{else if eq .page "documents"}}
         {{template "documents-hub" .}}
+      {{else if or (eq .page "settings-profile") (eq .page "settings-account") (eq .page "settings-quotas")}}
+        {{if eq .page "settings-profile"}}
+          {{template "settings-profile-content" .}}
+        {{else if eq .page "settings-account"}}
+          {{template "settings-account-content" .}}
+        {{else if eq .page "settings-quotas"}}
+          {{template "settings-quotas-content" .}}
+        {{end}}
       {{else}}
         <!-- Fallback content if no specific template is defined -->
         <div class="text-center py-8">
