@@ -12,31 +12,31 @@
 
 {{define "documents-hub"}}
 <div class="max-w-7xl mx-auto px-0 md:px-6 lg:px-8">
-  <div class="bg-slate-800 rounded-none md:rounded-xl shadow-lg mb-6">
-    <div class="px-4 md:px-6 py-4 md:py-5 border-b border-slate-700">
+  <div class="bg-white rounded-none md:rounded-xl shadow-lg mb-6">
+    <div class="px-4 md:px-6 py-4 md:py-5 border-b border-gray-200">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-bold text-white">My Documents</h1>
-          <p class="text-gray-400 text-sm mt-1">Manage your saved cover letters and resumes</p>
+          <h1 class="text-2xl font-bold text-gray-900">My Documents</h1>
+          <p class="text-gray-500 text-sm mt-1">Manage your saved cover letters and resumes</p>
         </div>
         <div class="flex gap-3">
-          <div class="bg-slate-700 px-4 py-2 rounded-lg">
-            <div class="text-xs text-gray-400">Total Documents</div>
-            <div class="text-xl font-semibold text-white">{{add .CoverLetterCount .ResumeCount}}</div>
+          <div class="bg-white px-4 py-2 rounded-lg">
+            <div class="text-xs text-gray-500">Total Documents</div>
+            <div class="text-xl font-semibold text-gray-900">{{add .CoverLetterCount .ResumeCount}}</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="border-b border-slate-700">
+    <div class="border-b border-gray-200">
       <nav class="flex -mb-px" aria-label="Document type tabs">
         <button
           type="button"
           class="tab-button flex-1 md:flex-none px-4 md:px-6 py-3 text-sm font-medium border-b-2 transition-colors
                  {{if eq .ActiveTab "cover-letters"}}
-                   text-primary border-primary bg-slate-700 bg-opacity-50
+                   text-primary border-primary bg-white bg-opacity-50
                  {{else}}
-                   text-gray-400 border-transparent hover:text-gray-300 hover:border-gray-300
+                   text-gray-500 border-transparent hover:text-gray-600 hover:border-gray-300
                  {{end}}"
           hx-get="/documents?tab=cover-letters"
           hx-target="#documents-content"
@@ -59,9 +59,9 @@
           type="button"
           class="tab-button flex-1 md:flex-none px-4 md:px-6 py-3 text-sm font-medium border-b-2 transition-colors
                  {{if eq .ActiveTab "resumes"}}
-                   text-primary border-primary bg-slate-700 bg-opacity-50
+                   text-primary border-primary bg-white bg-opacity-50
                  {{else}}
-                   text-gray-400 border-transparent hover:text-gray-300 hover:border-gray-300
+                   text-gray-500 border-transparent hover:text-gray-600 hover:border-gray-300
                  {{end}}"
           hx-get="/documents?tab=resumes"
           hx-target="#documents-content"
@@ -89,15 +89,15 @@
          _="on htmx:beforeRequest set @aria-busy to 'true' then on htmx:afterSwap set @aria-busy to 'false'">
       <div class="animate-pulse">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="bg-slate-700 h-48 rounded-lg"></div>
-          <div class="bg-slate-700 h-48 rounded-lg"></div>
-          <div class="bg-slate-700 h-48 rounded-lg hidden lg:block"></div>
+          <div class="bg-white h-48 rounded-lg"></div>
+          <div class="bg-white h-48 rounded-lg"></div>
+          <div class="bg-white h-48 rounded-lg hidden lg:block"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="loading-indicator" class="htmx-indicator absolute inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-10 rounded-lg">
+  <div id="loading-indicator" class="htmx-indicator absolute inset-0 bg-gray-50 bg-opacity-50 flex items-center justify-center z-10 rounded-lg">
     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
   </div>
 </div>
@@ -124,11 +124,11 @@
         button.setAttribute('aria-current', isActive ? 'page' : 'false');
         
         if (isActive) {
-          button.classList.add('text-primary', 'border-primary', 'bg-slate-700', 'bg-opacity-50');
-          button.classList.remove('text-gray-400', 'border-transparent');
+          button.classList.add('text-primary', 'border-primary', 'bg-white', 'bg-opacity-50');
+          button.classList.remove('text-gray-500', 'border-transparent');
         } else {
-          button.classList.remove('text-primary', 'border-primary', 'bg-slate-700', 'bg-opacity-50');
-          button.classList.add('text-gray-400', 'border-transparent');
+          button.classList.remove('text-primary', 'border-primary', 'bg-white', 'bg-opacity-50');
+          button.classList.add('text-gray-500', 'border-transparent');
         }
       });
     }

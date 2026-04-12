@@ -1,13 +1,13 @@
 {{define "settings-layout"}}
-<div class="min-h-screen bg-slate-900">
+<div class="min-h-screen bg-gray-50">
   {{template "mobile-nav" .}}
 
   <div class="flex md:flex-row">
     {{template "sidebar" .}}
 
-    <div class="flex-1 bg-slate-900 min-h-screen pt-14 md:pt-0">
+    <div class="flex-1 bg-gray-50 min-h-screen pt-14 md:pt-0">
     <!-- Header - Only show on desktop -->
-    <header class="hidden md:block bg-slate-800 shadow-md sticky top-0 z-10">
+    <header class="hidden md:block bg-white shadow-md sticky top-0 z-10">
       <div class="px-4 py-6 md:px-6 lg:px-8">
         <h1 class="text-xl md:text-2xl font-bold text-primary">{{.pageTitle}}</h1>
       </div>
@@ -24,7 +24,7 @@
       {{else}}
         <!-- Fallback content if no specific template is defined -->
         <div class="text-center py-8">
-          <p class="text-gray-400">This settings page is currently under development.</p>
+          <p class="text-gray-500">This settings page is currently under development.</p>
         </div>
       {{end}}
     </main>

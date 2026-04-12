@@ -1,44 +1,21 @@
 {{define "login-content"}}
-<main id="main-content" class="w-full sm:max-w-md lg:max-w-lg z-10 relative sm:px-0 mx-auto" role="main">
-
-  <div class="hidden sm:block absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary-dark/20 rounded-2xl blur-xl opacity-50"></div>
-  <div class="hidden sm:block absolute -inset-0.5 bg-slate-700/40 rounded-2xl blur-sm"></div>
-
-  <div class="relative p-6 sm:p-8 lg:p-10 bg-slate-800/80 sm:backdrop-blur-xl rounded-none sm:rounded-2xl shadow-none sm:shadow-2xl border-0 sm:border sm:border-slate-700/30 min-h-screen sm:min-h-0 flex flex-col justify-center sm:block">
-    <div class="text-center mb-6 lg:mb-8">
-      <div class="flex justify-center">
+<main id="main-content" class="w-full min-h-screen flex z-10 relative" role="main">
+  <!-- Left Side: Login Form -->
+  <div class="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 lg:px-24 bg-white relative z-10">
+    <div class="w-full max-w-md mx-auto">
+      <div class="mb-8">
         {{template "partials/logo_component.html" "lg"}}
       </div>
-    </div>
 
-    <div class="relative z-10">
       {{if .isCloudMode}}
-      <div class="text-center">
-        <p class="text-gray-400 text-sm sm:text-base lg:text-lg mb-8 -mt-2">Your intelligent job search companion</p>
-
-        <div class="space-y-3.5 mb-10 text-left max-w-sm mx-auto">
-          <div class="flex items-start gap-3">
-            <svg class="h-5 w-5 text-primary mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <p class="text-gray-300 text-xs sm:text-sm">Track job applications effortlessly</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <svg class="h-5 w-5 text-primary mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <p class="text-gray-300 text-xs sm:text-sm">AI-powered job matching & insights</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <svg class="h-5 w-5 text-primary mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <p class="text-gray-300 text-xs sm:text-sm">Generate tailored resumes & cover letters</p>
-          </div>
-        </div>
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2 font-heading">Log in to Vega AI.</h2>
+        <p class="text-gray-500 text-sm">Track job applications effortlessly and get AI-powered insights.</p>
       </div>
       {{else}}
-      <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-center mb-4 sm:mb-6 text-white font-heading">Welcome Back</h2>
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2 font-heading">Welcome back.</h2>
+      </div>
       {{end}}
 
       {{if not .isCloudMode}}
@@ -47,21 +24,20 @@
             hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
             hx-swap="none"
             data-no-swap-on-error="true"
-            class="relative z-10"
             aria-label="Login form"
             onsubmit="return validateLoginForm(event)">
         <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
-        <div class="space-y-4 sm:space-y-5 lg:space-y-6">
+        <div class="space-y-5">
           <div class="group">
-            <label for="username" class="block text-sm lg:text-base font-medium text-gray-200 mb-1.5 sm:mb-2">Username (3-50 characters)</label>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-1.5">Username (3-50 characters)</label>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-focus-within:text-primary transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400 group-focus-within:text-teal-600 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
               <input type="text" id="username" name="username" required
-                     class="w-full pl-10 sm:pl-11 pr-4 py-3 sm:py-4 rounded-lg bg-slate-700/50 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:bg-slate-700/70 text-base min-h-[48px] transition-all duration-300 hover:border-slate-500"
+                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white text-base transition-all duration-300"
                      placeholder="Enter your username"
                      autocomplete="username"
                      hx-trigger="keyup[keyCode==13]"
@@ -84,22 +60,22 @@
           </div>
 
           <div class="group">
-            <label for="password" class="block text-sm lg:text-base font-medium text-gray-200 mb-1.5 sm:mb-2">Password (8-64 characters)</label>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">Password (8-64 characters)</label>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-focus-within:text-primary transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400 group-focus-within:text-teal-600 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <input type="password" id="password" name="password" required
-                     class="w-full pl-10 sm:pl-11 pr-12 sm:pr-14 py-3 sm:py-4 rounded-lg bg-slate-700/50 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:bg-slate-700/70 text-base min-h-[48px] transition-all duration-300 hover:border-slate-500"
+                     class="w-full pl-10 pr-12 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white text-base transition-all duration-300"
                      placeholder="Enter your password"
                      autocomplete="current-password"
                      _="on input
                           set password to my.value
                           if password is not '' and (password.length < 8 or password.length > 64)
                             if password.length < 8
-                              set message to 'Password must be at least 8 characters long'
+                              set message to 'That password does not match'
                             else
                               set message to 'Password must be no more than 64 characters long'
                             end
@@ -110,23 +86,23 @@
                           end">
               <button type="button" 
                       id="password-toggle"
-                      class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:text-teal-600 transition-colors duration-200"
                       aria-label="Toggle password visibility"
                       onclick="togglePasswordVisibility()">
-                <svg id="show-password-icon" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg id="show-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                <svg id="hide-password-icon" class="h-5 w-5 sm:h-6 sm:w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg id="hide-password-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                 </svg>
               </button>
             </div>
           </div>
 
-          <div id="client-error" class="hidden text-center text-sm bg-red-900 bg-opacity-50 text-white rounded-lg border border-red-800 p-3" aria-live="polite">
-            <div class="flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div id="client-error" class="hidden text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg p-3" aria-live="polite">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span id="client-error-message"></span>
@@ -134,8 +110,8 @@
           </div>
         </div>
 
-        <div class="pt-4 relative">
-          <button type="submit" class="w-full py-3 sm:py-4 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white font-semibold rounded-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800 min-h-[48px] text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300" aria-label="Sign in to your account">
+        <div class="pt-6">
+          <button type="submit" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow" aria-label="Sign in to your account">
             Sign in
             <span id="spinner" class="htmx-indicator" aria-hidden="true">
                 <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -151,17 +127,13 @@
       {{end}}
 
       {{if .isCloudMode}}
-      <div class="my-10">
-        <div class="w-full border-t border-slate-700/50"></div>
-      </div>
-
       <form action="/auth/google/login" method="get">
         <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
         
         <button type="submit"
-                class="w-full flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 bg-white hover:bg-gray-50 text-gray-700 font-medium sm:font-semibold rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transform hover:scale-[1.01] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800 min-h-[48px] sm:min-h-[56px] text-sm sm:text-base"
+                class="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                 aria-label="Sign in with Google">
-          <svg class="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <svg class="h-5 w-5 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -172,17 +144,69 @@
       </form>
       {{end}}
 
-      <div class="text-center mt-6 sm:mt-8">
-          <a href="/"
-             class="inline-flex items-center justify-center gap-2 text-gray-400 hover:text-primary text-sm py-2 px-4 rounded-lg hover:bg-slate-700/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-slate-800"
-             aria-label="Return to homepage">
-            <svg class="h-4 w-4 flex-shrink-0 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Return to home</span>
-          </a>
-        </div>
+      <div class="text-center mt-8">
+        <a href="/"
+           class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-teal-600 transition-colors"
+           aria-label="Return to homepage">
+          <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Return to home
+        </a>
+      </div>
+    </div>
+  </div>
 
+  <!-- Right Side: Soft Branded Graphic / Feature Highlights -->
+  <div class="hidden lg:flex w-1/2 bg-gray-50 items-center justify-center relative overflow-hidden border-l border-gray-200">
+    <div class="absolute inset-0 z-0 overflow-hidden">
+      <div class="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-teal-100 blur-3xl opacity-50 mix-blend-multiply"></div>
+      <div class="absolute top-40 -left-20 w-72 h-72 rounded-full bg-blue-100 blur-3xl opacity-50 mix-blend-multiply"></div>
+      <div class="absolute -bottom-40 left-1/2 w-96 h-96 rounded-full bg-yellow-50 blur-3xl opacity-50 mix-blend-multiply"></div>
+      <div class="absolute inset-0 bg-white/40 backdrop-blur-[1px]"></div>
+    </div>
+    <div class="relative z-10 max-w-md w-full px-8">
+      <div class="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100/50 text-left">
+        <h3 class="text-2xl font-bold text-gray-900 mb-8 font-heading">Supercharge your job search</h3>
+        
+        <div class="space-y-6">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 text-teal-600 mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-gray-900 font-semibold mb-1">Track Applications</h4>
+              <p class="text-sm text-gray-500 leading-relaxed">Keep all your job prospects organized and updated in one place.</p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-600 mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-gray-900 font-semibold mb-1">AI Match Scoring</h4>
+              <p class="text-sm text-gray-500 leading-relaxed">Know instantly how well your profile matches the job description.</p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-purple-50 text-purple-600 mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-gray-900 font-semibold mb-1">Tailored Resumes</h4>
+              <p class="text-sm text-gray-500 leading-relaxed">Generate custom cover letters and resumes with one click.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -210,7 +234,6 @@ function validateLoginForm(event) {
   const clientError = document.getElementById('client-error');
   const clientErrorMessage = document.getElementById('client-error-message');
 
-  // Validate username (trimmed to catch whitespace-only input)
   if (username.length < 3 || username.length > 50) {
     event.preventDefault();
     clientErrorMessage.textContent = username.length < 3
@@ -220,12 +243,9 @@ function validateLoginForm(event) {
     return false;
   }
 
-  // Validate password (don't trim - spaces may be intentional in passwords)
   if (password.length < 8 || password.length > 64) {
     event.preventDefault();
-    clientErrorMessage.textContent = password.length < 8
-      ? 'Password must be at least 8 characters long'
-      : 'Password must be no more than 64 characters long';
+    clientErrorMessage.textContent = 'That password does not match';
     clientError.classList.remove('hidden');
     return false;
   }

@@ -1,234 +1,228 @@
 {{define "settings-quotas-content"}}
-<div class="mx-0 md:max-w-6xl md:mx-auto relative">
+<div class="max-w-5xl mx-auto pb-12">
+  <div id="form-alert-container" class="mb-6" hx-swap-oob="true" aria-live="polite"></div>
   
-  <div id="form-alert-container" class="mb-4 md:mb-6 px-4 md:px-0" hx-swap-oob="true" aria-live="polite"></div>
-  
-  
-  <div class="relative p-4 md:p-6 bg-slate-800 bg-opacity-70 backdrop-blur-xl rounded-none md:rounded-xl shadow-2xl border-0 md:border border-white border-opacity-10">
-    
-    
-    <div class="mb-6 pb-6 border-b border-slate-700 border-opacity-50">
-      <h2 class="text-xl md:text-2xl font-bold text-white mb-2">Usage & Quotas</h2>
-      <p class="text-sm md:text-base text-gray-400">
-        {{if .isCloudMode}}
-          Monitor your usage and quota limits for all features.
-        {{else}}
-          Your self-hosted instance has unlimited usage for all features.
-        {{end}}
-      </p>
-    </div>
-
-    {{if .hasQuotaData}}
-    
-    <div class="mb-8">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-white">Current Usage</h3>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 lg:gap-6">
-        
-        <div class="bg-slate-700 bg-opacity-50 rounded-lg p-4 md:p-5 lg:p-6 hover:bg-opacity-70 transition-all duration-200">
-          <div class="flex items-center justify-between mb-2 md:mb-3">
-            <h4 class="text-sm md:text-base font-medium text-white">Jobs Found Today</h4>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 md:h-6 w-5 md:w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <p class="text-xl md:text-2xl font-bold text-white mb-2">
-            {{.quotaStatus.JobCapture.Used}}
-          </p>
-          <p class="text-xs text-gray-400">Unlimited</p>
-        </div>
-
-        
-        <div class="bg-slate-700 bg-opacity-50 rounded-lg p-4 md:p-5 lg:p-6 hover:bg-opacity-70 transition-all duration-200">
-          <div class="flex items-center justify-between mb-2 md:mb-3">
-            <h4 class="text-sm md:text-base font-medium text-white">AI Analyses This Month</h4>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 md:h-6 w-5 md:w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <p class="text-xl md:text-2xl font-bold text-white mb-2">
-            {{if eq .quotaStatus.AIAnalysis.Limit -1}}{{.quotaStatus.AIAnalysis.Used}}{{else}}{{cappedQuota .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}} / {{.quotaStatus.AIAnalysis.Limit}}{{end}}
-          </p>
-          {{if ne .quotaStatus.AIAnalysis.Limit -1}}
-          <div class="w-full bg-slate-600 rounded-full h-2 mb-2">
-            <div class="bg-primary h-2 rounded-full transition-all duration-300" data-used="{{.quotaStatus.AIAnalysis.Used}}" data-limit="{{.quotaStatus.AIAnalysis.Limit}}"></div>
-          </div>
-          <p class="text-xs text-gray-400">
-            {{if ge .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}}
-              Limit reached
-            {{else}}
-              {{max 0 (sub .quotaStatus.AIAnalysis.Limit .quotaStatus.AIAnalysis.Used)}} remaining
-            {{end}}
-          </p>
-          {{else}}
-          <p class="text-xs text-gray-400">Unlimited</p>
-          {{end}}
-          {{if and (ne .quotaStatus.AIAnalysis.Limit -1) (not .quotaStatus.AIAnalysis.ResetDate.IsZero)}}
-          <p class="text-xs text-gray-500 mt-2">
-            Resets {{.quotaStatus.AIAnalysis.ResetDate.Format "Jan 2, 2006"}}
-          </p>
-          {{end}}
-        </div>
-      </div>
-    </div>
-
-    
-    <div class="mb-8">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-white">Quota Details</h3>
-      
-      
-      <div class="hidden md:block bg-slate-700 bg-opacity-50 rounded-lg overflow-x-auto">
-        <table class="w-full min-w-[600px]">
-          <thead>
-            <tr class="border-b border-slate-600">
-              <th class="text-left px-4 py-3 text-sm font-medium text-gray-300">Feature</th>
-              <th class="text-center px-4 py-3 text-sm font-medium text-gray-300">Period</th>
-              <th class="text-center px-4 py-3 text-sm font-medium text-gray-300">Free Limit</th>
-              <th class="text-center px-4 py-3 text-sm font-medium text-gray-300">Your Limit</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-b border-slate-600 hover:bg-slate-600 hover:bg-opacity-30 transition-colors">
-              <td class="px-4 py-3 text-sm text-gray-300">Jobs Captured via Extension</td>
-              <td class="text-center px-4 py-3 text-sm text-gray-400">Daily</td>
-              <td class="text-center px-4 py-3 text-sm text-gray-400">Unlimited</td>
-              <td class="text-center px-4 py-3 text-sm font-medium text-white">Unlimited</td>
-            </tr>
-            <tr class="hover:bg-slate-600 hover:bg-opacity-30 transition-colors">
-              <td class="px-4 py-3 text-sm text-gray-300">AI Job Analysis</td>
-              <td class="text-center px-4 py-3 text-sm text-gray-400">Monthly</td>
-              <td class="text-center px-4 py-3 text-sm text-gray-400">10</td>
-              <td class="text-center px-4 py-3 text-sm font-medium text-white">
-                {{if eq .quotaStatus.AIAnalysis.Limit -1}}Unlimited{{else}}{{.quotaStatus.AIAnalysis.Limit}}{{end}}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      
-      <div class="block md:hidden space-y-3">
-        
-        <div class="bg-slate-700 bg-opacity-50 rounded-lg p-4 touch-manipulation">
-          <h4 class="font-medium text-white mb-3">Jobs Captured via Extension</h4>
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <span class="text-gray-400">Period:</span>
-              <span class="ml-2 text-gray-300">Daily</span>
-            </div>
-            <div>
-              <span class="text-gray-400">Free:</span>
-              <span class="ml-2 text-gray-300">Unlimited</span>
-            </div>
-            <div class="col-span-2">
-              <span class="text-gray-400">Your Limit:</span>
-              <span class="ml-2 font-medium text-white">Unlimited</span>
-            </div>
-          </div>
-        </div>
-
-        
-        <div class="bg-slate-700 bg-opacity-50 rounded-lg p-4 touch-manipulation">
-          <h4 class="font-medium text-white mb-3">AI Job Analysis</h4>
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <span class="text-gray-400">Period:</span>
-              <span class="ml-2 text-gray-300">Monthly</span>
-            </div>
-            <div>
-              <span class="text-gray-400">Free:</span>
-              <span class="ml-2 text-gray-300">10</span>
-            </div>
-            <div class="col-span-2">
-              <span class="text-gray-400">Your Limit:</span>
-              <span class="ml-2 font-medium text-white">
-                {{if eq .quotaStatus.AIAnalysis.Limit -1}}Unlimited{{else}}{{.quotaStatus.AIAnalysis.Limit}}{{end}}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    
-    <div class="space-y-3 md:space-y-4">
-      <div class="bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg p-3 md:p-4">
-        <div class="flex">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 mr-2 md:mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <h4 class="text-sm font-medium text-blue-300 mb-1">About Quotas</h4>
-            <p class="text-xs md:text-sm text-gray-300">
-              {{if .isCloudMode}}
-                Quotas help ensure fair usage and system stability. Daily quotas reset at midnight UTC, while monthly quotas reset on the first day of each month.
-              {{else}}
-                As a self-hosted user, you have unlimited access to all features. The usage tracking is for informational purposes only.
-              {{end}}
-            </p>
-          </div>
-        </div>
-      </div>
-
+  <div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-1">Usage & Quotas</h2>
+    <p class="text-gray-500">
       {{if .isCloudMode}}
-      <div class="bg-primary bg-opacity-20 border border-primary rounded-lg p-3 md:p-4">
-        <div class="flex">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 md:mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-          <div>
-            <h4 class="text-sm font-medium text-primary mb-1">Need Higher Limits?</h4>
-            <p class="text-xs md:text-sm text-gray-300">
-              You can create a self-hosted version with unlimited usage. Visit 
-              <a href="https://vega.benidevo.com" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-light underline">
-                vega.benidevo.com
-              </a> 
-              for instructions on how to get started.
-            </p>
-          </div>
-        </div>
-      </div>
+        Track your usage. Limits reset monthly.
+      {{else}}
+        Your self-hosted instance has unlimited usage.
       {{end}}
+    </p>
+  </div>
+
+  {{if .hasQuotaData}}
+  
+  <!-- Bento Box Layout for Quotas -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    
+    <!-- Primary Stat: Jobs Captured (Span 1) -->
+    <div class="col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+      <div class="absolute top-0 right-0 p-4 opacity-5 bg-teal-600 rounded-bl-[100px] w-24 h-24 transition-transform group-hover:scale-110 duration-500"></div>
+      
+      <div class="flex items-center justify-between mb-8 relative z-10">
+        <div class="p-3 bg-teal-50 text-teal-600 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+          Unlimited
+        </span>
+      </div>
+      
+      <div class="mt-auto relative z-10">
+        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Jobs Found Today</p>
+        <p class="text-4xl font-bold text-gray-900">{{.quotaStatus.JobCapture.Used}}</p>
+      </div>
     </div>
 
-    {{else}}
-    
-    <div class="bg-slate-700 bg-opacity-50 rounded-lg p-8 text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-      <p class="text-gray-400 text-base">Unable to load quota information. Please try again later.</p>
+    <!-- Secondary Stat: AI Analyses (Span 2) -->
+    <div class="col-span-1 lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+        <div class="flex items-center gap-4">
+          <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">AI Analyses</h3>
+            <p class="text-sm text-gray-500">This Month</p>
+          </div>
+        </div>
+        
+        <div class="text-right">
+          <div class="flex items-baseline justify-end gap-1">
+            <span class="text-3xl font-bold text-gray-900">{{if eq .quotaStatus.AIAnalysis.Limit -1}}{{.quotaStatus.AIAnalysis.Used}}{{else}}{{cappedQuota .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}}{{end}}</span>
+            {{if ne .quotaStatus.AIAnalysis.Limit -1}}
+            <span class="text-sm font-medium text-gray-400">/ {{.quotaStatus.AIAnalysis.Limit}}</span>
+            {{end}}
+          </div>
+          {{if and (ne .quotaStatus.AIAnalysis.Limit -1) (not .quotaStatus.AIAnalysis.ResetDate.IsZero)}}
+          <p class="text-xs text-gray-400 mt-1">Resets {{.quotaStatus.AIAnalysis.ResetDate.Format "Jan 2, 2006"}}</p>
+          {{end}}
+        </div>
+      </div>
+      
+      <div class="mt-auto">
+        {{if ne .quotaStatus.AIAnalysis.Limit -1}}
+        <div class="flex justify-between text-xs font-medium mb-2">
+          <span class="text-gray-500">Usage Progress</span>
+          <span class="{{if ge .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}}text-red-600{{else}}text-blue-600{{end}}">
+            {{if ge .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}}Limit reached{{else}}{{max 0 (sub .quotaStatus.AIAnalysis.Limit .quotaStatus.AIAnalysis.Used)}} remaining{{end}}
+          </span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+          <div class="bg-blue-600 h-full rounded-full transition-all duration-700 ease-out" data-used="{{.quotaStatus.AIAnalysis.Used}}" data-limit="{{.quotaStatus.AIAnalysis.Limit}}"></div>
+        </div>
+        {{else}}
+        <div class="flex items-center justify-center p-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+          <p class="text-sm font-medium text-gray-600">You have unlimited AI analyses on this instance.</p>
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Quota Details Table -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+    <div class="px-6 py-5 border-b border-gray-100">
+      <h3 class="text-lg font-semibold text-gray-900">Plan Details</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50">
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Feature</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Free Limit</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Your Limit</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr class="hover:bg-gray-50/50 transition-colors">
+            <td class="px-6 py-4 text-sm font-medium text-gray-900 flex items-center gap-3">
+              <div class="w-8 h-8 rounded bg-teal-50 flex items-center justify-center text-teal-600">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </div>
+              Jobs Captured via Extension
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">Daily</td>
+            <td class="px-6 py-4 text-sm text-gray-500">Unlimited</td>
+            <td class="px-6 py-4 text-sm font-semibold text-gray-900">Unlimited</td>
+          </tr>
+          <tr class="hover:bg-gray-50/50 transition-colors">
+            <td class="px-6 py-4 text-sm font-medium text-gray-900 flex items-center gap-3">
+              <div class="w-8 h-8 rounded bg-blue-50 flex items-center justify-center text-blue-600">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              AI Job Analysis
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">Monthly</td>
+            <td class="px-6 py-4 text-sm text-gray-500">10</td>
+            <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+              {{if eq .quotaStatus.AIAnalysis.Limit -1}}Unlimited{{else}}{{.quotaStatus.AIAnalysis.Limit}}{{end}}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Information Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-gray-50 rounded-xl p-5 border border-gray-100 flex gap-4">
+      <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0 text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-gray-900 mb-1">About Quotas</h4>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          {{if .isCloudMode}}
+            Limits reset on the first day of each month. Re-analyzing existing jobs is always free.
+          {{else}}
+            As a self-hosted user, you have unlimited access to all features.
+          {{end}}
+        </p>
+      </div>
+    </div>
+
+    {{if .isCloudMode}}
+    <div class="bg-teal-50 rounded-xl p-5 border border-teal-100 flex gap-4">
+      <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0 text-teal-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-teal-900 mb-1">Need Higher Limits?</h4>
+        <p class="text-sm text-teal-700 leading-relaxed">
+          You can create a self-hosted version with unlimited usage. Visit 
+          <a href="https://vega.benidevo.com" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:text-teal-900 transition-colors">
+            vega.benidevo.com
+          </a> 
+          for instructions on how to get started.
+        </p>
+      </div>
     </div>
     {{end}}
   </div>
+
+  {{else}}
+  <!-- Empty/Error State -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-2">Unable to load quota data</h3>
+    <p class="text-gray-500">Please try refreshing the page or check back later.</p>
+  </div>
+  {{end}}
 </div>
 
-
 <script>
-// Set quota progress bars on page load
+// Set quota progress bars on page load with animation
 document.addEventListener('DOMContentLoaded', function() {
-  const progressBars = document.querySelectorAll('.bg-primary[data-used][data-limit]');
-  progressBars.forEach(bar => {
-    const used = parseInt(bar.dataset.used);
-    const limit = parseInt(bar.dataset.limit);
-    
-    if (limit > 0) {
-      const percentage = Math.min((used / limit) * 100, 100);
-      bar.style.width = percentage + '%';
+  setTimeout(() => {
+    const progressBars = document.querySelectorAll('[data-used][data-limit]');
+    progressBars.forEach(bar => {
+      const used = parseInt(bar.dataset.used);
+      const limit = parseInt(bar.dataset.limit);
       
-      // Add color variations based on usage
-      if (percentage >= 90) {
-        bar.classList.add('bg-red-500');
-        bar.classList.remove('bg-primary');
-      } else if (percentage >= 75) {
-        bar.classList.add('bg-yellow-500');
-        bar.classList.remove('bg-primary');
+      if (limit > 0) {
+        const percentage = Math.min((used / limit) * 100, 100);
+        bar.style.width = percentage + '%';
+        
+        const textSpan = bar.parentElement.previousElementSibling.querySelector('span:last-child');
+        
+        // Add color variations based on usage
+        if (percentage >= 90) {
+          bar.classList.add('bg-red-600');
+          bar.classList.remove('bg-blue-600');
+          if (textSpan) {
+             textSpan.classList.add('text-red-600');
+             textSpan.classList.remove('text-blue-600', 'text-yellow-600');
+          }
+        } else if (percentage >= 75) {
+          bar.classList.add('bg-yellow-500');
+          bar.classList.remove('bg-blue-600');
+          if (textSpan) {
+             textSpan.classList.add('text-yellow-600');
+             textSpan.classList.remove('text-blue-600', 'text-red-600');
+          }
+        }
+      } else {
+        bar.style.width = '0%';
       }
-    } else {
-      bar.style.width = '0%';
-    }
-  });
+    });
+  }, 100); // Slight delay to ensure animation triggers
 });
 </script>
-
 {{end}}

@@ -3,14 +3,14 @@
 
   <div id="form-alert-container" class="mb-4 md:mb-6" hx-swap-oob="true" aria-live="polite"></div>
 
-  <div class="relative p-4 md:p-6 bg-slate-800 bg-opacity-70 backdrop-blur-xl rounded-xl shadow-2xl border border-white border-opacity-10">
+  <div class="relative p-4 md:p-6 bg-white bg-opacity-70 backdrop-blur-xl rounded-xl shadow-2xl border border-white border-opacity-10">
 
     {{if .isCloudMode}}
     <!-- Google Sign-In Section (Cloud Mode) -->
-    <div class="mb-6 pb-6 border-b border-slate-700 border-opacity-50">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Google Account</h3>
+    <div class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
+      <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Google Account</h3>
 
-      <div class="bg-slate-700 bg-opacity-40 rounded-lg p-4 md:p-6">
+      <div class="bg-gray-50 bg-opacity-40 rounded-lg p-4 md:p-6">
         <div class="flex items-start sm:items-center flex-col sm:flex-row gap-4 sm:gap-0 justify-between">
           <div class="flex items-center">
             <!-- Google Logo -->
@@ -23,8 +23,8 @@
               </svg>
             </div>
             <div>
-              <h4 class="text-base md:text-lg font-medium text-white">Google Account</h4>
-              <p class="text-sm md:text-base text-gray-300">{{.user.Username}}</p>
+              <h4 class="text-base md:text-lg font-medium text-gray-900">Google Account</h4>
+              <p class="text-sm md:text-base text-gray-600">{{.user.Username}}</p>
             </div>
           </div>
 
@@ -33,7 +33,7 @@
               <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
               </svg>
-              <span class="text-sm font-medium text-gray-300">Google Connected</span>
+              <span class="text-sm font-medium text-gray-600">Google Connected</span>
             </div>
             <a href="https://myaccount.google.com/security" target="_blank" rel="noopener noreferrer"
                class="text-sm text-primary hover:text-teal-500 transition-colors flex items-center gap-1 touch-manipulation min-h-[44px] px-2 py-1 rounded">
@@ -46,8 +46,8 @@
           </div>
         </div>
 
-        <div class="mt-4 md:mt-6 p-3 md:p-4 bg-slate-600 bg-opacity-40 rounded-lg border border-slate-600">
-          <p class="text-sm text-gray-300">
+        <div class="mt-4 md:mt-6 p-3 md:p-4 bg-gray-100 bg-opacity-40 rounded-lg border border-gray-300">
+          <p class="text-sm text-gray-600">
             Your Google account is used for signing in to Vega AI.
           </p>
         </div>
@@ -55,16 +55,16 @@
     </div>
     {{else}}
     <!-- Account Management Section (Self-Hosted Mode) -->
-    <div class="mb-6 pb-6 border-b border-slate-700 border-opacity-50">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Account Management</h3>
+    <div class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
+      <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Account Management</h3>
 
       <form id="account-update-form" action="/settings/account/update" method="POST" hx-post="/settings/account/update" hx-target="#form-alert-container" hx-swap="innerHTML" hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}' hx-on::after-request="if(event.detail.successful && event.detail.xhr.responseText.includes('successfully')) { document.getElementById('current_password').value = ''; document.getElementById('new_password').value = ''; document.getElementById('confirm_password').value = ''; }" class="space-y-6">
         <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
         <!-- Current Password (Required for any changes) -->
-        <div class="bg-slate-700 bg-opacity-40 rounded-lg p-4 md:p-6">
-          <h4 class="text-md font-medium text-white mb-4">Authentication Required</h4>
+        <div class="bg-gray-50 bg-opacity-40 rounded-lg p-4 md:p-6">
+          <h4 class="text-md font-medium text-gray-900 mb-4">Authentication Required</h4>
           <div class="space-y-1">
-            <label for="current_password" class="block text-sm font-medium text-gray-300">
+            <label for="current_password" class="block text-sm font-medium text-gray-600">
               Current Password <span class="text-red-500">*</span>
             </label>
             <div class="relative">
@@ -74,9 +74,9 @@
                      required
                      autocomplete="current-password"
                      placeholder="Enter your current password"
-                     class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                     class="w-full px-3 py-2 pr-10 rounded-md bg-gray-100 bg-opacity-70 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
               <button type="button" 
-                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none focus:text-primary transition-colors duration-200"
                       aria-label="Toggle password visibility"
                       onclick="togglePasswordFieldVisibility('current_password')">
                 <svg id="show-current-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,15 +88,15 @@
                 </svg>
               </button>
             </div>
-            <p class="text-xs text-gray-400 mt-1">Required to make any changes</p>
+            <p class="text-xs text-gray-500 mt-1">Required to make any changes</p>
           </div>
         </div>
 
         <!-- Username Change -->
-        <div class="bg-slate-700 bg-opacity-40 rounded-lg p-4 md:p-6">
-          <h4 class="text-md font-medium text-white mb-4">Change Username</h4>
+        <div class="bg-gray-50 bg-opacity-40 rounded-lg p-4 md:p-6">
+          <h4 class="text-md font-medium text-gray-900 mb-4">Change Username</h4>
           <div class="space-y-1">
-            <label for="new_username" class="block text-sm font-medium text-gray-300">
+            <label for="new_username" class="block text-sm font-medium text-gray-600">
               New Username
             </label>
             <input type="text"
@@ -105,17 +105,17 @@
                    value="{{.user.Username}}"
                    autocomplete="username"
                    placeholder="Enter new username"
-                   class="w-full px-3 py-2 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
-            <p class="text-xs text-gray-400 mt-1">Leave blank to keep current username</p>
+                   class="w-full px-3 py-2 rounded-md bg-gray-100 bg-opacity-70 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+            <p class="text-xs text-gray-500 mt-1">Leave blank to keep current username</p>
           </div>
         </div>
 
         <!-- Password Change -->
-        <div class="bg-slate-700 bg-opacity-40 rounded-lg p-4 md:p-6">
-          <h4 class="text-md font-medium text-white mb-4">Change Password</h4>
+        <div class="bg-gray-50 bg-opacity-40 rounded-lg p-4 md:p-6">
+          <h4 class="text-md font-medium text-gray-900 mb-4">Change Password</h4>
           <div class="space-y-4">
             <div class="space-y-1">
-              <label for="new_password" class="block text-sm font-medium text-gray-300">
+              <label for="new_password" class="block text-sm font-medium text-gray-600">
                 New Password
               </label>
               <div class="relative">
@@ -124,9 +124,9 @@
                        name="new_password"
                        autocomplete="new-password"
                        placeholder="Enter new password"
-                       class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                       class="w-full px-3 py-2 pr-10 rounded-md bg-gray-100 bg-opacity-70 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
                 <button type="button" 
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none focus:text-primary transition-colors duration-200"
                         aria-label="Toggle password visibility"
                         onclick="togglePasswordFieldVisibility('new_password')">
                   <svg id="show-new-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,7 +141,7 @@
             </div>
 
             <div class="space-y-1">
-              <label for="confirm_password" class="block text-sm font-medium text-gray-300">
+              <label for="confirm_password" class="block text-sm font-medium text-gray-600">
                 Confirm New Password
               </label>
               <div class="relative">
@@ -150,9 +150,9 @@
                        name="confirm_password"
                        autocomplete="new-password"
                        placeholder="Confirm new password"
-                       class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                       class="w-full px-3 py-2 pr-10 rounded-md bg-gray-100 bg-opacity-70 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
                 <button type="button" 
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none focus:text-primary transition-colors duration-200"
                         aria-label="Toggle password visibility"
                         onclick="togglePasswordFieldVisibility('confirm_password')">
                   <svg id="show-confirm-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,13 +165,13 @@
                 </button>
               </div>
             </div>
-            <p class="text-xs text-gray-400">Leave blank to keep current password</p>
+            <p class="text-xs text-gray-500">Leave blank to keep current password</p>
           </div>
         </div>
 
         <div class="flex justify-end pt-4">
           <button type="submit"
-                  class="px-6 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-md transition-colors duration-300">
+                  class="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-colors duration-300">
             Save Changes
           </button>
         </div>
@@ -185,8 +185,8 @@
           </svg>
           <div>
             <h4 class="text-sm font-medium text-blue-300 mb-1">Forgot your password?</h4>
-            <p class="text-xs text-gray-300">
-              Restart the application with <code class="bg-slate-700 px-2 py-1 rounded text-xs">RESET_ADMIN_PASSWORD=true</code> in your config to reset your password.
+            <p class="text-xs text-gray-600">
+              Restart the application with <code class="bg-gray-50 px-2 py-1 rounded text-xs">RESET_ADMIN_PASSWORD=true</code> in your config to reset your password.
             </p>
           </div>
         </div>
@@ -195,12 +195,12 @@
     {{end}}
 
     {{if .isCloudMode}}
-    <div class="mb-6 pb-6 border-b border-slate-700 border-opacity-50">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Browser Extension</h3>
+    <div class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
+      <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Browser Extension</h3>
 
-      <div class="bg-slate-700 bg-opacity-40 rounded-lg p-4 md:p-6">
+      <div class="bg-gray-50 bg-opacity-40 rounded-lg p-4 md:p-6">
         <div class="mb-4">
-          <p class="text-sm text-gray-300 mb-4">
+          <p class="text-sm text-gray-600 mb-4">
             Set a password for authenticating with the Vega AI browser extension. This password is separate from your Google account and is used only for the extension.
           </p>
         </div>
@@ -215,7 +215,7 @@
           <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
           
           <div class="space-y-1">
-            <label for="extension_password" class="block text-sm font-medium text-gray-300">
+            <label for="extension_password" class="block text-sm font-medium text-gray-600">
               Browser Extension Password
             </label>
             <div class="relative">
@@ -225,9 +225,9 @@
                      required
                      autocomplete="new-password"
                      placeholder="Enter password for browser extension"
-                     class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                     class="w-full px-3 py-2 pr-10 rounded-md bg-gray-100 bg-opacity-70 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
               <button type="button" 
-                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none focus:text-primary transition-colors duration-200"
                       aria-label="Toggle password visibility"
                       onclick="toggleExtensionPasswordVisibility('extension_password')">
                 <svg id="show-extension-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -239,11 +239,11 @@
                 </svg>
               </button>
             </div>
-            <p class="text-xs text-gray-400 mt-1">Minimum 8 characters</p>
+            <p class="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
           </div>
 
           <div class="space-y-1">
-            <label for="confirm_extension_password" class="block text-sm font-medium text-gray-300">
+            <label for="confirm_extension_password" class="block text-sm font-medium text-gray-600">
               Confirm Password
             </label>
             <div class="relative">
@@ -253,9 +253,9 @@
                      required
                      autocomplete="new-password"
                      placeholder="Confirm password"
-                     class="w-full px-3 py-2 pr-10 rounded-md bg-slate-600 bg-opacity-70 border border-slate-500 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                     class="w-full px-3 py-2 pr-10 rounded-md bg-gray-100 bg-opacity-70 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
               <button type="button" 
-                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 focus:outline-none focus:text-primary transition-colors duration-200"
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none focus:text-primary transition-colors duration-200"
                       aria-label="Toggle password visibility"
                       onclick="toggleExtensionPasswordVisibility('confirm_extension_password')">
                 <svg id="show-confirm-extension-password-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -271,7 +271,7 @@
 
           <div class="flex justify-end pt-2">
             <button type="submit"
-                    class="px-6 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-md transition-colors duration-300">
+                    class="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-colors duration-300">
               {{if .hasExtensionPassword}}Update{{else}}Set{{end}} Extension Password
             </button>
           </div>
@@ -284,7 +284,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p class="text-sm text-gray-300">
+              <p class="text-sm text-gray-600">
                 Extension password is set. Use your Google email ({{.user.Username}}) and this password to log into the browser extension.
               </p>
             </div>
@@ -297,7 +297,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p class="text-sm text-gray-300">
+              <p class="text-sm text-gray-600">
                 No browser extension password set. Set a password to use the browser extension.
               </p>
             </div>
@@ -307,8 +307,8 @@
       </div>
     </div>
 
-    <div class="mb-6 pb-6 border-b border-slate-700 border-opacity-50">
-      <h3 class="text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Connected Services</h3>
+    <div class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
+      <h3 class="text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Connected Services</h3>
 
       <div class="bg-yellow-800 bg-opacity-30 text-yellow-100 p-4 rounded-lg mb-4">
         <h3 class="text-sm font-medium text-yellow-200">Coming Soon</h3>
@@ -317,7 +317,7 @@
         </div>
       </div>
 
-      <div class="bg-slate-700 bg-opacity-40 rounded-lg p-6">
+      <div class="bg-gray-50 bg-opacity-40 rounded-lg p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <svg class="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
@@ -327,8 +327,8 @@
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
             <div>
-              <h4 class="text-lg font-medium text-white">Google</h4>
-              <p class="text-sm text-gray-400">Connected for authentication</p>
+              <h4 class="text-lg font-medium text-gray-900">Google</h4>
+              <p class="text-sm text-gray-500">Connected for authentication</p>
             </div>
           </div>
         </div>
@@ -338,13 +338,13 @@
 
 
     <div>
-      <h3 class="text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Account Activity</h3>
+      <h3 class="text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Account Activity</h3>
 
-      <div class="bg-slate-700 bg-opacity-40 rounded-lg p-6">
+      <div class="bg-gray-50 bg-opacity-40 rounded-lg p-6">
         <div class="space-y-4">
           <div>
-            <h4 class="text-md font-medium text-white">Last Login</h4>
-            <p class="text-gray-300 mt-1">
+            <h4 class="text-md font-medium text-gray-900">Last Login</h4>
+            <p class="text-gray-600 mt-1">
               {{if .user.LastLogin.IsZero}}
                 Never
               {{else}}
@@ -356,8 +356,8 @@
           </div>
 
           <div>
-            <h4 class="text-md font-medium text-white">Account Created</h4>
-            <p class="text-gray-300 mt-1">
+            <h4 class="text-md font-medium text-gray-900">Account Created</h4>
+            <p class="text-gray-600 mt-1">
               {{if .user.CreatedAt.IsZero}}
                 Unknown
               {{else}}
@@ -372,11 +372,11 @@
     </div>
 
     <!-- Account Deletion Section -->
-    <div class="mt-6 pt-6 border-t border-slate-700 border-opacity-50">
-      <h3 class="text-xl font-semibold mb-4 text-white">Danger Zone</h3>
+    <div class="mt-6 pt-6 border-t border-gray-200 border-opacity-50">
+      <h3 class="text-xl font-semibold mb-4 text-gray-900">Danger Zone</h3>
       <div class="bg-red-900 bg-opacity-30 border border-red-700 rounded-lg p-6">
         <h4 class="text-lg font-medium text-red-300 mb-2">Delete Account</h4>
-        <p class="text-sm text-gray-300 mb-4">
+        <p class="text-sm text-gray-600 mb-4">
           Once you delete your account, there is no going back. All your data including jobs, profile information, and settings will be permanently removed.
         </p>
         <button onclick="showDeleteModal()"
@@ -390,12 +390,12 @@
 
 <!-- Delete Account Modal -->
 <div id="deleteAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[70] flex items-center justify-center p-4">
-  <div class="bg-slate-800 rounded-lg p-4 sm:p-6 max-w-md w-full">
-    <h3 class="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Confirm Account Deletion</h3>
+  <div class="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full">
+    <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Confirm Account Deletion</h3>
 
     <div class="mb-3 sm:mb-4">
-      <p class="text-sm sm:text-base text-gray-300 mb-2">This action cannot be undone. All your data will be permanently deleted.</p>
-      <p class="text-sm sm:text-base text-gray-300 font-medium">Type <span class="text-red-400 font-mono">DELETE</span> to confirm:</p>
+      <p class="text-sm sm:text-base text-gray-600 mb-2">This action cannot be undone. All your data will be permanently deleted.</p>
+      <p class="text-sm sm:text-base text-gray-600 font-medium">Type <span class="text-red-400 font-mono">DELETE</span> to confirm:</p>
     </div>
 
     <div class="space-y-3 sm:space-y-4">
@@ -404,7 +404,7 @@
                id="delete_confirmation"
                placeholder="Type DELETE to confirm"
                autocomplete="off"
-               class="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base rounded-md bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+               class="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base rounded-md bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                _="on input
                   if my.value == 'DELETE' then
                     add .border-green-500 to me
@@ -413,7 +413,7 @@
                     remove .bg-gray-500 from #delete-btn
                     add .hover:bg-red-700 to #delete-btn
                   else
-                    add .border-slate-600 to me
+                    add .border-gray-300 to me
                     add @disabled to #delete-btn
                     remove .bg-red-600 from #delete-btn
                     add .bg-gray-500 to #delete-btn
@@ -423,7 +423,7 @@
 
       <div class="flex gap-2 sm:gap-3 justify-end">
         <button type="button" onclick="hideDeleteModal()"
-                class="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-slate-600 hover:bg-slate-700 text-white rounded-md transition-colors">
+                class="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-gray-100 hover:bg-gray-50 text-gray-900 rounded-md transition-colors">
           Cancel
         </button>
         <button type="button"
@@ -431,7 +431,7 @@
                 disabled
                 hx-delete="/settings/account/delete"
                 hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
-                class="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-gray-500 text-white font-medium rounded-md transition-colors cursor-not-allowed">
+                class="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-gray-500 text-gray-900 font-medium rounded-md transition-colors cursor-not-allowed">
           Delete My Account
         </button>
       </div>

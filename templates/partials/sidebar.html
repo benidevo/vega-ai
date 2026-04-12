@@ -1,18 +1,18 @@
 {{define "sidebar"}}
 <!-- Sidebar Navigation - hidden on mobile by default -->
-<div id="sidebar" class="hidden md:flex w-full md:w-48 lg:w-56 bg-slate-800 text-white shadow-lg py-4 md:py-8 px-4 flex-col justify-between fixed md:sticky top-0 left-0 bottom-0 right-0 md:right-auto md:h-screen z-[60] overflow-y-auto transition-all duration-300 transform -translate-x-full md:translate-x-0">
+<div id="sidebar" class="hidden md:flex w-full md:w-48 lg:w-56 bg-gray-50 border-r border-gray-200 text-gray-700 shadow-sm py-4 md:py-8 px-4 flex-col justify-between fixed md:sticky top-0 left-0 bottom-0 right-0 md:right-auto md:h-screen z-[60] overflow-y-auto transition-all duration-300 transform -translate-x-full md:translate-x-0">
   <!-- Logo and Nav -->
   <div>
     <!-- Logo - hidden on mobile as it's in the top bar -->
     <div class="mb-8 px-4 hidden md:block">
-      <a href="/" class="text-primary hover:text-primary-dark transition-colors">
+      <a href="/" class="text-teal-600 hover:text-teal-700 transition-colors">
         {{template "partials/logo_component.html" "sm"}}
       </a>
     </div>
 
     <!-- Close button - only on mobile -->
     <div class="md:hidden flex justify-end mb-4">
-      <button id="close-sidebar" class="text-gray-400 p-2 -m-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:text-white transition-colors" aria-label="Close navigation menu">
+      <button id="close-sidebar" class="text-gray-500 p-2 -m-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:text-gray-900 transition-colors" aria-label="Close navigation menu">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -20,57 +20,55 @@
     </div>
 
     <nav class="space-y-1 px-2">
-      <a href="/dashboard" class="{{if eq .activeNav "dashboard"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "dashboard"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/dashboard" class="{{if eq .activeNav "dashboard"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "dashboard"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
         Dashboard
       </a>
 
-      <a href="/jobs" class="{{if eq .activeNav "jobs"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "jobs"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/jobs" class="{{if eq .activeNav "jobs"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "jobs"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
         </svg>
         Jobs
       </a>
 
-      <a href="/jobs/new" class="{{if eq .activeNav "newjob"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "newjob"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/jobs/new" class="{{if eq .activeNav "newjob"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "newjob"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
         New Job
       </a>
 
-      <a href="/documents" class="{{if eq .activeNav "documents"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "documents"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/documents" class="{{if eq .activeNav "documents"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "documents"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
         </svg>
         Documents
       </a>
 
-      <a href="/settings/profile" class="{{if eq .activeNav "profile"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "profile"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/settings/profile" class="{{if eq .activeNav "profile"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "profile"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
         Profile
       </a>
 
-
-      <a href="/settings/quotas" class="{{if eq .activeNav "quotas"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "quotas"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/settings/quotas" class="{{if eq .activeNav "quotas"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "quotas"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
         Usage & Quotas
       </a>
 
-      <a href="/settings/account" class="{{if eq .activeNav "account"}}bg-slate-700 text-white{{else}}text-gray-300 hover:bg-slate-700 hover:text-white{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "account"}}text-primary{{else}}text-gray-400 group-hover:text-primary{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a href="/settings/account" class="{{if eq .activeNav "account"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-100 hover:text-gray-900{{end}} group flex items-center px-3 py-3 sm:py-2.5 text-sm font-medium rounded-md min-h-[48px] sm:min-h-0 touch-manipulation transition-all duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{if eq .activeNav "account"}}text-teal-600{{else}}text-gray-500 group-hover:text-teal-600{{end}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
         Account
       </a>
-
     </nav>
   </div>
 
@@ -78,9 +76,9 @@
   <div class="px-4 mt-4 md:mt-8">
     <form action="/auth/logout" method="POST">
       <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
-      <button type="submit" class="w-full group bg-red-900 bg-opacity-50 hover:bg-red-800 py-3 sm:py-2 px-4 border border-red-800 border-opacity-50 hover:border-red-700 rounded-md shadow-sm text-sm font-medium text-red-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-150 min-h-[48px] sm:min-h-0 touch-manipulation">
+      <button type="submit" class="w-full group bg-white hover:bg-gray-50 py-3 sm:py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-200 ease-in-out min-h-[48px] sm:min-h-0 touch-manipulation">
         <div class="flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 group-hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           Logout
@@ -93,14 +91,14 @@
 
 {{define "mobile-nav"}}
 <!-- Mobile Top Navbar - only visible on small screens -->
-<div class="md:hidden bg-slate-800 py-3 px-4 shadow-lg flex justify-between items-center fixed top-0 left-0 right-0 z-50">
+<div class="md:hidden bg-white border-b border-gray-200 py-3 px-4 shadow-sm flex justify-between items-center fixed top-0 left-0 right-0 z-50">
   <div class="flex items-center">
-    <button id="mobile-menu-button" class="mr-3 text-white p-2 -m-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Open navigation menu">
+    <button id="mobile-menu-button" class="mr-3 text-gray-600 hover:text-gray-900 p-2 -m-2 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors" aria-label="Open navigation menu">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
     </button>
-    <a href="/" class="text-primary hover:text-primary-dark transition-colors">
+    <a href="/" class="text-teal-600 hover:text-teal-700 transition-colors">
       {{template "partials/logo_component.html" "xs"}}
     </a>
   </div>
@@ -116,7 +114,7 @@
     const overlay = document.createElement('div');
 
     // Setup overlay
-    overlay.classList.add('fixed', 'inset-0', 'bg-black', 'bg-opacity-50', 'z-[55]', 'hidden');
+    overlay.classList.add('fixed', 'inset-0', 'bg-gray-900', 'bg-opacity-50', 'z-[55]', 'hidden', 'backdrop-blur-sm');
     document.body.appendChild(overlay);
 
     // Open sidebar
@@ -164,18 +162,18 @@
 
 {{define "dashboard-layout"}}
 <!-- Mobile responsive dashboard with sidebar that converts to top navbar on small screens -->
-<div class="min-h-screen bg-slate-900">
+<div class="min-h-screen bg-gray-50">
   {{template "mobile-nav" .}}
   
   <div class="flex md:flex-row">
     {{template "sidebar" .}}
 
     <!-- Main Content Area -->
-    <div class="flex-1 bg-slate-900 min-h-screen pt-14 md:pt-0">
+    <div class="flex-1 bg-gray-50 min-h-screen pt-14 md:pt-0">
     <!-- Header - Only show on desktop -->
-    <header id="page-header" class="hidden md:block bg-slate-800 shadow-md md:sticky md:top-0 z-10">
+    <header id="page-header" class="hidden md:block bg-white border-b border-gray-200 md:sticky md:top-0 z-10">
       <div class="px-4 py-3 md:py-4 md:px-6 lg:px-8">
-        <h1 class="text-xl md:text-2xl font-bold text-primary">{{.pageTitle}}</h1>
+        <h1 class="text-xl md:text-2xl font-bold text-gray-900">{{.pageTitle}}</h1>
       </div>
     </header>
 
@@ -194,7 +192,7 @@
       {{else}}
         <!-- Fallback content if no specific template is defined -->
         <div class="text-center py-8">
-          <p class="text-gray-400">This page is currently under development.</p>
+          <p class="text-gray-500">This page is currently under development.</p>
         </div>
       {{end}}
     </main>

@@ -9,11 +9,11 @@
 {{template "partials/job-form-validation.html" .}}
 
 {{define "job-form-content"}}
-<!-- Form Content with Glassy Effect -->
+<!-- Form Content -->
 <div class="max-w-6xl mx-auto relative">
 
   <!-- Form container -->
-  <div class="relative p-4 md:p-6 bg-slate-800 bg-opacity-70 backdrop-blur-xl rounded-xl shadow-2xl border border-white border-opacity-10">
+  <div class="relative p-4 md:p-6 bg-white rounded-xl shadow-lg border border-gray-200">
     <form id="job-form" hx-post="/jobs/new" hx-target="#form-response" hx-target-4*="#form-response" hx-target-5*="#form-response" hx-swap="innerHTML" hx-indicator="#spinner" hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}' hx-on::after-request="if(event.detail.successful && event.detail.xhr.responseText.includes('successfully')) { this.reset(); }">
       <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
 
@@ -21,7 +21,7 @@
       <div class="space-y-6 md:space-y-8">
         <!-- Job Basics Section -->
         <div>
-          <h2 class="text-lg font-medium text-white mb-5 flex items-center">
+          <h2 class="text-lg font-medium text-gray-900 mb-5 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
@@ -30,50 +30,58 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Job Title -->
             <div class="col-span-1 md:col-span-2">
-              <label for="title" class="block text-sm font-medium text-gray-300 mb-1">Job Title *</label>
+              <label for="title" class="block text-sm font-medium text-gray-600 mb-1">Job Title *</label>
               <input type="text" id="title" name="title" required
-                     class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
+                     class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
             </div>
 
             <!-- Company Section -->
             <div>
-              <label for="company_name" class="block text-sm font-medium text-gray-300 mb-1">Company Name *</label>
+              <label for="company_name" class="block text-sm font-medium text-gray-600 mb-1">Company Name *</label>
               <input type="text" id="company_name" name="company_name" required
-                     class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
+                     class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
             </div>
 
             <!-- Location -->
             <div>
-              <label for="location" class="block text-sm font-medium text-gray-300 mb-1">Location</label>
+              <label for="location" class="block text-sm font-medium text-gray-600 mb-1">Location</label>
               <input type="text" id="location" name="location"
-                     class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
+                     class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
                      placeholder="e.g., Remote, San Francisco, CA">
+            </div>
+
+            <!-- Skills -->
+            <div class="col-span-1 md:col-span-2">
+              <label for="skills" class="block text-sm font-medium text-gray-600 mb-1">Required Skills (comma separated)</label>
+              <input type="text" id="skills" name="skills"
+                     class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
+                     placeholder="Go, React, TypeScript, SQL">
             </div>
 
             <!-- URL -->
             <div class="col-span-1 md:col-span-3">
-              <label for="source_url" class="block text-sm font-medium text-gray-300 mb-1">Source URL *</label>
+              <label for="source_url" class="block text-sm font-medium text-gray-600 mb-1">Source URL *</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
                 </div>
                 <input type="url" id="source_url" name="source_url"
-                       class="w-full pl-10 pr-4 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
+                       class="w-full pl-10 pr-4 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
                        placeholder="https://example.com/job-posting" required>
               </div>
             </div>
             <div class="col-span-1 md:col-span-3">
-              <label for="application_url" class="block text-sm font-medium text-gray-300 mb-1">Application URL</label>
+              <label for="application_url" class="block text-sm font-medium text-gray-600 mb-1">Application URL</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
                 </div>
                 <input type="url" id="application_url" name="application_url"
-                       class="w-full pl-10 pr-4 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
+                       class="w-full pl-10 pr-4 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
                        placeholder="https://example.com/job-application">
               </div>
             </div>
@@ -82,7 +90,7 @@
 
         <!-- Description Section -->
         <div>
-          <h2 class="text-lg font-medium text-white mb-5 flex items-center">
+          <h2 class="text-lg font-medium text-gray-900 mb-5 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -91,62 +99,42 @@
           <div class="space-y-4">
             <!-- Description -->
             <div>
-              <label for="description" class="block text-sm font-medium text-gray-300 mb-1">Description *</label>
+              <label for="description" class="block text-sm font-medium text-gray-600 mb-1">Description *</label>
               <textarea id="description" name="description" rows="4" required
-                        class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base min-h-[120px] md:min-h-[150px]"></textarea>
-              <p class="mt-1 text-sm text-gray-400">Paste the full job description or enter the key responsibilities and requirements</p>
+                        class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base min-h-[120px] md:min-h-[150px]"></textarea>
+              <p class="mt-1 text-sm text-gray-500">Paste the full job description or enter the key responsibilities and requirements</p>
             </div>
           </div>
         </div>
 
-        <!-- Skills & Tags Section -->
+        <!-- Meta Information Section -->
         <div>
-          <h2 class="text-lg font-medium text-white mb-5 flex items-center">
+          <h2 class="text-lg font-medium text-gray-900 mb-5 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Skills & Classification
+            Additional Details
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Skills -->
-            <div class="col-span-1 md:col-span-3">
-              <label for="skills" class="block text-sm font-medium text-gray-300 mb-1">Skills (comma separated)</label>
-              <input type="text" id="skills" name="skills"
-                     class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
-                     placeholder="e.g., Go, Docker, Kubernetes, SQL, API Design">
-              <p class="mt-1 text-sm text-gray-400">List the required technical skills for this position</p>
-            </div>
-
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Job Type -->
             <div>
-              <label for="job_type" class="block text-sm font-medium text-gray-300 mb-1">Job Type</label>
+              <label for="job_type" class="block text-sm font-medium text-gray-600 mb-1">Job Type</label>
               <select id="job_type" name="job_type"
-                      class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
-                <option value="full_time">Full Time</option>
-                <option value="part_time">Part Time</option>
+                      class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
+                <option value="full_time">Full-time</option>
+                <option value="part_time">Part-time</option>
                 <option value="contract">Contract</option>
+                <option value="intern">Intern</option>
+                <option value="remote">Remote</option>
                 <option value="freelance">Freelance</option>
-                <option value="internship">Internship</option>
               </select>
             </div>
 
-          </div>
-        </div>
-
-        <!-- Application Status and Notes in One Row -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          <!-- Application Status -->
-          <div>
-            <h2 class="text-lg font-medium text-white mb-5 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Application Status
-            </h2>
+            <!-- Status -->
             <div>
-              <label for="status" class="block text-sm font-medium text-gray-300 mb-1">Current Status</label>
+              <label for="status" class="block text-sm font-medium text-gray-600 mb-1">Current Status</label>
               <select id="status" name="status"
-                      class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
+                      class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base">
                 <option value="interested">Interested</option>
                 <option value="applied">Applied</option>
                 <option value="interviewing">Interviewing</option>
@@ -156,45 +144,40 @@
               </select>
             </div>
           </div>
+        </div>
 
-          <!-- Notes Section -->
+        <!-- Notes Section -->
+        <div>
+          <h2 class="text-lg font-medium text-gray-900 mb-5 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Notes
+          </h2>
           <div>
-            <h2 class="text-lg font-medium text-white mb-5 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Notes
-            </h2>
-            <div>
-              <label for="notes" class="block text-sm font-medium text-gray-300 mb-1">Additional Notes</label>
-              <textarea id="notes" name="notes" rows="3"
-                        class="w-full px-3 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base min-h-[80px]"
-                        placeholder="Any additional details or personal notes about this position"></textarea>
-            </div>
+            <label for="notes" class="block text-sm font-medium text-gray-600 mb-1">Personal Notes</label>
+            <textarea id="notes" name="notes" rows="3"
+                      class="w-full px-3 py-3 rounded-md bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base min-h-[80px]"
+                      placeholder="Any additional details or personal notes about this position"></textarea>
           </div>
         </div>
 
-        <!-- Form response area -->
-        <div id="form-response" class="text-center text-sm">
-          <!-- Error or success messages will be placed here -->
-        </div>
+        <div id="form-response"></div>
 
         <!-- Submit Button -->
-        <div class="pt-4 border-t border-slate-700">
-          <div class="flex flex-col sm:flex-row justify-end gap-4">
-            <a href="/jobs" class="w-full sm:w-auto px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md text-sm transition-colors text-center">
-              Back
-            </a>
-            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-primary hover:bg-primary-dark text-white font-semibold rounded-md transition-colors duration-300 flex items-center justify-center">
-              <span id="spinner" class="htmx-indicator mr-2">
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </span>
-              Save
-            </button>
-          </div>
+        <div class="pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
+          <button type="submit" class="flex-1 sm:flex-none px-8 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center">
+            <span id="spinner" class="htmx-indicator mr-2">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            Save Job Application
+          </button>
+          <a href="/jobs" class="flex-1 sm:flex-none px-8 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-50 transition-all duration-300 text-center flex items-center justify-center">
+            Cancel
+          </a>
         </div>
       </div>
     </form>

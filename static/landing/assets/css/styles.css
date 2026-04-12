@@ -347,10 +347,10 @@ nav.scrolled {
   bottom: 0;
   width: 280px;
   max-width: 80vw;
-  background-color: rgb(15, 23, 42);
+  background-color: #ffffff;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
 }

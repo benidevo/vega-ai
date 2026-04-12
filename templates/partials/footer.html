@@ -1,10 +1,10 @@
 {{define "footer"}}
-<footer class="bg-slate-800 border-t border-slate-700 mt-auto" style="margin-top: 3rem;">
+<footer class="bg-white border-t border-gray-200 mt-auto" style="margin-top: 3rem;">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
       
       <!-- Left side: Copyright and License -->
-      <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-400">
+      <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-500">
         <div class="flex items-center space-x-2">
           <span>© {{.currentYear}} Vega AI</span>
         </div>
@@ -23,14 +23,14 @@
       {{if .cfg.IsCloudMode}}
       <div class="flex items-center space-x-4 text-sm">
         <a href="/privacy" 
-           class="text-gray-400 hover:text-primary transition-colors duration-200">
+           class="text-gray-500 hover:text-primary transition-colors duration-200">
           Privacy Policy
         </a>
       </div>
       {{end}}
 
       <!-- Right side: App info and Source link -->
-      <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-400">
+      <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-500">
         <div class="flex items-center space-x-2">
           <span class="text-primary font-medium">Vega AI</span>
         </div>

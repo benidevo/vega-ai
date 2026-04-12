@@ -8,54 +8,54 @@
 
 {{define "job-details"}}
 <div class="mx-0 md:max-w-6xl md:mx-auto">
-  <div class="bg-slate-800 rounded-none md:rounded-xl shadow-lg overflow-hidden mb-6">
-    <div class="px-4 py-4 sm:px-5 md:px-6 sm:py-5 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+  <div class="bg-white rounded-none md:rounded-xl shadow-lg overflow-hidden mb-6">
+    <div class="px-4 py-4 sm:px-5 md:px-6 sm:py-5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
       <div>
         <div id="job-header-display">
           <div class="flex items-center">
-            <h2 class="text-xl md:text-2xl font-semibold text-white mr-2">{{.job.Title | html}}</h2>
+            <h2 class="text-xl md:text-2xl font-semibold text-gray-900 mr-2">{{.job.Title | html}}</h2>
             <button type="button"
                     _="on click toggle .hidden on #job-header-display then toggle .hidden on #job-header-edit"
-                    class="text-gray-400 hover:text-white flex items-center justify-center p-2.5 sm:p-2 min-w-[44px] min-h-[44px] -m-2.5 sm:-m-2"
+                    class="text-gray-500 hover:text-gray-900 flex items-center justify-center p-2.5 sm:p-2 min-w-[44px] min-h-[44px] -m-2.5 sm:-m-2"
                     aria-label="Edit job title and details">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
             </button>
           </div>
-          <p class="text-gray-400 text-sm md:text-base">{{.job.Company.Name | html}}{{if .job.Location}} · {{.job.Location | html}}{{end}}</p>
+          <p class="text-gray-500 text-sm md:text-base">{{.job.Company.Name | html}}{{if .job.Location}} · {{.job.Location | html}}{{end}}</p>
         </div>
 
         <div id="job-header-edit" class="hidden space-y-2" role="form" aria-label="Edit job details form">
           <div>
-            <label for="job-title-input" class="block text-sm font-medium text-gray-300 mb-1">Job Title</label>
+            <label for="job-title-input" class="block text-sm font-medium text-gray-600 mb-1">Job Title</label>
             <input
               type="text"
               id="job-title-input"
               name="title"
-              class="w-full px-3 py-2 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              class="w-full px-3 py-2 rounded-md bg-white bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
               value="{{.job.Title | html}}"
               aria-required="true"
             >
           </div>
           <div>
-            <label for="job-company-input" class="block text-sm font-medium text-gray-300 mb-1">Company</label>
+            <label for="job-company-input" class="block text-sm font-medium text-gray-600 mb-1">Company</label>
             <input
               type="text"
               id="job-company-input"
               name="company_name"
-              class="w-full px-3 py-2 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              class="w-full px-3 py-2 rounded-md bg-white bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
               value="{{.job.Company.Name | html}}"
               aria-required="true"
             >
           </div>
           <div>
-            <label for="job-location-input" class="block text-sm font-medium text-gray-300 mb-1">Location</label>
+            <label for="job-location-input" class="block text-sm font-medium text-gray-600 mb-1">Location</label>
             <input
               type="text"
               id="job-location-input"
               name="location"
-              class="w-full px-3 py-2 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              class="w-full px-3 py-2 rounded-md bg-white bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
               value="{{.job.Location | html}}"
             >
           </div>
@@ -73,7 +73,7 @@
             </button>
             <button
               type="button"
-              class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md"
+              class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-gray-50 hover:bg-white text-gray-900 text-sm rounded-md"
               _="on click toggle .hidden on #job-header-display then toggle .hidden on #job-header-edit"
               aria-label="Cancel editing job details">
               Cancel
@@ -91,7 +91,7 @@
       <div class="lg:col-span-2 space-y-4 sm:space-y-5 md:space-y-6">
         <div>
           <h3 class="text-lg font-medium text-primary mb-3">Job Description</h3>
-          <div class="text-gray-300 space-y-4">
+          <div class="text-gray-600 space-y-4">
             <p class="whitespace-pre-wrap leading-relaxed text-sm md:text-base">{{.job.Description | html}}</p>
           </div>
         </div>
@@ -120,9 +120,9 @@
 
           <div id="skills-display" class="flex flex-wrap gap-2" role="list" aria-label="Required skills">
             {{range .job.RequiredSkills}}
-            <span class="px-3 py-1.5 bg-slate-700 rounded-md text-sm text-primary" role="listitem">{{. | html}}</span>
+            <span class="px-3 py-1.5 bg-white rounded-md text-sm text-primary" role="listitem">{{. | html}}</span>
             {{else}}
-            <span class="text-gray-400">No skills listed</span>
+            <span class="text-gray-500">No skills listed</span>
             {{end}}
           </div>
 
@@ -132,13 +132,13 @@
                 type="text"
                 id="skills-input"
                 name="skills"
-                class="w-full px-3 py-2 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                class="w-full px-3 py-2 rounded-md bg-white bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                 placeholder="Enter skills separated by commas"
                 value="{{range $i, $skill := .job.RequiredSkills}}{{if $i}}, {{end}}{{$skill | html}}{{end}}"
                 aria-label="Skills list"
                 aria-describedby="skills-help-text"
               >
-              <p id="skills-help-text" class="text-xs text-gray-400 mt-1">Enter skills separated by commas (e.g., "Go, Docker, SQL")</p>
+              <p id="skills-help-text" class="text-xs text-gray-500 mt-1">Enter skills separated by commas (e.g., "Go, Docker, SQL")</p>
             </div>
             <div class="flex gap-2">
               <button
@@ -163,12 +163,12 @@
                      if trimmedSkills.length > 0
                        put '' into #skills-display then
                        for skill in trimmedSkills
-                         make a <span.px-3.py-1.5.bg-slate-700.rounded-md.text-sm.text-primary.mr-2/>
+                         make a <span.px-3.py-1.5.bg-white.rounded-md.text-sm.text-primary.mr-2/>
                          put skill into the result
                          put the result at the end of #skills-display
                        end
                      else
-                       make a <span.text-gray-400/> called noSkills
+                       make a <span.text-gray-500/> called noSkills
                        put 'No skills listed' into noSkills
                        put '' into #skills-display
                        put noSkills into #skills-display
@@ -179,7 +179,7 @@
               </button>
               <button
                 type="button"
-                class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md"
+                class="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-gray-50 hover:bg-white text-gray-900 text-sm rounded-md"
                 _="on click trigger click on #edit-skills-btn">
                 Cancel
               </button>
@@ -208,7 +208,7 @@
           <textarea
             id="job-notes"
             name="notes"
-            class="w-full px-4 py-3 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-sm md:text-base"
+            class="w-full px-4 py-3 rounded-md bg-white bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-sm md:text-base"
             rows="4"
             placeholder="Add your personal notes about this job..."
             _="on input remove .hidden from #save-notes-btn"
@@ -219,25 +219,25 @@
       </div>
 
       <div class="space-y-4 sm:space-y-5 md:space-y-6">
-        <div class="bg-slate-700 bg-opacity-60 rounded-lg p-4 sm:p-5 space-y-3 sm:space-y-4">
-          <h3 class="text-lg font-medium text-white">Job Details</h3>
+        <div class="bg-white bg-opacity-60 rounded-lg p-4 sm:p-5 space-y-3 sm:space-y-4">
+          <h3 class="text-lg font-medium text-gray-900">Job Details</h3>
 
           <div>
-            <p class="text-gray-400 text-sm">Location</p>
-            <p class="text-white">{{if .job.Location}}{{.job.Location | html}}{{else}}Not specified{{end}}</p>
+            <p class="text-gray-500 text-sm">Location</p>
+            <p class="text-gray-900">{{if .job.Location}}{{.job.Location | html}}{{else}}Not specified{{end}}</p>
           </div>
 
           <div>
-            <p class="text-gray-400 text-sm">Job Type</p>
-            <p class="text-white">{{.job.JobType.String}}</p>
+            <p class="text-gray-500 text-sm">Job Type</p>
+            <p class="text-gray-900">{{.job.JobType.String}}</p>
           </div>
 
         </div>
 
-        <div id="ai-actions-section" class="bg-slate-700 bg-opacity-60 rounded-lg p-4 sm:p-5">
-          <h3 class="text-lg font-medium text-white mb-3">Application Status</h3>
+        <div id="ai-actions-section" class="bg-white bg-opacity-60 rounded-lg p-4 sm:p-5">
+          <h3 class="text-lg font-medium text-gray-900 mb-3">Application Status</h3>
           <select
-            class="w-full px-3 py-2 rounded-md bg-slate-700 bg-opacity-70 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors mb-4"
+            class="w-full px-3 py-2 rounded-md bg-white bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors mb-4"
             aria-label="Application status"
             hx-put="/jobs/{{.jobID}}/status"
             hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}'
@@ -258,7 +258,7 @@
           {{if and (ne .quotaCheck.Status.Limit -1) (not .isReanalysis) (not .quotaCheck.Allowed)}}
           <div class="w-full mb-3 p-3 bg-red-900 bg-opacity-30 border border-red-800 rounded-lg">
             <p class="text-red-400 text-sm font-medium">Monthly Limit Reached</p>
-            <p class="text-gray-400 text-xs mt-1">You've used all {{.quotaCheck.Status.Limit}} job analyses this month. Limit resets on {{.quotaCheck.Status.ResetDate.Format "Jan 2"}}.</p>
+            <p class="text-gray-500 text-xs mt-1">You've used all {{.quotaCheck.Status.Limit}} job analyses this month. Limit resets on {{.quotaCheck.Status.ResetDate.Format "Jan 2"}}.</p>
           </div>
           {{end}}
           {{end}}
@@ -276,7 +276,7 @@
                   hx-on:htmx:before-request="window.handleAIOperationStart(this, 'Analyzing...')"
                   hx-on:htmx:after-request="window.handleAIOperationEnd(this)"
                   hx-on:htmx:response-error="window.handleAIOperationEnd(this)"
-                  _="on click put '<div class=&quot;text-center py-8&quot;><div class=&quot;animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto&quot;></div><p class=&quot;mt-4 text-gray-400&quot;>Analyzing job requirements...</p></div>' into #ai-analysis"
+                  _="on click put '<div class=&quot;text-center py-8&quot;><div class=&quot;animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto&quot;></div><p class=&quot;mt-4 text-gray-500&quot;>Analyzing job requirements...</p></div>' into #ai-analysis"
                   {{end}}>
             <span id="analyze-spinner" class="htmx-indicator">
               <svg class="animate-spin h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -309,7 +309,7 @@
           {{if .isCloudMode}}
           {{if ne .quotaCheck.Status.Limit -1}}
           <div class="w-full mb-3">
-            <div class="flex justify-between text-xs text-gray-400 mb-1">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
               <span>Monthly quota</span>
               <span>{{cappedQuota .quotaCheck.Status.Used .quotaCheck.Status.Limit}}/{{.quotaCheck.Status.Limit}} used</span>
             </div>
@@ -319,7 +319,7 @@
           </div>
           {{else}}
           <div class="w-full mb-3">
-            <div class="text-xs text-gray-400">
+            <div class="text-xs text-gray-500">
               <span>Admin access: Unlimited analyses</span>
             </div>
           </div>
@@ -381,14 +381,14 @@
           </div>
 
 
-          <a href="/jobs/{{.jobID}}/match-history" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-slate-600 hover:bg-slate-500 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
+          <a href="/jobs/{{.jobID}}/match-history" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>Match History</span>
           </a>
 
-          <a href="/documents" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-slate-600 hover:bg-slate-500 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
+          <a href="/documents" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
             </svg>
@@ -401,7 +401,7 @@
           </a>
 
           {{if .job.SourceURL}}
-          <a href="{{safeURL .job.SourceURL}}" target="_blank" rel="noopener noreferrer" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-slate-600 hover:bg-slate-500 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
+          <a href="{{safeURL .job.SourceURL}}" target="_blank" rel="noopener noreferrer" class="w-full mb-3 py-3 sm:py-2.5 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
@@ -420,7 +420,7 @@
 
           <button
             id="delete-job-btn"
-            class="w-full py-3 sm:py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
+            class="w-full py-3 sm:py-2.5 px-4 bg-red-600 hover:bg-red-700 text-gray-900 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
             aria-label="Delete this job listing"
             _="on click
                js window.setDeleteItem({url: '/jobs/{{.jobID}}', method: 'DELETE', type: 'job'}) end

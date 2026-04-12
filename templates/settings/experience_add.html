@@ -8,12 +8,12 @@
 <div class="max-w-6xl mx-auto relative">
 
   <!-- Content container -->
-  <div class="relative p-6 bg-slate-800 bg-opacity-70 backdrop-blur-xl rounded-xl shadow-2xl border border-white border-opacity-10">
+  <div class="relative p-6 bg-white bg-opacity-70 backdrop-blur-xl rounded-xl shadow-2xl border border-white border-opacity-10">
   <!-- Breadcrumb -->
   <nav class="flex mb-6" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
       <li class="inline-flex items-center">
-        <a href="/settings/profile" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-white">
+        <a href="/settings/profile" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
           </svg>
@@ -22,10 +22,10 @@
       </li>
       <li>
         <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
           </svg>
-          <span class="ml-1 text-sm font-medium text-white md:ml-2">Add</span>
+          <span class="ml-1 text-sm font-medium text-gray-900 md:ml-2">Add</span>
         </div>
       </li>
     </ol>
@@ -33,8 +33,8 @@
 
   <!-- Page Header -->
   <div class="mb-8">
-    <h2 class="text-2xl font-bold text-white mb-2">Add Work Experience</h2>
-    <p class="text-gray-400">Add a new work experience to your profile. This information will be visible to potential employers.</p>
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Add Work Experience</h2>
+    <p class="text-gray-500">Add a new work experience to your profile. This information will be visible to potential employers.</p>
   </div>
 
   <!-- Experience Form -->
@@ -46,63 +46,63 @@
       <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label for="title" class="block text-sm font-medium text-gray-300 mb-2">Job Title *</label>
+          <label for="title" class="block text-sm font-medium text-gray-600 mb-2">Job Title *</label>
           <input type="text" id="title" name="title" required value="{{if .experience}}{{.experience.Title | html}}{{end}}"
-                 class="w-full px-4 py-2 rounded-lg bg-slate-700 bg-opacity-50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                 class="w-full px-4 py-2 rounded-lg bg-gray-50 bg-opacity-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
         </div>
 
         <div>
-          <label for="company" class="block text-sm font-medium text-gray-300 mb-2">Company *</label>
+          <label for="company" class="block text-sm font-medium text-gray-600 mb-2">Company *</label>
           <input type="text" id="company" name="company" required value="{{if .experience}}{{.experience.Company | html}}{{end}}"
-                 class="w-full px-4 py-2 rounded-lg bg-slate-700 bg-opacity-50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                 class="w-full px-4 py-2 rounded-lg bg-gray-50 bg-opacity-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
         </div>
       </div>
 
       <div>
-        <label for="location" class="block text-sm font-medium text-gray-300 mb-2">Location</label>
+        <label for="location" class="block text-sm font-medium text-gray-600 mb-2">Location</label>
         <input type="text" id="location" name="location" value="{{if .experience}}{{.experience.Location | html}}{{end}}"
-               class="w-full px-4 py-2 rounded-lg bg-slate-700 bg-opacity-50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+               class="w-full px-4 py-2 rounded-lg bg-gray-50 bg-opacity-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label for="start_date" class="block text-sm font-medium text-gray-300 mb-2">Start Date *</label>
-          <p class="text-xs text-gray-400 mb-2">Format: MM/YYYY (e.g., 01/2023)</p>
+          <label for="start_date" class="block text-sm font-medium text-gray-600 mb-2">Start Date *</label>
+          <p class="text-xs text-gray-500 mb-2">Format: MM/YYYY (e.g., 01/2023)</p>
           <input type="month" id="start_date" name="start_date" required
-                 class="w-full px-4 py-2 rounded-lg bg-slate-700 bg-opacity-50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                 class="w-full px-4 py-2 rounded-lg bg-gray-50 bg-opacity-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
         </div>
 
         <div>
-          <label for="end_date" class="block text-sm font-medium text-gray-300 mb-2">End Date</label>
-          <p class="text-xs text-gray-400 mb-2">Format: MM/YYYY (leave blank if current)</p>
+          <label for="end_date" class="block text-sm font-medium text-gray-600 mb-2">End Date</label>
+          <p class="text-xs text-gray-500 mb-2">Format: MM/YYYY (leave blank if current)</p>
           <input type="month" id="end_date" name="end_date"
-                 class="w-full px-4 py-2 rounded-lg bg-slate-700 bg-opacity-50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                 class="w-full px-4 py-2 rounded-lg bg-gray-50 bg-opacity-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
         </div>
       </div>
 
       <label class="flex items-center cursor-pointer">
         <input type="checkbox" id="current" name="current"
-               class="h-4 w-4 text-primary focus:ring-primary border-gray-600 rounded bg-slate-700 flex-shrink-0"
+               class="h-4 w-4 text-primary focus:ring-primary border-gray-600 rounded bg-gray-50 flex-shrink-0"
                _="on change set #end_date.disabled to my.checked">
-        <span class="ml-2 text-sm text-gray-300">I currently work here</span>
+        <span class="ml-2 text-sm text-gray-600">I currently work here</span>
       </label>
 
       <div>
-        <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Responsibilities & Achievements</label>
-        <p class="text-xs text-gray-400 mb-2">Add your key responsibilities and achievements one per line. Use bullet points (•) for better formatting.</p>
+        <label for="description" class="block text-sm font-medium text-gray-600 mb-2">Responsibilities & Achievements</label>
+        <p class="text-xs text-gray-500 mb-2">Add your key responsibilities and achievements one per line. Use bullet points (•) for better formatting.</p>
         <textarea id="description" name="description" rows="6"
-                  class="w-full px-4 py-2 rounded-lg bg-slate-700 bg-opacity-50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  class="w-full px-4 py-2 rounded-lg bg-gray-50 bg-opacity-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   placeholder="• Managed team of 5 developers&#10;• Increased revenue by 20%&#10;• Implemented CI/CD pipeline">{{if .experience}}{{.experience.Description | html}}{{end}}</textarea>
       </div>
 
       <!-- Form Actions -->
-      <div class="flex justify-end space-x-4 pt-6 border-t border-slate-700">
+      <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
         <a href="/settings/profile?scroll=experience"
-           class="px-6 py-2 border border-gray-500 rounded-lg shadow-sm text-sm font-medium text-gray-300 bg-transparent hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+           class="px-6 py-2 border border-gray-500 rounded-lg shadow-sm text-sm font-medium text-gray-600 bg-transparent hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
           Back
         </a>
         <button type="submit"
-                class="px-6 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                class="px-6 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-gray-900 bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
           Add
         </button>
       </div>

@@ -1,23 +1,26 @@
 {{define "partials/jobs-container"}}
-<div id="loading-indicator" class="htmx-indicator absolute inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-10">
-  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+<div id="loading-indicator" class="htmx-indicator absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
 </div>
 
 <div class="flex-1 min-h-0 px-4 md:px-0">
   {{if and .jobs (gt (len .jobs) 0)}}
   <div class="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {{range .jobs}}
-      <div class="bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:bg-slate-700 transition-colors cursor-pointer group touch-manipulation"
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:bg-gray-50 transition-all duration-200 ease-in-out cursor-pointer group touch-manipulation"
            onclick="if (!event.target.matches('select') && !event.target.closest('select')) { window.location.href = '/jobs/{{.ID}}/details'; }">
         <div class="px-4 py-4 sm:px-5 sm:py-5">
           <div class="flex justify-between items-start mb-2">
-            <h3 class="text-lg font-semibold text-white truncate group-hover:text-blue-300 transition-colors flex-1 min-w-0 pr-2">{{.Title | html}}</h3>
+            <h3 class="text-lg font-semibold text-gray-900 truncate group-hover:text-teal-600 transition-colors flex-1 min-w-0 pr-2">{{.Title | html}}</h3>
             <div class="flex-none px-2.5 py-1.5 {{matchColors .MatchScore}} rounded text-xs font-medium whitespace-nowrap">
               {{.GetMatchScoreString}}
             </div>
           </div>
-          <p class="text-gray-400 text-sm truncate mb-2 sm:mb-3">{{.Company.Name | html}}{{if .Location}} · {{.Location | html}}{{end}}</p>
-          <p class="text-gray-300 text-sm mb-3 sm:mb-4 line-clamp-2 leading-relaxed">
+          <div class="flex items-center text-gray-500 text-sm truncate mb-2 sm:mb-3">
+            <img src="https://logo.clearbit.com/{{.Company.Name}}.com" onerror="this.style.display='none'" class="inline-block h-4 w-4 mr-2 rounded-sm" alt="{{.Company.Name}} logo">
+            <span class="truncate">{{.Company.Name | html}}{{if .Location}} · {{.Location | html}}{{end}}</span>
+          </div>
+          <p class="text-gray-600 text-sm mb-3 sm:mb-4 line-clamp-2 leading-relaxed">
             {{if gt (len .Description) 120}}
               {{slice .Description 0 120 | html}}...
             {{else}}
@@ -25,7 +28,7 @@
             {{end}}
           </p>
           <div class="flex justify-start">
-            <span class="text-xs text-gray-400 bg-slate-700/50 px-2.5 py-1.5 rounded">
+            <span class="text-xs text-gray-600 bg-gray-100 px-2.5 py-1.5 rounded border border-gray-200">
               {{if eq .Status 0}}Interested{{else if eq .Status 1}}Applied{{else if eq .Status 2}}Interviewing{{else if eq .Status 3}}Offer Received{{else if eq .Status 4}}Rejected{{else if eq .Status 5}}Not Interested{{end}}
             </span>
           </div>
@@ -35,33 +38,30 @@
   </div>
   {{else}}
       <div class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-        </svg>
         {{if or (eq .statusFilter "active") (eq .statusFilter "")}}
-          <h3 class="text-lg font-medium text-white mb-2">No active jobs</h3>
-          <p class="text-gray-400 mb-4">
-            All your tracked jobs are rejected or marked as not interested.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="/jobs/new" class="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 bg-primary hover:bg-primary-dark text-white rounded-md min-h-[48px] sm:min-h-0">
-              Add New Job
-            </a>
+          {{template "partials/empty_state.html" (dict 
+            "Title" "No active jobs" 
+            "Description" "All your tracked jobs are rejected or marked as not interested."
+            "ActionText" "Add New Job"
+            "ActionLink" "/jobs/new"
+          )}}
+          <div class="mt-4 flex justify-center">
             <button
               hx-get="/jobs?status=all"
               hx-target="#jobs-container"
               hx-push-url="true"
               _="on click set #status-filter.value to 'all'"
-              class="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md min-h-[48px] sm:min-h-0">
+              class="inline-flex items-center px-5 py-2 sm:px-4 sm:py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md shadow-sm transition-all duration-200 ease-in-out">
               View All Jobs
             </button>
           </div>
         {{else}}
-          <h3 class="text-lg font-medium text-white mb-2">No jobs yet</h3>
-          <p class="text-gray-400 mb-4">Start tracking your job applications</p>
-          <a href="/jobs/new" class="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 bg-primary hover:bg-primary-dark text-white rounded-md min-h-[48px] sm:min-h-0">
-            Add Job
-          </a>
+          {{template "partials/empty_state.html" (dict 
+            "Title" "No jobs yet" 
+            "Description" "Start tracking your job applications"
+            "ActionText" "Add Job"
+            "ActionLink" "/jobs/new"
+          )}}
         {{end}}
       </div>
   {{end}}

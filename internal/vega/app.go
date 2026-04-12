@@ -309,6 +309,16 @@ func templateFuncMap() template.FuncMap {
 			}
 			return b
 		},
+		"until": func(start, end int) []int {
+			if end <= start {
+				return nil
+			}
+			res := make([]int, 0, end-start)
+			for i := start; i < end; i++ {
+				res = append(res, i)
+			}
+			return res
+		},
 		"pageRange": func(current, total int) []int {
 			// Show at most 5 page numbers around current page
 			start := current - 2

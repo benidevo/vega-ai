@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" sizes="192x192" href="/static/images/favicon-192x192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="/static/css/output.css" rel="stylesheet">
   <link href="/static/css/components.css" rel="stylesheet">
   <link href="/static/css/utilities.css" rel="stylesheet">
@@ -27,30 +27,30 @@
     });
   </script>
 </head>
-<body class="bg-slate-900 text-gray-100 font-sans">
+<body class="bg-gray-50 text-gray-900 font-sans antialiased">
   {{if eq .page "dashboard"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "dashboard-content" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "job-new"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "job-new-content" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "job-details"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "job-details-content" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "match-history"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "match-history-content" .}}
       </div>
@@ -61,51 +61,53 @@
   {{else if eq .page "500"}}
     {{template "500-content" .}}
   {{else if eq .page "settings-home" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "settings-layout" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "settings-profile" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "settings-layout" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "settings-account" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "settings-layout" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "settings-search-preferences" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "settings-layout" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "settings-quotas" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "settings-layout" .}}
       </div>
       {{template "footer" .}}
     </div>
   {{else if eq .page "documents" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
       <div class="flex-1">
         {{template "documents-content" .}}
       </div>
       {{template "footer" .}}
     </div>
+  {{else if eq .page "login"}}
+    {{template "login-content" .}}
   {{else}}
-    <div class="{{if eq .page "login"}}h-screen overflow-hidden{{else}}min-h-screen{{end}} flex {{if eq .page "home"}}flex-col{{end}} items-center justify-center relative overflow-hidden">
+    <div class="min-h-screen flex {{if eq .page "home"}}flex-col{{end}} items-center justify-center relative overflow-hidden">
 
-      <div class="absolute inset-0 z-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+      <div class="absolute inset-0 z-0 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50"></div>
 
       <div class="relative z-10 w-full {{if eq .page "home"}}flex flex-col{{else}}h-full{{end}}">
         {{if eq .page "home"}}
@@ -113,31 +115,8 @@
             {{template "home-content" .}}
           </div>
           {{template "footer" .}}
-        {{else if eq .page "login"}}
-          <div class="w-full h-full flex relative">
-            <div class="absolute inset-0 hidden lg:block">
-              <img src="/static/images/login/team-meeting.jpg" 
-                   alt="Diverse team in meeting" 
-                   class="w-full h-full object-cover">
-            </div>
-            <div class="hidden lg:block lg:w-1/2 relative">
-              <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/75 to-slate-900/70"></div>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="text-center px-8">
-                  <h2 class="text-5xl font-bold text-white mb-4">Land Your Dream Job</h2>
-                  <p class="text-xl text-white/90">Join other job seekers who use AI to optimize their job search</p>
-                </div>
-              </div>
-            </div>
-            <div class="w-full lg:w-1/2 flex items-center justify-center py-0 sm:py-8 px-0 sm:px-4 relative">
-              <div class="absolute inset-0 bg-slate-900 sm:bg-slate-900/95 backdrop-blur-sm"></div>
-              <div class="w-full h-full sm:h-auto relative z-10">
-                {{template "login-content" .}}
-              </div>
-            </div>
-          </div>
         {{else}}
-          <div class="z-10 text-white">Unknown page template</div>
+          <div class="z-10 text-gray-900">Unknown page template</div>
         {{end}}
       </div>
     </div>

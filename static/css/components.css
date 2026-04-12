@@ -161,9 +161,9 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px var(--color-slate-700) inset !important;
-  -webkit-text-fill-color: white !important;
-  border-color: var(--color-slate-600) !important;
+  -webkit-box-shadow: 0 0 0 30px #f9fafb inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  border-color: #d1d5db !important;
 }
 
 /* ==========================================================================
