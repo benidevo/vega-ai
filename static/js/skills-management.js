@@ -33,7 +33,7 @@ function addSkill(skillText = null) {
 function hasSkill(skill) {
     const tags = document.querySelectorAll('.skill-tag');
     return Array.from(tags).some(tag =>
-        tag.textContent.trim().toLowerCase() === skill.toLowerCase()
+        tag.dataset.skill.toLowerCase() === skill.toLowerCase()
     );
 }
 
@@ -41,6 +41,7 @@ function createSkillTag(skill) {
     const container = document.getElementById('skills-tags');
     const tag = document.createElement('span');
     tag.className = 'skill-tag inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30';
+    tag.dataset.skill = skill;
 
     const skillText = document.createTextNode(skill);
     tag.appendChild(skillText);
@@ -70,7 +71,7 @@ function removeSkillTag(button) {
 
 function updateSkills() {
     const tags = document.querySelectorAll('.skill-tag');
-    const skills = Array.from(tags).map(tag => tag.textContent.trim());
+    const skills = Array.from(tags).map(tag => tag.dataset.skill);
     document.getElementById('skills').value = skills.join(', ');
 }
 
@@ -86,7 +87,7 @@ function initializeSkillSuggestions() {
     const container = input.parentElement;
     const suggestionsDiv = document.createElement('div');
     suggestionsDiv.id = 'skill-suggestions';
-    suggestionsDiv.className = 'absolute z-10 w-full bg-slate-700 border border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto hidden';
+    suggestionsDiv.className = 'absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto hidden';
     suggestionsDiv.style.top = '100%';
     suggestionsDiv.style.left = '0';
 
@@ -132,34 +133,35 @@ function showSkillSuggestions(query) {
         return;
     }
 
-    // Build suggestions HTML
-    let html = '';
+    suggestionsDiv.textContent = '';
+
     let currentCategory = '';
+    let categoryGroup = null;
 
     matches.forEach(({skill, category}) => {
         if (category !== currentCategory) {
-            if (currentCategory) html += '</div>';
-            html += `<div class="category-group">
-                        <div class="px-3 py-2 text-xs font-medium text-gray-400 bg-slate-800 border-b border-slate-600">
-                            ${category}
-                        </div>`;
+            categoryGroup = document.createElement('div');
+            categoryGroup.className = 'category-group';
+
+            const header = document.createElement('div');
+            header.className = 'px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50 border-b border-gray-100';
+            header.textContent = category;
+            categoryGroup.appendChild(header);
+
+            suggestionsDiv.appendChild(categoryGroup);
             currentCategory = category;
         }
 
-        const escapedSkill = skill.replace(/'/g, "\\'").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        html += `<div class="skill-suggestion px-3 py-2 text-sm text-gray-200 hover:bg-slate-600 cursor-pointer"
-                      onclick="selectSkill('${escapedSkill}')">${escapedSkill}</div>`;
+        const item = document.createElement('div');
+        item.className = 'skill-suggestion px-3 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 cursor-pointer';
+        item.textContent = skill;
+        item.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // prevent blur firing before click
+            selectSkill(skill);
+        });
+        categoryGroup.appendChild(item);
     });
 
-    if (currentCategory) html += '</div>';
-
-    suggestionsDiv.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    
-    while (tempDiv.firstChild) {
-        suggestionsDiv.appendChild(tempDiv.firstChild);
-    }
     suggestionsDiv.classList.remove('hidden');
 }
 

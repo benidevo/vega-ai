@@ -90,7 +90,7 @@
 
         <div>
           <div class="flex justify-between items-center mb-3">
-            <h3 class="text-lg font-medium text-primary">Skills</h3>
+            <h3 class="text-base font-semibold text-gray-900">Skills</h3>
             <button type="button"
               id="edit-skills-btn"
               class="px-4 py-2 sm:px-3 sm:py-1.5 bg-primary hover:bg-primary-dark text-white text-sm rounded-md flex items-center gap-2 min-h-[44px] sm:min-h-0"
@@ -184,7 +184,7 @@
 
         <div>
           <div class="flex justify-between items-center mb-3">
-            <h3 class="text-lg font-medium text-primary">Your Notes</h3>
+            <h3 class="text-base font-semibold text-gray-900">Your Notes</h3>
             <button type="button"
               id="save-notes-btn"
               class="px-4 py-2 sm:px-3 sm:py-1.5 bg-primary hover:bg-primary-dark text-white text-sm rounded-md hidden min-h-[44px] sm:min-h-0"
@@ -212,7 +212,7 @@
 
       <div class="space-y-4 sm:space-y-5 md:space-y-6">
         <div class="bg-white bg-opacity-60 rounded-lg p-4 sm:p-5 space-y-3 sm:space-y-4">
-          <h3 class="text-lg font-medium text-gray-900">Job Details</h3>
+          <h3 class="text-base font-semibold text-gray-900">Job Details</h3>
 
           <div>
             <p class="text-gray-500 text-sm">Location</p>
@@ -384,8 +384,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
             </svg>
-            <span>My Documents</span>
-            {{if or .HasCoverLetter .HasResume}}
+            <span>Documents</span>            {{if or .HasCoverLetter .HasResume}}
             <span class="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary bg-opacity-20 text-primary">
               {{if and .HasCoverLetter .HasResume}}2{{else}}1{{end}}
             </span>
@@ -412,7 +411,7 @@
 
           <button
             id="delete-job-btn"
-            class="w-full py-3 sm:py-2.5 px-4 bg-red-600 hover:bg-red-700 text-gray-900 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
+            class="w-full py-3 sm:py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 min-h-[48px] sm:min-h-0"
             aria-label="Delete this job listing"
             _="on click
                js window.setDeleteItem({url: '/jobs/{{.jobID}}', method: 'DELETE', type: 'job'}) end
@@ -505,3 +504,4 @@ document.addEventListener('click', function(evt) {
 </script>
 
 {{end}}
+

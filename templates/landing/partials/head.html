@@ -12,18 +12,18 @@
   {{if .CanonicalURL}}<link rel="canonical" href="{{.CanonicalURL}}">{{end}}
   
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="{{if .OGTitle}}{{.OGTitle}}{{else}}{{.PageTitle}}{{end}} • Vega AI">
+  <meta property="og:title" content="{{if .OGTitle}}{{.OGTitle}}{{else}}{{.PageTitle}} • Vega AI{{end}}">
   <meta property="og:description" content="{{if .OGDescription}}{{.OGDescription}}{{else}}{{.PageDescription}}{{end}}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{if .OGURL}}{{.OGURL}}{{else}}https://vega.benidevo.com/{{end}}">
-  <meta property="og:image" content="https://vega.benidevo.com/assets/images/og-image.png">
+  <meta property="og:image" content="https://vega.benidevo.com/static/landing/assets/images/og-image.png">
   <meta property="og:site_name" content="Vega AI">
   
   <!-- Social Card Meta Tags (Twitter/X) -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{{if .TwitterTitle}}{{.TwitterTitle}}{{else}}{{.PageTitle}}{{end}} • Vega AI">
+  <meta name="twitter:title" content="{{if .TwitterTitle}}{{.TwitterTitle}}{{else}}{{.PageTitle}} • Vega AI{{end}}">
   <meta name="twitter:description" content="{{if .TwitterDescription}}{{.TwitterDescription}}{{else}}{{.PageDescription}}{{end}}">
-  <meta name="twitter:image" content="https://vega.benidevo.com/assets/images/twitter-card.png">
+  <meta name="twitter:image" content="https://vega.benidevo.com/static/landing/assets/images/twitter-card.png">
   
   <!-- Additional Meta Tags -->
   <meta name="theme-color" content="#0D9488">

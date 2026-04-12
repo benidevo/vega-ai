@@ -3,7 +3,7 @@
   <div id="form-alert-container" class="mb-6" hx-swap-oob="true" aria-live="polite"></div>
   
   <div class="mb-8">
-    <h2 class="text-2xl font-bold text-gray-900 mb-1">Usage & Quotas</h2>
+    <h2 class="text-2xl font-semibold text-gray-900 mb-1">Usage & Quotas</h2>
     <p class="text-gray-500">
       {{if .isCloudMode}}
         Track your usage. Limits reset monthly.
@@ -19,7 +19,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     
     <!-- Primary Stat: Jobs Captured (Span 1) -->
-    <div class="col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+    <div class="col-span-1 bg-gray-50 border border-gray-100 rounded-xl shadow-sm p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
       <div class="absolute top-0 right-0 p-4 opacity-5 bg-teal-600 rounded-bl-[100px] w-24 h-24 transition-transform group-hover:scale-110 duration-500"></div>
       
       <div class="flex items-center justify-between mb-8 relative z-10">
@@ -40,7 +40,7 @@
     </div>
 
     <!-- Secondary Stat: AI Analyses (Span 2) -->
-    <div class="col-span-1 lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+    <div class="col-span-1 lg:col-span-2 bg-gray-50 border border-gray-100 rounded-xl shadow-sm p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
       <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div class="flex items-center gap-4">
           <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
@@ -71,12 +71,12 @@
         {{if ne .quotaStatus.AIAnalysis.Limit -1}}
         <div class="flex justify-between text-xs font-medium mb-2">
           <span class="text-gray-500">Usage Progress</span>
-          <span class="{{if ge .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}}text-red-600{{else}}text-blue-600{{end}}">
+          <span class="{{if ge .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}}text-red-600{{else}}text-teal-600{{end}}">
             {{if ge .quotaStatus.AIAnalysis.Used .quotaStatus.AIAnalysis.Limit}}Limit reached{{else}}{{max 0 (sub .quotaStatus.AIAnalysis.Limit .quotaStatus.AIAnalysis.Used)}} remaining{{end}}
           </span>
         </div>
         <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-          <div class="bg-blue-600 h-full rounded-full transition-all duration-700 ease-out" data-used="{{.quotaStatus.AIAnalysis.Used}}" data-limit="{{.quotaStatus.AIAnalysis.Limit}}"></div>
+          <div class="bg-teal-600 h-full rounded-full transition-all duration-700 ease-out" data-used="{{.quotaStatus.AIAnalysis.Used}}" data-limit="{{.quotaStatus.AIAnalysis.Limit}}"></div>
         </div>
         {{else}}
         <div class="flex items-center justify-center p-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
@@ -88,7 +88,7 @@
   </div>
   
   <!-- Quota Details Table -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+  <div class="bg-gray-50 border border-gray-100 rounded-xl shadow-sm overflow-hidden mb-8">
     <div class="px-6 py-5 border-b border-gray-100">
       <h3 class="text-lg font-semibold text-gray-900">Plan Details</h3>
     </div>
@@ -175,7 +175,7 @@
 
   {{else}}
   <!-- Empty/Error State -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+  <div class="bg-gray-50 border border-gray-100 rounded-xl shadow-sm p-12 text-center">
     <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

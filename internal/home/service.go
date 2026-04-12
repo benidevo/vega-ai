@@ -45,8 +45,7 @@ func (s *Service) GetHomePageData(ctx context.Context, userID int, username stri
 
 	topMatches, err := s.jobRepository.GetTopMatchesByUserID(ctx, userID, 3)
 	if err != nil {
-		// Non-fatal: insights card degrades gracefully
-		log.Warn().Err(err).Msg("failed to get top matches")
+		log.Warn().Err(err).Int("user_id", userID).Msg("failed to get top matches; insights card will be empty")
 	}
 
 	homeData.Stats = JobStatsSummary{

@@ -16,13 +16,13 @@
     </div>
   </div>
 
-  <div class="bg-blue-900 bg-opacity-20 border border-blue-800 rounded-lg p-4 mb-6">
+  <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
     <div class="flex items-start gap-3">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <div class="text-sm text-gray-600">
-        <p class="font-medium text-blue-400 mb-1">Note about score changes</p>
+        <p class="font-semibold text-gray-900 mb-1">Note about score changes</p>
         <p>Match scores may vary between analyses if you've updated your profile. Each analysis reflects your profile at that point in time.</p>
       </div>
     </div>
@@ -30,7 +30,7 @@
 
   <div class="relative">
     {{if .matchHistory}}
-      <div class="hidden sm:block absolute left-10 top-12 bottom-12 w-0.5 bg-white"></div>
+      <div class="hidden sm:block absolute left-10 top-12 bottom-12 w-0.5 bg-gray-100"></div>
       
       {{range .matchHistory}}
       <div class="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 relative mb-4 sm:mb-6 last:mb-0">
@@ -92,10 +92,10 @@
             
             {{if .Strengths}}
             <div class="mb-4 sm:mb-3">
-              <h4 class="text-sm font-medium text-green-400 mb-2">Strengths</h4>
+              <h4 class="text-sm font-semibold mb-2">Strengths</h4>
               <ul class="space-y-1.5">
                 {{range .Strengths}}
-                <li class="text-sm md:text-base text-gray-600 pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-green-400">{{.}}</li>
+                <li class="text-sm md:text-base text-gray-600 border-l-2 border-green-400 pl-3">{{.}}</li>
                 {{end}}
               </ul>
             </div>
@@ -103,10 +103,10 @@
             
             {{if .Weaknesses}}
             <div class="mb-4 sm:mb-3">
-              <h4 class="text-sm font-medium text-red-400 mb-2">Areas for Improvement</h4>
+              <h4 class="text-sm font-semibold mb-2">Areas for Improvement</h4>
               <ul class="space-y-1.5">
                 {{range .Weaknesses}}
-                <li class="text-sm md:text-base text-gray-600 pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-red-400">{{.}}</li>
+                <li class="text-sm md:text-base text-gray-600 border-l-2 border-red-400 pl-3">{{.}}</li>
                 {{end}}
               </ul>
             </div>
@@ -114,17 +114,17 @@
             
             {{if .Highlights}}
             <div class="mb-4 sm:mb-3">
-              <h4 class="text-sm font-medium text-blue-400 mb-2">Key Highlights</h4>
+              <h4 class="text-sm font-semibold mb-2">Key Highlights</h4>
               <ul class="space-y-1.5">
                 {{range .Highlights}}
-                <li class="text-sm md:text-base text-gray-600 pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-blue-400">{{.}}</li>
+                <li class="text-sm md:text-base text-gray-600 border-l-2 border-blue-400 pl-3">{{.}}</li>
                 {{end}}
               </ul>
             </div>
             {{end}}
             
             {{if .Feedback}}
-            <div class="mt-3 p-3 bg-white rounded-md">
+            <div class="mt-3 p-3 bg-gray-50 rounded-md border border-gray-100">
               <p class="text-sm md:text-base text-gray-600">{{.Feedback}}</p>
             </div>
             {{end}}

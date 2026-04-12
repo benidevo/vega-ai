@@ -17,9 +17,7 @@
           {{template "partials/logo_component.html" "sm"}}
         </div>
         <div class="logo-mini hidden">
-          <svg class="w-8 h-8 text-teal-600" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-          </svg>
+          {{template "partials/logo_component.html" "icon-only"}}
         </div>
       </a>
     </div>
@@ -56,7 +54,7 @@
       </a>
 
       <div class="pt-4 pb-2 px-3 sidebar-text transition-all duration-300 opacity-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Settings</span>
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Settings</span>
       </div>
 
       <a href="/settings/profile" class="{{if eq .activeNav "profile"}}bg-teal-50 text-teal-700{{else}}text-gray-600 hover:bg-gray-50 hover:text-gray-900{{end}} group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out nav-link" title="Profile">
@@ -87,7 +85,7 @@
   <div class="px-2 mt-4 md:mt-8">
     <form action="/auth/logout" method="POST">
       <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
-      <button type="submit" class="w-full group bg-gray-50 hover:bg-red-50 py-2.5 px-3 rounded-xl text-sm font-medium text-gray-600 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200 ease-in-out nav-link" title="Logout">
+      <button type="submit" class="w-full group bg-gray-50 hover:bg-red-50 py-2.5 px-3 rounded-xl text-sm font-medium text-gray-600 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200 ease-in-out nav-link" title="Logout">
         <div class="flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -1,28 +1,21 @@
 {{define "partials/logo_component.html"}}
-{{if eq . "xs"}}
-  <div class="flex items-center">
-    <img src="/static/images/star-icon.png" alt="Vega" class="h-6 w-6">
-    <span class="ml-2 text-base font-bold text-gray-900">Vega <span class="font-light text-gray-500">AI</span></span>
-  </div>
-{{else if eq . "sm"}}
-  <div class="flex items-center">
-    <img src="/static/images/star-icon.png" alt="Vega" class="h-8 w-8">
-    <span class="ml-2.5 text-xl font-bold text-gray-900">Vega <span class="font-light text-gray-500">AI</span></span>
-  </div>
-{{else if eq . "md"}}
-  <div class="flex items-center">
-    <img src="/static/images/star-icon.png" alt="Vega" class="h-10 w-10">
-    <span class="ml-3 text-2xl font-bold text-gray-900">Vega <span class="font-light text-gray-500">AI</span></span>
-  </div>
-{{else if eq . "lg"}}
-  <div class="flex items-center">
-    <img src="/static/images/star-icon.png" alt="Vega" class="h-12 w-12">
-    <span class="ml-3 text-3xl font-bold text-gray-900">Vega <span class="font-light text-gray-500">AI</span></span>
-  </div>
-{{else}}
-  <div class="flex items-center">
-    <img src="/static/images/star-icon.png" alt="Vega" class="h-8 w-8">
-    <span class="ml-2.5 text-xl font-bold text-gray-900">Vega <span class="font-light text-gray-500">AI</span></span>
-  </div>
-{{end}}
+{{/* Vega Logo SVG Mark */}}
+{{$svgClass := ""}}
+{{if eq . "xs"}}{{$svgClass = "h-5 w-5"}}{{else if eq . "sm"}}{{$svgClass = "h-6 w-6"}}{{else if eq . "md"}}{{$svgClass = "h-8 w-8"}}{{else if eq . "lg"}}{{$svgClass = "h-10 w-10"}}{{else}}{{$svgClass = "h-7 w-7"}}{{end}}
+
+<div class="flex items-center">
+  <svg class="{{$svgClass}} text-teal-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="12" y1="3" x2="4" y2="20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    <line x1="12" y1="3" x2="20" y2="20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    <circle cx="12" cy="3" r="2" fill="currentColor" />
+    <circle cx="4" cy="20" r="1.5" fill="currentColor" />
+    <circle cx="20" cy="20" r="1.5" fill="currentColor" />
+  </svg>
+  
+  {{if ne . "icon-only"}}
+  <span class="ml-2 {{if eq . "xs"}}text-base{{else if eq . "sm"}}text-xl{{else if eq . "md"}}text-2xl{{else if eq . "lg"}}text-3xl{{else}}text-xl{{end}} font-semibold text-gray-900 logo-text transition-all duration-300 opacity-100 whitespace-nowrap overflow-hidden">
+    vega <span class="font-normal text-teal-600">ai</span>
+  </span>
+  {{end}}
+</div>
 {{end}}

@@ -23,6 +23,11 @@ type scanner interface {
 	Scan(dest ...any) error
 }
 
+// topMatchThreshold is the minimum match score (inclusive) for a job to appear
+// in the "top matches" insights panel. Must stay in sync with GetStatsByUserID
+// which also uses this value for the high_match counter.
+const topMatchThreshold = 70
+
 // jobColumns defines the columns for job queries with company join.
 var jobColumns = []string{
 	"j.id", "j.title", "j.description", "j.location", "j.job_type",
@@ -661,6 +666,7 @@ func (r *SQLiteJobRepository) UpdateMatchScore(ctx context.Context, userID int, 
 		return models.ErrJobNotFound
 	}
 
+	r.invalidateCachePattern(ctx, fmt.Sprintf("top-matches:u%d:*", userID))
 	r.invalidateCache(ctx,
 		fmt.Sprintf("job:u%d:id%d", userID, jobID),
 		fmt.Sprintf("stats:u%d:summary", userID),
@@ -767,12 +773,11 @@ func (r *SQLiteJobRepository) GetCount(ctx context.Context, userID int, filter m
 }
 
 // GetStats returns aggregate statistics about jobs in the database.
-// It returns the total number of jobs, jobs with status APPLIED, and jobs with high match scores (>=70).
 func (r *SQLiteJobRepository) GetStats(ctx context.Context, userID int) (*models.JobStats, error) {
 	query, args, err := querybuilder.Select(
 		"COUNT(*) AS total_jobs",
 		"COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) AS applied",
-		"COALESCE(SUM(CASE WHEN match_score >= 70 THEN 1 ELSE 0 END), 0) AS high_match",
+		fmt.Sprintf("COALESCE(SUM(CASE WHEN match_score >= %d THEN 1 ELSE 0 END), 0) AS high_match", topMatchThreshold),
 	).
 		From("jobs").
 		Where(sq.Eq{"user_id": userID}).
@@ -814,7 +819,7 @@ func (r *SQLiteJobRepository) GetStatsByUserID(ctx context.Context, userID int) 
 	query, args, err := querybuilder.Select(
 		"COUNT(*) AS total_jobs",
 		"COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) AS applied",
-		"COALESCE(SUM(CASE WHEN match_score >= 70 THEN 1 ELSE 0 END), 0) AS high_match",
+		fmt.Sprintf("COALESCE(SUM(CASE WHEN match_score >= %d THEN 1 ELSE 0 END), 0) AS high_match", topMatchThreshold),
 	).
 		From("jobs").
 		Where(sq.Eq{"user_id": userID}).
@@ -871,12 +876,17 @@ func (r *SQLiteJobRepository) GetTopMatchesByUserID(ctx context.Context, userID 
 		limit = 10
 	}
 
-	// Use squirrel to build the query manually since GetAll has hardcoded sorting
+	cacheKey := fmt.Sprintf("top-matches:u%d:limit%d", userID, limit)
+	var cached []*models.Job
+	if err := r.cache.Get(ctx, cacheKey, &cached); err == nil {
+		return cached, nil
+	}
+
 	query := sq.Select(jobColumns...).
 		From("jobs j").
 		LeftJoin("companies c ON j.company_id = c.id").
 		Where(sq.Eq{"j.user_id": userID}).
-		Where(sq.GtOrEq{"j.match_score": 70}).
+		Where(sq.GtOrEq{"j.match_score": topMatchThreshold}).
 		OrderBy("j.match_score DESC", "j.updated_at DESC").
 		Limit(uint64(limit))
 
@@ -903,6 +913,8 @@ func (r *SQLiteJobRepository) GetTopMatchesByUserID(ctx context.Context, userID 
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("failed to iterate top matches: %w", err)
 	}
+
+	_ = r.cache.Set(ctx, cacheKey, jobs, 5*time.Minute)
 
 	return jobs, nil
 }

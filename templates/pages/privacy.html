@@ -10,24 +10,20 @@
 <body class="bg-gray-50 text-gray-900 font-sans page-fade-in overflow-x-hidden">
 
   <!-- Navigation -->
-  <nav class="fixed top-0 w-full z-50 border-b border-gray-200/50 transition-all duration-300 bg-gray-50/95 backdrop-blur-sm">
+  <nav class="fixed top-0 w-full z-50 border-b border-gray-200/50 transition-all duration-300 bg-white/80 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-14 sm:h-16">
         <!-- Logo -->
         <div class="flex items-center">
-          <a href="/" class="flex items-center group">
-            <div class="relative">
-              <div class="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/30 transition-all duration-300 rounded-full"></div>
-              <img src="/static/images/star-icon.png" alt="Vega" class="h-6 w-6 sm:h-7 sm:w-7 relative z-10 transform group-hover:scale-110 transition-transform duration-300">
-            </div>
-            <span class="ml-2 text-base sm:text-lg font-bold font-heading tracking-tight">Vega AI</span>
+          <a href="/" class="hover:opacity-90 transition-opacity">
+            {{template "partials/logo_component.html" "sm"}}
           </a>
         </div>
 
         <!-- CTA -->
         <div class="flex items-center">
-          <a href="/" class="inline-flex bg-primary hover:bg-primary-dark text-white px-4 sm:px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 transform hover:scale-105 btn-primary items-center">
-            <span class="relative z-10">Back to Home</span>
+          <a href="/" class="inline-flex items-center px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+            Back to Home
           </a>
         </div>
       </div>
@@ -44,7 +40,7 @@
           <strong>Last updated:</strong> July 27, 2025
         </p>
 
-        <div class="prose prose-lg prose-invert max-w-none">
+        <div class="prose prose-lg max-w-none">
           <p class="text-gray-600 leading-relaxed mb-6">
             This policy explains how Vega AI handles your information. I built Vega AI to help you track job applications and organize your job search, and I want to be clear about what data gets collected and how it's used.
           </p>

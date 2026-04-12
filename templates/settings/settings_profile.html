@@ -52,7 +52,7 @@
     </div>
 
     <div class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Personal Information</h3>
+      <h3 class="text-2xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Personal Information</h3>
 
       <form class="space-y-4 md:space-y-6" hx-post="/settings/profile/personal" hx-target="#form-alert-container" hx-swap="innerHTML" hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}' hx-indicator=".personal-indicator">
         <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
@@ -110,7 +110,7 @@
         <div class="space-y-1">
           <label for="career_summary" class="block text-sm font-medium text-gray-600">Career Summary</label>
           <textarea id="career_summary" name="career_summary" rows="4"
-                  class="w-full px-3 py-3 md:py-2 rounded-md bg-gray-50 bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base md:text-sm touch-manipulation resize-none">{{.profile.CareerSummary | html}}</textarea>
+                  class="w-full px-3 py-3 md:py-2 rounded-md bg-white border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors text-base md:text-sm touch-manipulation resize-none">{{.profile.CareerSummary | html}}</textarea>
         </div>
 
         <div class="space-y-1">
@@ -131,9 +131,9 @@
             </div>
             <div class="flex gap-2">
               <input type="text" id="skills-input" placeholder="Type to search skills or add custom..."
-                     class="flex-1 px-3 py-2 rounded-md bg-gray-50 bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-sm"
+                     class="flex-1 px-3 py-2 rounded-md bg-white border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors text-sm"
                      onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}">
-              <button type="button" class="px-3 py-2 bg-gray-100 hover:bg-slate-500 text-gray-900 text-sm rounded-md transition-colors"
+              <button type="button" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm rounded-md transition-colors"
                       onclick="addSkill()">
                 Add
               </button>
@@ -158,7 +158,7 @@
     </div>
 
     <div class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Online Presence</h3>
+      <h3 class="text-2xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Online Presence</h3>
 
       <form class="space-y-4 md:space-y-6" hx-post="/settings/profile/online" hx-target="#form-alert-container" hx-swap="innerHTML" hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}' hx-indicator=".online-indicator">
         <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
@@ -197,7 +197,7 @@
     </div>
 
     <div class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Personal Context</h3>
+      <h3 class="text-2xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Personal Context</h3>
 
       <form class="space-y-4 md:space-y-6" hx-post="/settings/profile/context" hx-target="#form-alert-container" hx-swap="innerHTML" hx-headers='{"X-CSRF-Token": "{{.csrfToken}}"}' hx-indicator=".context-indicator">
         <input type="hidden" name="csrf_token" value="{{.csrfToken}}">
@@ -213,7 +213,7 @@
             name="context"
             rows="5"
             maxlength="6000"
-            class="w-full px-3 py-3 md:py-2 rounded-md bg-gray-50 bg-opacity-70 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors whitespace-pre-wrap text-base md:text-sm touch-manipulation resize-none"
+            class="w-full px-3 py-3 md:py-2 rounded-md bg-white border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors whitespace-pre-wrap text-base md:text-sm touch-manipulation resize-none"
             placeholder="Example: I'm passionate about sustainable technology and renewable energy. In my free time, I volunteer at local coding bootcamps teaching underprivileged youth. I'm also an avid rock climber which has taught me persistence and problem-solving. I value work-life balance and prefer companies with strong environmental commitments...">{{.profile.Context}}</textarea>
           <div class="text-xs text-gray-500 mt-1">Maximum 1000 words</div>
         </div>
@@ -233,7 +233,7 @@
     </div>
 
     <div id="experience-section" class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
-      <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Work Experience</h3>
+      <h3 class="text-2xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Work Experience</h3>
 
       <div id="work-experience-list">
         {{if eq (len .profile.WorkExperience) 0}}
@@ -293,7 +293,7 @@
     </div>
 
     <div id="education-section" class="mb-6 pb-6 border-b border-gray-200 border-opacity-50">
-      <h3 class="text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Education</h3>
+      <h3 class="text-2xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Education</h3>
 
       <div id="education-list">
         {{if eq (len .profile.Education) 0}}
@@ -345,7 +345,7 @@
     </div>
 
     <div id="certification-section" class="mb-6">
-      <h3 class="text-xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Certifications</h3>
+      <h3 class="text-2xl font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Certifications</h3>
 
       <div id="certification-list">
         {{if eq (len .profile.Certifications) 0}}

@@ -131,7 +131,7 @@ body {
   font-family: 'DM Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
   line-height: 1.6;
-  color: rgb(203, 213, 225);
+  color: #4b5563;
 }
 
 .gradient-text {
@@ -175,17 +175,38 @@ html {
 
 /* Enhanced navigation styles */
 nav {
-  background: rgba(15, 23, 42, 0.95);
+  background: rgba(249, 250, 251, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 nav.scrolled {
-  background: rgba(15, 23, 42, 0.98);
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+nav.scrolled .logo-text {
+  color: #111827;
+}
+
+nav.scrolled .nav-links a {
+  color: #4b5563;
+}
+
+nav.scrolled .nav-links a:hover {
+  color: #0d9488;
+}
+
+nav.scrolled .nav-links button {
+  color: #4b5563;
+}
+
+nav.scrolled .nav-links button:hover {
+  color: #4b5563;
 }
 
 /* Fixed nav height for mobile */
@@ -208,10 +229,11 @@ nav.scrolled {
 /* Enhanced card hover effects */
 .card-hover {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(to bottom right, rgba(30, 41, 59, 0.5), rgba(30, 41, 59, 0.3));
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .card-hover::before {
@@ -231,8 +253,8 @@ nav.scrolled {
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px -15px rgba(13, 148, 136, 0.3), 0 0 0 1px rgba(13, 148, 136, 0.1);
-  background: linear-gradient(to bottom right, rgba(30, 41, 59, 0.7), rgba(30, 41, 59, 0.4));
+  box-shadow: 0 20px 40px -15px rgba(13, 148, 136, 0.1), 0 0 0 1px rgba(13, 148, 136, 0.05);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* Subtle glow effect for interactive elements */
@@ -298,13 +320,13 @@ nav.scrolled {
 .btn-secondary {
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(71, 85, 105, 0.8);
+  border: 1px solid rgba(209, 213, 219, 1);
 }
 
 .btn-secondary:hover {
   transform: translateY(-2px);
   border-color: rgba(13, 148, 136, 0.5);
-  box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.05);
 }
 
 /* Enhanced mobile menu animation */
@@ -409,10 +431,10 @@ nav.scrolled {
 
 /* Enhanced glass effect */
 .glass-effect {
-  background: rgba(30, 41, 59, 0.4);
+  background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Mobile optimizations for glass effect */
@@ -622,8 +644,16 @@ html {
 
   /* Fix benefit cards on mobile */
   .bg-slate-800 {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
     width: 100%;
     max-width: 100%;
+  }
+  .bg-slate-800 h4 {
+    color: #111827;
+  }
+  .bg-slate-800 p {
+    color: #4b5563;
   }
 }
 
@@ -834,14 +864,14 @@ html {
 .slider-thumb::-webkit-slider-track {
   width: 100%;
   height: 8px;
-  background: #475569;
+  background: #e5e7eb;
   border-radius: 4px;
 }
 
 .slider-thumb::-moz-range-track {
   width: 100%;
   height: 8px;
-  background: #475569;
+  background: #e5e7eb;
   border-radius: 4px;
 }
 
@@ -889,7 +919,7 @@ html {
 
 /* Fill track to the left of thumb */
 .slider-thumb::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #0D9488 0%, #0D9488 var(--value), #475569 var(--value), #475569 100%);
+  background: linear-gradient(to right, #0D9488 0%, #0D9488 var(--value), #e5e7eb var(--value), #e5e7eb 100%);
 }
 
 /* Form Message Styles */

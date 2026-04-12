@@ -2,9 +2,6 @@
 <div class="bg-white rounded-xl shadow-lg mb-6">
   <div class="px-4 md:px-6 py-4 md:py-5 border-b border-gray-200">
     <h3 class="text-lg md:text-xl font-semibold text-gray-900 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
       AI Match Analysis
     </h3>
   </div>
@@ -29,7 +26,7 @@
 {{if .Analysis.Strengths}}
 <!-- Strengths -->
 <div>
-  <h4 class="text-base md:text-lg font-medium text-green-400 mb-3">Strengths</h4>
+  <h4 class="text-sm font-semibold mb-3">Strengths</h4>
   <ul class="space-y-2">
     {{range .Analysis.Strengths}}
     <li class="flex items-start">
@@ -46,13 +43,10 @@
 {{if .Analysis.Highlights}}
 <!-- Areas to Highlight -->
 <div>
-  <h4 class="text-base md:text-lg font-medium text-yellow-400 mb-3">Areas to Highlight</h4>
+  <h4 class="text-sm font-semibold mb-3">Worth emphasising</h4>
   <ul class="space-y-2">
     {{range .Analysis.Highlights}}
-    <li class="flex items-start">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 mr-2 text-yellow-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
+    <li class="flex items-start border-l-2 border-yellow-400 pl-3">
       <span class="text-gray-600 text-sm md:text-base break-words">{{. | html}}</span>
     </li>
     {{end}}
@@ -63,13 +57,10 @@
 {{if .Analysis.Weaknesses}}
 <!-- Areas for Improvement -->
 <div>
-  <h4 class="text-base md:text-lg font-medium text-red-400 mb-3">Areas for Improvement</h4>
+  <h4 class="text-sm font-semibold mb-3">Gaps to address</h4>
   <ul class="space-y-2">
     {{range .Analysis.Weaknesses}}
-    <li class="flex items-start">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 mr-2 text-red-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
+    <li class="flex items-start border-l-2 border-red-400 pl-3">
       <span class="text-gray-600 text-sm md:text-base break-words">{{. | html}}</span>
     </li>
     {{end}}
@@ -79,8 +70,8 @@
 
 {{if .Analysis.Feedback}}
 <!-- AI Feedback -->
-<div class="bg-blue-900 bg-opacity-30 border border-blue-800 rounded-lg p-4 md:p-5">
-  <h4 class="text-base md:text-lg font-medium text-blue-400 mb-2">AI Feedback</h4>
+<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-5">
+  <h4 class="text-sm font-semibold mb-2">Summary</h4>
   <p class="text-gray-600 text-sm md:text-base leading-relaxed break-words">{{.Analysis.Feedback | html}}</p>
 </div>
 {{end}}
@@ -105,4 +96,19 @@ function scrollToAIActions() {
 }
 </script>
   </div>
+</div>v>>
 </div>
+
+<script>
+function scrollToAIActions() {
+  const aiActionsSection = document.getElementById('ai-actions-section');
+  if (aiActionsSection) {
+    aiActionsSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+  } else {
+    // Fallback to top if section not found
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+}
+</script>
+  </div>
+</div>v>iv>v>

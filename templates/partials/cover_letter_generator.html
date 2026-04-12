@@ -2,9 +2,6 @@
 <div class="bg-white rounded-none md:rounded-xl shadow-lg mb-6">
   <div class="px-4 md:px-6 py-4 md:py-5 border-b border-gray-200">
     <h3 class="text-lg md:text-xl font-semibold text-gray-900 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
       Cover Letter
     </h3>
   </div>
@@ -35,16 +32,16 @@
       </p>
 
       <!-- Editing Instructions -->
-      <div class="bg-blue-900 bg-opacity-20 border border-blue-700 rounded-lg p-3 mb-4 text-xs">
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-xs">
         <div class="flex items-start space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <div class="text-blue-200">
-            <div class="font-medium mb-1">Editing Tips:</div>
-            <ul class="space-y-1 text-blue-300">
+          <div class="text-gray-600">
+            <div class="font-medium mb-1">How to edit</div>
+            <ul class="space-y-1 text-gray-500">
               <li>• Click anywhere in the letter to edit text</li>
-              <li>• Press <kbd class="px-1 py-0.5 bg-blue-800 rounded text-xs">Enter</kbd> for new line</li>
+              <li>• Press Enter for new line</li>
               <li>• Personalize content before downloading</li>
             </ul>
           </div>
@@ -74,8 +71,7 @@
       <!-- Mobile editing controls -->
       <div id="mobile-edit-controls" class="mt-4 md:hidden">
         <button class="w-full py-3 px-4 bg-primary hover:bg-primary-dark text-white rounded-md font-medium mb-3"
-                onclick="enableMobileEdit()">
-          ✏️ Edit Cover Letter
+                onclick="enableMobileEdit()">Edit Cover Letter
         </button>
         <div id="mobile-edit-buttons" class="hidden flex gap-2">
           <button class="flex-1 py-3 px-4 bg-primary hover:bg-primary-dark text-white rounded-md font-medium"
@@ -97,9 +93,9 @@
     </div>
 
     <!-- Actions -->
-    <div class="bg-blue-900 bg-opacity-30 border border-blue-800 rounded-lg p-4 md:p-5">
-      <h4 class="text-base md:text-lg font-medium text-blue-400 mb-2">Next Steps</h4>
-      <p class="text-gray-600 mb-3 text-sm md:text-base">Your cover letter has been generated. Review it carefully and personalize it further if needed before submitting your application.</p>
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-5">
+      <h4 class="text-base font-semibold text-gray-900 mb-2">Before you apply</h4>
+      <p class="text-gray-600 mb-3 text-sm md:text-base">Review and edit before you send it. The draft is a starting point, not a final product.</p>
       <div class="flex flex-col md:flex-row gap-2">
         <button class="hidden md:block px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md text-sm transition-colors"
                 onclick="editCoverLetter()">
