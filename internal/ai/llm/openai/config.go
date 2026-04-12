@@ -38,6 +38,8 @@ type Config struct {
 
 	CacheMaxEntries int
 	CacheTTL        time.Duration
+
+	OperationTimeout time.Duration
 }
 
 // NewConfig creates a Config from application settings.
@@ -77,6 +79,8 @@ func NewConfig(cfg *config.Settings) *Config {
 
 		CacheMaxEntries: 100,
 		CacheTTL:        60 * time.Second,
+
+		OperationTimeout: cfg.AIOperationTimeout,
 	}
 }
 

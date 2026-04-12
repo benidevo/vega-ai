@@ -66,6 +66,8 @@ type Settings struct {
 	// Security settings
 	EnableSecurityHeaders bool
 	EnableCSRF            bool
+
+	AIOperationTimeout time.Duration
 }
 
 func NewSettings() Settings {
@@ -169,6 +171,8 @@ func NewSettings() Settings {
 
 		EnableSecurityHeaders: getEnv("ENABLE_SECURITY_HEADERS", "true") == "true",
 		EnableCSRF:            getEnv("ENABLE_CSRF", "true") == "true",
+
+		AIOperationTimeout: getAIOperationTimeout(),
 	}
 }
 
@@ -290,4 +294,13 @@ func getCacheDefaultTTL() time.Duration {
 		}
 	}
 	return time.Hour
+}
+
+func getAIOperationTimeout() time.Duration {
+	if envVal := getEnv("AI_OPERATION_TIMEOUT", ""); envVal != "" {
+		if d, err := time.ParseDuration(envVal); err == nil && d > 0 {
+			return d
+		}
+	}
+	return 120 * time.Second
 }

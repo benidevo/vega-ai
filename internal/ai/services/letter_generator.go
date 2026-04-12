@@ -19,17 +19,19 @@ type CoverLetterGeneratorService struct {
 	log       *logger.PrivacyLogger
 	validator *validation.AIRequestValidator
 	helper    *helpers.ServiceHelper
+	timeout   time.Duration
 }
 
 // NewCoverLetterGeneratorService creates and returns a new instance of CoverLetterGeneratorService
 // using the provided llm.Provider as the underlying model.
-func NewCoverLetterGeneratorService(model llm.Provider) *CoverLetterGeneratorService {
+func NewCoverLetterGeneratorService(model llm.Provider, timeout time.Duration) *CoverLetterGeneratorService {
 	log := logger.GetPrivacyLogger("ai_cover_letter")
 	return &CoverLetterGeneratorService{
 		model:     model,
 		log:       log,
 		validator: validation.NewAIRequestValidator(),
 		helper:    helpers.NewServiceHelper(log),
+		timeout:   timeout,
 	}
 }
 
@@ -43,16 +45,13 @@ func (c *CoverLetterGeneratorService) GenerateCoverLetter(ctx context.Context, r
 		return nil, c.helper.LogValidationError(constants.OperationCoverLetter, req.ApplicantName, err)
 	}
 
-	// Use enhanced prompting by default
 	prompt := models.NewPrompt(
 		"You are a professional career advisor and expert cover letter writer.",
 		req,
 		true,
 	)
 
-	// Add timeout to prevent indefinite waiting on AI operations
-	// Cover letter generation should complete within 30 seconds
-	aiCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	aiCtx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
 	response, err := c.model.Generate(aiCtx, llm.GenerateRequest{

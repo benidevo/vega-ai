@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/benidevo/vega/internal/ai/llm"
 	llmMocks "github.com/benidevo/vega/internal/ai/llm/mocks"
@@ -131,7 +132,7 @@ func TestCoverLetterGeneratorService_GenerateCoverLetter(t *testing.T) {
 				tt.setupMock(mockProvider)
 			}
 
-			service := NewCoverLetterGeneratorService(mockProvider)
+			service := NewCoverLetterGeneratorService(mockProvider, 30*time.Second)
 			result, err := service.GenerateCoverLetter(context.Background(), tt.request)
 
 			if tt.expectError {

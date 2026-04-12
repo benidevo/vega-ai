@@ -315,7 +315,8 @@ func TestPrompt_ToCVGenerationPrompt(t *testing.T) {
 			// Should always contain JSON structure instructions
 			assert.Contains(t, result, "JSON")
 			assert.Contains(t, result, "structured CV")
-			assert.Contains(t, result, "USER PROFILE")
+			assert.Contains(t, result, "SOURCE OF TRUTH")
+			assert.Contains(t, result, "TARGET JOB")
 		})
 	}
 }

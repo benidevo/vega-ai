@@ -2,6 +2,7 @@ package ai
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/benidevo/vega/internal/ai/llm"
 	openaiProvider "github.com/benidevo/vega/internal/ai/llm/openai"
@@ -32,7 +33,7 @@ func Setup(cfg *config.Settings) (*AIService, error) {
 		return nil, models.WrapError(models.ErrProviderInitFailed, err)
 	}
 
-	return NewAIService(provider), nil
+	return NewAIService(provider, cfg.AIOperationTimeout), nil
 }
 
 func createProvider(cfg *config.Settings) (llm.Provider, error) {
@@ -52,12 +53,12 @@ func createProvider(cfg *config.Settings) (llm.Provider, error) {
 	}
 }
 
-// NewAIService initializes the AI service with the provided LLM provider.
-func NewAIService(provider llm.Provider) *AIService {
+// NewAIService initializes the AI service with the provided LLM provider and operation timeout.
+func NewAIService(provider llm.Provider, timeout time.Duration) *AIService {
 	return &AIService{
-		JobMatcher:           services.NewJobMatcherService(provider),
-		CoverLetterGenerator: services.NewCoverLetterGeneratorService(provider),
+		JobMatcher:           services.NewJobMatcherService(provider, timeout),
+		CoverLetterGenerator: services.NewCoverLetterGeneratorService(provider, timeout),
 		CVParser:             services.NewCVParserService(provider),
-		CVGenerator:          services.NewCVGeneratorService(provider),
+		CVGenerator:          services.NewCVGeneratorService(provider, timeout),
 	}
 }

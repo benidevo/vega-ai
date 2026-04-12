@@ -108,7 +108,6 @@ func (c *Client) callChat(ctx context.Context, systemPrompt, userPrompt string, 
 				openaisdk.UserMessage(userPrompt),
 			},
 			Temperature: openaisdk.Float(float64(temperature)),
-			MaxTokens:   openaisdk.Int(int64(c.cfg.MaxOutputTokens)),
 			ResponseFormat: openaisdk.ChatCompletionNewParamsResponseFormatUnion{
 				OfJSONObject: &rfParam,
 			},
@@ -217,7 +216,7 @@ Respond ONLY with a JSON object in this exact format:
   "isValid": true,
   "reason": "",
   "personalInfo": {"firstName": "", "lastName": "", "email": "", "phone": "", "location": "", "title": ""},
-  "workExperience": [{"company": "", "title": "", "location": "", "startDate": "", "endDate": "", "description": ""}],
+  "workExperience": [{"company": "", "title": "", "location": "", "startDate": "", "endDate": "", "description": ["bullet point 1", "bullet point 2"]}],
   "education": [{"institution": "", "degree": "", "fieldOfStudy": "", "startDate": "", "endDate": ""}],
   "certifications": [{"name": "", "issuingOrg": "", "issueDate": "", "expiryDate": "", "credentialId": "", "credentialUrl": ""}],
   "skills": [""]
@@ -272,7 +271,7 @@ Respond ONLY with a JSON object in this exact format:
 {
   "isValid": true,
   "personalInfo": {"firstName": "", "lastName": "", "email": "", "phone": "", "location": "", "title": ""},
-  "workExperience": [{"company": "", "title": "", "location": "", "startDate": "", "endDate": "", "description": ""}],
+  "workExperience": [{"company": "", "title": "", "location": "", "startDate": "", "endDate": "", "description": ["bullet point 1", "bullet point 2"]}],
   "education": [{"institution": "", "degree": "", "fieldOfStudy": "", "startDate": "", "endDate": ""}],
   "skills": [""]
 }`
@@ -441,6 +440,15 @@ func (c *Client) parseGeneratedCVJSON(raw string) (models.CVParsingResult, error
 	}
 
 	result.IsValid = true
+
+	result.PersonalInfo.NormalizeName()
+	if result.PersonalInfo.FirstName != "" && result.PersonalInfo.LastName == "" {
+		parts := strings.SplitN(strings.TrimSpace(result.PersonalInfo.FirstName), " ", 2)
+		if len(parts) == 2 {
+			result.PersonalInfo.FirstName = parts[0]
+			result.PersonalInfo.LastName = parts[1]
+		}
+	}
 
 	if result.WorkExperience == nil {
 		result.WorkExperience = []models.WorkExperience{}

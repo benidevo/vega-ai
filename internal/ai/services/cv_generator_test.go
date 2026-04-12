@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/benidevo/vega/internal/ai/llm"
 	llmMocks "github.com/benidevo/vega/internal/ai/llm/mocks"
@@ -43,7 +44,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 							Company:     "Tech Corp",
 							StartDate:   "2020",
 							EndDate:     "Present",
-							Description: "Led frontend development team",
+							Description: []string{"Led frontend development team"},
 						},
 					},
 					Education: []models.Education{
@@ -137,7 +138,7 @@ func TestCVGeneratorService_GenerateCV(t *testing.T) {
 				tt.setupMock(mockProvider)
 			}
 
-			service := NewCVGeneratorService(mockProvider)
+			service := NewCVGeneratorService(mockProvider, 30*time.Second)
 			result, err := service.GenerateCV(context.Background(), tt.request, 1, "Test Job")
 
 			if tt.expectError {

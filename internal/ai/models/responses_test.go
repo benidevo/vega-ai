@@ -149,7 +149,7 @@ func TestCVParsingResult(t *testing.T) {
 					Location:    "San Francisco, CA",
 					StartDate:   "2020-01",
 					EndDate:     "Present",
-					Description: "Led development of microservices",
+					Description: []string{"Led development of microservices"},
 				},
 			},
 			Education: []Education{
@@ -259,7 +259,7 @@ func TestWorkExperience(t *testing.T) {
 				Location:    "Remote",
 				StartDate:   "2022-06",
 				EndDate:     "Present",
-				Description: "Leading a team of 5 engineers",
+				Description: []string{"Leading a team of 5 engineers"},
 			},
 		},
 		{
@@ -293,6 +293,32 @@ func TestWorkExperience(t *testing.T) {
 			assert.Equal(t, tt.experience, decoded)
 		})
 	}
+}
+
+func TestWorkExperienceDescriptionUnmarshal(t *testing.T) {
+	t.Run("should_split_string_description_on_newlines", func(t *testing.T) {
+		raw := `{"company":"Acme","title":"Dev","startDate":"2020","description":"• Built things\n• Shipped stuff"}`
+		var w WorkExperience
+		err := json.Unmarshal([]byte(raw), &w)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"• Built things", "• Shipped stuff"}, w.Description)
+	})
+
+	t.Run("should_preserve_array_description_from_local_model", func(t *testing.T) {
+		raw := `{"company":"Acme","title":"Dev","startDate":"2020","description":["• Built things","• Shipped stuff"]}`
+		var w WorkExperience
+		err := json.Unmarshal([]byte(raw), &w)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"• Built things", "• Shipped stuff"}, w.Description)
+	})
+
+	t.Run("should_handle_missing_description", func(t *testing.T) {
+		raw := `{"company":"Acme","title":"Dev","startDate":"2020"}`
+		var w WorkExperience
+		err := json.Unmarshal([]byte(raw), &w)
+		assert.NoError(t, err)
+		assert.Nil(t, w.Description)
+	})
 }
 
 func TestEducation(t *testing.T) {

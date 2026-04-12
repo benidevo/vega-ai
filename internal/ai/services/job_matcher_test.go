@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/benidevo/vega/internal/ai/llm"
 	llmMocks "github.com/benidevo/vega/internal/ai/llm/mocks"
@@ -172,7 +173,7 @@ Skills: Python, ML, SQL`,
 				tt.setupMock(mockProvider)
 			}
 
-			service := NewJobMatcherService(mockProvider)
+			service := NewJobMatcherService(mockProvider, 30*time.Second)
 			result, err := service.AnalyzeMatch(context.Background(), tt.request)
 
 			if tt.expectError {
@@ -266,7 +267,7 @@ func TestJobMatcherService_GetMatchCategories(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockProvider := llmMocks.NewMockProvider(t)
-			service := NewJobMatcherService(mockProvider)
+			service := NewJobMatcherService(mockProvider, 30*time.Second)
 
 			category, description := service.GetMatchCategories(tt.score)
 

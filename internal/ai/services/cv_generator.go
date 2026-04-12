@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/benidevo/vega/internal/ai/constants"
@@ -19,17 +20,19 @@ type CVGeneratorService struct {
 	log       *logger.PrivacyLogger
 	validator *validation.AIRequestValidator
 	helper    *helpers.ServiceHelper
+	timeout   time.Duration
 }
 
 // NewCVGeneratorService creates and returns a new instance of CVGeneratorService
 // using the provided llm.Provider as the underlying model.
-func NewCVGeneratorService(model llm.Provider) *CVGeneratorService {
+func NewCVGeneratorService(model llm.Provider, timeout time.Duration) *CVGeneratorService {
 	log := logger.GetPrivacyLogger("ai_cv_generator")
 	return &CVGeneratorService{
 		model:     model,
 		log:       log,
 		validator: validation.NewAIRequestValidator(),
 		helper:    helpers.NewServiceHelper(log),
+		timeout:   timeout,
 	}
 }
 
@@ -48,15 +51,13 @@ func (c *CVGeneratorService) GenerateCV(ctx context.Context, req models.Request,
 	prompt := models.NewPrompt(
 		"You are a professional career advisor and expert CV writer.",
 		req,
-		false, // Use basic template for faster processing
+		false,
 	)
 
 	optimalTemp := prompt.GetOptimalTemperature(string(models.TaskTypeCVGeneration))
 	prompt.SetTemperature(optimalTemp)
 
-	// Add timeout to prevent indefinite waiting on AI operations
-	// CV generation is complex but should complete within 30 seconds
-	aiCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	aiCtx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
 	response, err := c.model.Generate(aiCtx, llm.GenerateRequest{
@@ -73,7 +74,15 @@ func (c *CVGeneratorService) GenerateCV(ctx context.Context, req models.Request,
 		return nil, c.helper.LogOperationError("cv_generation", req.ApplicantName, constants.ErrorTypeResponseParseFailed, time.Since(start), err)
 	}
 
-	// Log the generated CV result for debugging
+	// Fallback: if the model omitted the name, populate it from the known applicant name.
+	if result.PersonalInfo.FirstName == "" && result.PersonalInfo.LastName == "" && req.ApplicantName != "" {
+		parts := strings.SplitN(strings.TrimSpace(req.ApplicantName), " ", 2)
+		result.PersonalInfo.FirstName = parts[0]
+		if len(parts) == 2 {
+			result.PersonalInfo.LastName = parts[1]
+		}
+	}
+
 	c.log.Debug().
 		Str("applicant", req.ApplicantName).
 		Bool("is_valid", result.IsValid).
@@ -115,7 +124,7 @@ func (c *CVGeneratorService) validateGeneratedCV(cv *models.CVParsingResult) err
 		return models.WrapError(models.ErrValidationFailed, fmt.Errorf("generated CV is not valid: %s", cv.Reason))
 	}
 
-	if cv.PersonalInfo.FirstName == "" || cv.PersonalInfo.LastName == "" {
+	if cv.PersonalInfo.FirstName == "" && cv.PersonalInfo.LastName == "" {
 		return models.WrapError(models.ErrValidationFailed, fmt.Errorf("generated CV missing required personal information"))
 	}
 

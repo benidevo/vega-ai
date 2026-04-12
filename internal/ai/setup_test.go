@@ -3,6 +3,7 @@ package ai
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/benidevo/vega/internal/ai/llm"
 	"github.com/benidevo/vega/internal/ai/models"
@@ -150,7 +151,7 @@ func TestNewAIService(t *testing.T) {
 	t.Run("creates service with all components", func(t *testing.T) {
 		mockProvider := &MockProvider{}
 
-		service := NewAIService(mockProvider)
+		service := NewAIService(mockProvider, 30*time.Second)
 
 		require.NotNil(t, service)
 		assert.NotNil(t, service.JobMatcher)

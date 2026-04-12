@@ -477,7 +477,7 @@ func (h *SettingsHandler) convertAIWorkExperienceToModel(aiExp aimodels.WorkExpe
 		Location:    aiExp.Location,
 		StartDate:   startDate,
 		EndDate:     endDate,
-		Description: aiExp.Description,
+		Description: strings.Join(aiExp.Description, "\n"),
 		Current:     current,
 	}
 }

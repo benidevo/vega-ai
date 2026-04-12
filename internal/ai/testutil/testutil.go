@@ -243,14 +243,14 @@ func (td *TestData) ValidCVParsingResult() models.CVParsingResult {
 				Title:       "Senior Frontend Developer",
 				StartDate:   "2021-03",
 				EndDate:     "Present",
-				Description: "Lead frontend development for e-commerce platform",
+				Description: []string{"Lead frontend development for e-commerce platform"},
 			},
 			{
 				Company:     "DigitalCorp",
 				Title:       "Frontend Developer",
 				StartDate:   "2019-06",
 				EndDate:     "2021-02",
-				Description: "Developed responsive web applications using React",
+				Description: []string{"Developed responsive web applications using React"},
 			},
 		},
 		Education: []models.Education{
@@ -411,12 +411,17 @@ func (td *TestData) ValidGeneratedCV() models.CVParsingResult {
 		},
 		WorkExperience: []models.WorkExperience{
 			{
-				Company:     "WebTech Solutions",
-				Title:       "Senior Frontend Developer",
-				Location:    "Seattle, WA",
-				StartDate:   "March 2021",
-				EndDate:     "Present",
-				Description: "• Lead frontend development for e-commerce platform serving 100K+ daily users\n• Implemented React components using TypeScript and modern hooks\n• Optimized application performance resulting in 30% faster load times\n• Mentored 3 junior developers and conducted code reviews",
+				Company:   "WebTech Solutions",
+				Title:     "Senior Frontend Developer",
+				Location:  "Seattle, WA",
+				StartDate: "March 2021",
+				EndDate:   "Present",
+				Description: []string{
+					"• Lead frontend development for e-commerce platform serving 100K+ daily users",
+					"• Implemented React components using TypeScript and modern hooks",
+					"• Optimized application performance resulting in 30% faster load times",
+					"• Mentored 3 junior developers and conducted code reviews",
+				},
 			},
 		},
 		Education: []models.Education{

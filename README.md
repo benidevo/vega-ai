@@ -5,15 +5,13 @@
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![GitHub Container Registry](https://img.shields.io/badge/ghcr.io-vega--ai-blue)](https://github.com/benidevo/vega-ai/pkgs/container/vega-ai)
 
-> Navigate your career journey with AI-powered precision
+Vega AI is a self-hostable job search assistant. Track applications, generate tailored CVs and cover letters, get AI-powered job match scores, and capture jobs from LinkedIn via a browser extension.
 
-Just as ancient navigators used the star Vega to find their way, Vega AI helps you navigate your career journey with intelligent job search tools. Track applications, generate tailored documents using AI, get smart job matching based on your profile, and capture opportunities from LinkedIn with the browser extension.
-
-**Try it now:** Visit [vega.benidevo.com](https://vega.benidevo.com) for the cloud mode, or self-host for complete data privacy.
+Cloud instance: [vega.benidevo.com](https://vega.benidevo.com)
 
 ## Self-Hosted Quick Start
 
-Self-hosting Vega AI gives you complete control over your data. Choose any supported AI provider, including fully local free options.
+Requires Docker and an API key for any OpenAI-compatible provider (or a local Ollama instance).
 
 ### 1. Choose Your AI Provider
 
@@ -65,13 +63,13 @@ EOF
 
 ### Supported Models
 
-Any model served via an OpenAI-compatible API works. As a general guide, instruct-tuned models released from 2025 onwards are reliable. For example `gemini-2.5-flash`, `gpt-4o-mini`, or `llama3.2` via Ollama. Newer models work too.
+Models must support **JSON mode** (`response_format: json_object`). Instruct-tuned models from 2025 onwards reliably do. For example `gemini-2.5-flash`, `gpt-4o-mini`, or `llama3.2` via Ollama.
 
-> **Note:** Models under ~3B parameters may produce inconsistent JSON output. 7B+ instruct-tuned models are recommended for reliable results.
+> **Note:** Models under ~3B parameters may produce inconsistent JSON output. 7B+ instruct-tuned models are recommended for reliable results. Older or custom GGUF models that don't support JSON mode will fail with a parse error.
 
 ### 3. Run with Docker
 
-Start Vega AI with a single command:
+Run the container:
 
 ```bash
 docker run --pull always -d \
@@ -92,14 +90,13 @@ docker run --pull always -d \
 
 ## Features
 
-- **AI Document Generation**: Generate tailored cover letters and CVs based on your profile
-- **Smart Job Matching**: Get AI-powered match scores and detailed analysis for job compatibility
-- **CV Parsing**: Upload your existing CV to automatically populate your profile
-- **Job Management**: Track job applications with customizable statuses
-- **Browser Extension**: One-click job capture from LinkedIn and other job boards
-- **Profile Management**: Comprehensive professional profile with experience, education, and skills
-- **Privacy-First**: Self-hosted option with complete data control
-- **Usage Quotas**: Fair usage limits for AI features (cloud mode)
+- **CV and cover letter generation**: AI-generated documents tailored to a specific job description
+- **Job match scoring**: AI analysis of how well your profile matches a job posting
+- **CV parsing**: Upload a CV to auto-populate your profile
+- **Job tracking**: Manage applications with customizable statuses
+- **Browser extension**: Capture jobs from LinkedIn and other boards in one click
+- **Self-hosted**: All data stays on your machine; no third-party storage
+- **Cloud mode**: Hosted instance with per-user AI usage quotas
 
 ## Browser Extension
 
