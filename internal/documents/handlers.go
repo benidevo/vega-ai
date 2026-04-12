@@ -495,51 +495,20 @@ func (h *DocumentHandler) formatDescriptionSafe(text string) string {
 	if text == "" {
 		return ""
 	}
-
-	lines := strings.Split(text, "\n")
 	var result strings.Builder
-	inList := false
-
-	for _, line := range lines {
+	result.WriteString("<ul>")
+	for _, line := range strings.Split(text, "\n") {
 		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "•") || strings.HasPrefix(trimmed, "-") || strings.HasPrefix(trimmed, "*") {
-			if !inList {
-				result.WriteString("<ul>")
-				inList = true
-			}
-			var content string
-			if strings.HasPrefix(trimmed, "•") {
-				content = strings.TrimSpace(trimmed[len("•"):])
-			} else {
-				content = strings.TrimSpace(trimmed[1:])
-			}
-			escapedContent := template.HTMLEscapeString(content)
-			result.WriteString(fmt.Sprintf("<li>%s</li>", escapedContent))
-		} else {
-			if inList {
-				result.WriteString("</ul>")
-				inList = false
-			}
-			if trimmed != "" {
-				escapedContent := template.HTMLEscapeString(trimmed)
-				result.WriteString(fmt.Sprintf("<p>%s</p>", escapedContent))
-			}
+		trimmed = strings.TrimPrefix(trimmed, "•")
+		trimmed = strings.TrimPrefix(trimmed, "-")
+		trimmed = strings.TrimPrefix(trimmed, "*")
+		trimmed = strings.TrimSpace(trimmed)
+		if trimmed != "" {
+			result.WriteString(fmt.Sprintf("<li>%s</li>", template.HTMLEscapeString(trimmed)))
 		}
 	}
-
-	if inList {
-		result.WriteString("</ul>")
-	}
-
-	formatted := result.String()
-	if formatted == "" {
-		return template.HTMLEscapeString(text)
-	}
-	return formatted
-}
-
-func (h *DocumentHandler) formatDescription(text string) string {
-	return h.formatDescriptionSafe(text)
+	result.WriteString("</ul>")
+	return result.String()
 }
 
 type SaveDocumentRequest struct {

@@ -50,7 +50,7 @@ func TestSetup(t *testing.T) {
 
 		cfg := &config.Settings{
 			DBConnectionString: "test.db",
-			GeminiAPIKey:       "test-key",
+			OpenAIAPIKey:       "test-key",
 		}
 
 		aiService := &ai.AIService{}
@@ -91,7 +91,7 @@ func TestSetupWithService(t *testing.T) {
 
 		cfg := &config.Settings{
 			DBConnectionString: "test.db",
-			GeminiAPIKey:       "test-key",
+			OpenAIAPIKey:       "test-key",
 		}
 
 		aiService := &ai.AIService{}

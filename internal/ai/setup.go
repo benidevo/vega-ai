@@ -1,18 +1,21 @@
 package ai
 
 import (
-	"context"
 	"fmt"
+	"time"
 
 	"github.com/benidevo/vega/internal/ai/llm"
-	"github.com/benidevo/vega/internal/ai/llm/gemini"
+	openaiProvider "github.com/benidevo/vega/internal/ai/llm/openai"
 	"github.com/benidevo/vega/internal/ai/models"
 	"github.com/benidevo/vega/internal/ai/services"
 	"github.com/benidevo/vega/internal/config"
 )
 
 const (
+	// ProviderGemini uses Gemini via its OpenAI-compatible endpoint.
 	ProviderGemini = "gemini"
+	// ProviderOpenAI uses OpenAI or any OpenAI-spec-compatible provider (Ollama, vLLM, etc.).
+	ProviderOpenAI = "openai"
 )
 
 type AIService struct {
@@ -30,18 +33,17 @@ func Setup(cfg *config.Settings) (*AIService, error) {
 		return nil, models.WrapError(models.ErrProviderInitFailed, err)
 	}
 
-	return NewAIService(provider), nil
+	return NewAIService(provider, cfg.AIOperationTimeout), nil
 }
 
 func createProvider(cfg *config.Settings) (llm.Provider, error) {
 	switch cfg.AIProvider {
-	case ProviderGemini:
-		if cfg.GeminiAPIKey == "" {
-			return nil, models.WrapError(models.ErrMissingAPIKey, fmt.Errorf("GEMINI_API_KEY is required for Gemini provider"))
+	case ProviderGemini, ProviderOpenAI:
+		if cfg.OpenAIAPIKey == "" {
+			return nil, models.WrapError(models.ErrMissingAPIKey, fmt.Errorf("AI_KEY is required"))
 		}
-		geminiCfg := gemini.NewConfig(cfg)
-
-		provider, err := gemini.New(context.Background(), geminiCfg)
+		providerCfg := openaiProvider.NewConfig(cfg)
+		provider, err := openaiProvider.New(providerCfg)
 		if err != nil {
 			return nil, models.WrapError(models.ErrProviderInitFailed, err)
 		}
@@ -51,12 +53,12 @@ func createProvider(cfg *config.Settings) (llm.Provider, error) {
 	}
 }
 
-// NewAIService initializes the AI service with the provided LLM provider.
-func NewAIService(provider llm.Provider) *AIService {
+// NewAIService initializes the AI service with the provided LLM provider and operation timeout.
+func NewAIService(provider llm.Provider, timeout time.Duration) *AIService {
 	return &AIService{
-		JobMatcher:           services.NewJobMatcherService(provider),
-		CoverLetterGenerator: services.NewCoverLetterGeneratorService(provider),
+		JobMatcher:           services.NewJobMatcherService(provider, timeout),
+		CoverLetterGenerator: services.NewCoverLetterGeneratorService(provider, timeout),
 		CVParser:             services.NewCVParserService(provider),
-		CVGenerator:          services.NewCVGeneratorService(provider),
+		CVGenerator:          services.NewCVGeneratorService(provider, timeout),
 	}
 }

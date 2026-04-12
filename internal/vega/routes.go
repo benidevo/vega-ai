@@ -3,7 +3,6 @@ package vega
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/benidevo/vega/internal/ai"
 	authapi "github.com/benidevo/vega/internal/api/auth"
@@ -26,7 +25,7 @@ import (
 func SetupRoutes(a *App) {
 	a.router.Use(localmiddleware.RequestID())
 	a.router.Use(globalErrorHandler(a.renderer))
-	a.router.Use(localmiddleware.RequestTimeout(30 * time.Second))
+	a.router.Use(localmiddleware.RequestTimeout(a.config.AIOperationTimeout))
 
 	if a.config.EnableSecurityHeaders {
 		a.router.Use(middleware.SecurityHeaders())

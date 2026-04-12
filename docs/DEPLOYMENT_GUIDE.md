@@ -8,7 +8,7 @@ This guide covers setting up a fresh Hetzner Cloud VM to run Vega AI in producti
 - Domain name with Cloudflare DNS
 - SSH key pair generated locally
 - Google OAuth credentials
-- Gemini API key
+- AI provider key (`AI_KEY`) Gemini, OpenAI, or any OpenAI-compatible provider
 
 ## Step 1: Create Hetzner Cloud VM
 
@@ -127,8 +127,9 @@ cat > .env.production << 'EOF'
 # JWT Token Secret - Generate with: openssl rand -base64 32
 TOKEN_SECRET=<GENERATED_SECRET>
 
-# Gemini API Key (required)
-GEMINI_API_KEY=<YOUR_GEMINI_API_KEY>
+# AI Provider Key (required): works with Gemini, OpenAI, or any OpenAI-compatible provider
+# GEMINI_API_KEY is deprecated but still works for backward compatibility
+AI_KEY=<YOUR_API_KEY>
 
 # Google OAuth Configuration (required)
 GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>

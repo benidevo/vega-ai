@@ -24,7 +24,7 @@ func TestSetup(t *testing.T) {
 				IsCloudMode:  false,
 				IsTest:       true,
 				TokenSecret:  "test-secret",
-				GeminiAPIKey: "test-api-key",
+				OpenAIAPIKey: "test-api-key",
 			},
 			cache: cache.NewNoOpCache(),
 		},
@@ -34,7 +34,7 @@ func TestSetup(t *testing.T) {
 				IsCloudMode:  true,
 				IsTest:       true,
 				TokenSecret:  "test-secret",
-				GeminiAPIKey: "test-api-key",
+				OpenAIAPIKey: "test-api-key",
 			},
 			cache: cache.NewNoOpCache(),
 		},
@@ -67,7 +67,7 @@ func TestSetupService(t *testing.T) {
 			cfg: &config.Settings{
 				IsCloudMode:  false,
 				TokenSecret:  "test-secret",
-				GeminiAPIKey: "test-api-key",
+				OpenAIAPIKey: "test-api-key",
 			},
 			cache: cache.NewNoOpCache(),
 		},
@@ -131,8 +131,8 @@ func TestSetupAIService(t *testing.T) {
 		{
 			name: "should_initialize_ai_service_when_api_key_provided",
 			cfg: &config.Settings{
-				GeminiAPIKey: "test-api-key",
-				AIProvider:   "gemini",
+				OpenAIAPIKey: "test-api-key",
+				AIProvider:   "openai",
 			},
 			expectError: false,
 		},

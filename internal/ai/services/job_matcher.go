@@ -20,18 +20,20 @@ type JobMatcherService struct {
 	log       *logger.PrivacyLogger
 	validator *validation.AIRequestValidator
 	helper    *helpers.ServiceHelper
+	timeout   time.Duration
 }
 
 // NewJobMatcherService creates and returns a new instance of JobMatcherService
 // using the provided llm.Provider as the model.
 // The returned JobMatcherService can be used to perform job matching operations.
-func NewJobMatcherService(model llm.Provider) *JobMatcherService {
+func NewJobMatcherService(model llm.Provider, timeout time.Duration) *JobMatcherService {
 	log := logger.GetPrivacyLogger("ai_job_matcher")
 	return &JobMatcherService{
 		model:     model,
 		log:       log,
 		validator: validation.NewAIRequestValidator(),
 		helper:    helpers.NewServiceHelper(log),
+		timeout:   timeout,
 	}
 }
 
@@ -51,10 +53,7 @@ func (j *JobMatcherService) AnalyzeMatch(ctx context.Context, req models.Request
 		true,
 	)
 
-	// Add timeout to prevent indefinite waiting on AI operations
-	// Job analysis is complex but should complete within 30 seconds
-	// If it takes longer, the prompt is likely too complex
-	aiCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	aiCtx, cancel := context.WithTimeout(ctx, j.timeout)
 	defer cancel()
 
 	response, err := j.model.Generate(aiCtx, llm.GenerateRequest{

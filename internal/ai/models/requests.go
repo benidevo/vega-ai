@@ -192,28 +192,34 @@ func (p Prompt) ToCVGenerationPrompt() string {
 		)
 	}
 
+	sanitizedApplicantName := p.ApplicantName
+	if p.sanitizer != nil {
+		sanitizedApplicantName = p.sanitizer.SanitizeText(p.ApplicantName)
+	}
+
 	return fmt.Sprintf(`%s
 
 Generate a tailored CV based on the user's profile and the job description.
 
-USER PROFILE:
+APPLICANT NAME: %s
+
+SOURCE OF TRUTH — CANDIDATE'S ACTUAL HISTORY (use this to populate work experience, education, skills):
 %s
 
-JOB DESCRIPTION:
+TARGET JOB — FOR TAILORING ONLY (do NOT add this as a work experience entry):
 %s
 
 %s
 
 INSTRUCTIONS:
-1. Create a CV that highlights relevant experience and skills for this specific job
-2. Maintain honesty. Do not oversell or exaggerate qualifications
-3. Focus on achievements and impact in previous roles
-4. Tailor the professional summary to match the job requirements
-5. Order sections by relevance to the job (most relevant first)
-6. Use action verbs and quantify achievements where possible
-7. Keep descriptions concise and impactful
-8. CRITICAL: Use ONLY the information from the USER PROFILE above - do not make up names, companies, or experiences
-9. Format work experience descriptions as bullet points, each starting with "• " on a new line
+1. Work experience MUST come ONLY from SOURCE OF TRUTH above — never from TARGET JOB
+2. NEVER add the target company or role as a work experience entry in the CV
+3. The TARGET JOB is only used to decide which existing experiences and skills to emphasise
+4. Use the APPLICANT NAME above for the personalInfo.firstName and personalInfo.lastName fields
+5. Focus on achievements and impact in previous roles
+6. Tailor the professional summary to match the job requirements
+7. Use action verbs and quantify achievements where possible
+8. Format work experience descriptions as an array of bullet point strings
 
 CRITICAL - ELIMINATE ALL AI LANGUAGE:
 10. BANNED WORDS/PHRASES: Never use "leverage", "utilize", "spearheaded", "orchestrated", "synergies", "cutting-edge", "innovative solutions", "dynamic", "passionate", "results-driven", "detail-oriented", "team player", "go-getter", "game-changer", "disruptive", "seamless", "robust", "scalable", "streamlined", "optimized", "enhanced", "facilitated", "collaborated with stakeholders", "deep dive", "circle back", "deliverables", "action items", "learnings", "best practices", "low-hanging fruit"
@@ -224,6 +230,7 @@ CRITICAL - ELIMINATE ALL AI LANGUAGE:
 
 Generate a structured CV in JSON format following the exact schema requirements.`,
 		sanitizedInstructions,
+		sanitizedApplicantName,
 		sanitizedCVText,
 		sanitizedJobDescription,
 		sanitizedExtraContext)

@@ -6,7 +6,7 @@ This guide explains how to deploy Vega AI using Docker Swarm mode.
 
 - Docker Engine with Swarm mode enabled
 - A `docker-compose.yml` file configured for Vega AI
-- Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+- AI provider key from ([Google AI Studio](https://aistudio.google.com/app/apikey)), OpenAI, or a local provider like Ollama
 
 ## Environment Variables and Docker Swarm
 
@@ -21,7 +21,7 @@ This method processes your `.env` file and creates a fully resolved configuratio
 1. Create your `.env` file:
 
 ```bash
-GEMINI_API_KEY=your-gemini-api-key
+AI_KEY=your-api-key  # Gemini, OpenAI, or set AI_KEY=ollama for local Ollama
 ADMIN_USERNAME=your-admin-username  # optional, defaults to admin
 ADMIN_PASSWORD=your-secure-password  # optional, defaults to VegaAdmin
 TOKEN_SECRET=your-secret-token  # optional
@@ -48,7 +48,7 @@ services:
   vega-ai:
     image: ghcr.io/benidevo/vega-ai:latest
     environment:
-      - GEMINI_API_KEY=your-gemini-api-key
+      - AI_KEY=your-api-key
       - ADMIN_USERNAME=your-admin-username  # optional, defaults to admin
       - ADMIN_PASSWORD=your-secure-password  # optional, defaults to VegaAdmin
       - TOKEN_SECRET=your-secret-token  # optional
@@ -84,7 +84,7 @@ docker swarm init
 2. Create secrets:
 
 ```bash
-echo "your-gemini-api-key" | docker secret create gemini_api_key -
+echo "your-api-key" | docker secret create ai_key -
 echo "your-secure-token" | docker secret create token_secret -
 echo "your-admin-password" | docker secret create admin_password -
 ```

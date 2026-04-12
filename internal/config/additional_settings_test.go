@@ -15,7 +15,7 @@ func TestNewSettings(t *testing.T) {
 		"IS_DEVELOPMENT", "GO_ENV", "CLOUD_MODE",
 		"DB_CONNECTION_STRING", "LOG_LEVEL", "ACCESS_TOKEN_EXPIRY", "REFRESH_TOKEN_EXPIRY",
 		"GOOGLE_OAUTH_ENABLED", "CORS_ALLOWED_ORIGINS", "ENABLE_SECURITY_HEADERS",
-		"AI_PROVIDER", "GEMINI_API_KEY", "CACHE_MAX_MEMORY_MB", "CACHE_DEFAULT_TTL",
+		"AI_PROVIDER", "AI_KEY", "GEMINI_API_KEY", "CACHE_MAX_MEMORY_MB", "CACHE_DEFAULT_TTL",
 	}
 	for _, env := range envVars {
 		os.Unsetenv(env)
@@ -286,17 +286,17 @@ func TestSettingsWithFileEnvVars(t *testing.T) {
 				require.NoError(t, os.WriteFile(apiKeyFile, []byte("file-based-api-key"), 0600))
 
 				os.Setenv("TOKEN_SECRET_FILE", tokenFile)
-				os.Setenv("GEMINI_API_KEY_FILE", apiKeyFile)
+				os.Setenv("AI_KEY_FILE", apiKeyFile)
 
 				return tokenFile
 			},
 			cleanup: func() {
 				os.Unsetenv("TOKEN_SECRET_FILE")
-				os.Unsetenv("GEMINI_API_KEY_FILE")
+				os.Unsetenv("AI_KEY_FILE")
 			},
 			validate: func(t *testing.T, settings Settings) {
 				assert.Equal(t, "file-based-token-secret", settings.TokenSecret)
-				assert.Equal(t, "file-based-api-key", settings.GeminiAPIKey)
+				assert.Equal(t, "file-based-api-key", settings.OpenAIAPIKey)
 			},
 		},
 		{

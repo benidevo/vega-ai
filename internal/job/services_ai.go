@@ -677,7 +677,7 @@ func convertWorkExperience(aiExps []aimodels.WorkExperience) []models.WorkExperi
 			Location:    exp.Location,
 			StartDate:   exp.StartDate,
 			EndDate:     exp.EndDate,
-			Description: exp.Description,
+			Description: strings.Join(exp.Description, "\n"),
 		}
 	}
 	return exps
