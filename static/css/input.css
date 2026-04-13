@@ -37,10 +37,6 @@
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
   /* Custom scrollbar styles */
   .scrollbar-thin {
     scrollbar-width: thin;

@@ -34,10 +34,10 @@ format:
 	docker compose exec app sh -c "go fmt ./... && go vet ./..."
 
 mocks:
-	go run github.com/vektra/mockery/v2@v2.53.5
+	go run github.com/vektra/mockery/v2@v2.53.6
 
 mocks-docker:
-	docker compose exec app sh -c "go run github.com/vektra/mockery/v2@v2.53.5"
+	docker compose exec app sh -c "go run github.com/vektra/mockery/v2@v2.53.6"
 
 migrate-create:
 	@read -p "Migration name: " name; \

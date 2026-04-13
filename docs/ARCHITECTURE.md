@@ -17,7 +17,7 @@ graph TB
     end
 
     subgraph "Application Layer"
-        WA[Web Application<br/>Go + HTMX + Tailwind CDN]
+        WA[Web Application<br/>Go + HTMX + Tailwind CSS compiled]
         API[REST API<br/>Jobs & Auth Endpoints]
         MW[Auth Middleware<br/>JWT + User ID Injection]
     end
@@ -119,7 +119,7 @@ graph TB
 - **Backend:** Go with domain-driven layered architecture
 - **Database:** SQLite with WAL mode and multi-tenant support
 - **Authentication:** JWT sessions with username/password + Google OAuth
-- **Frontend:** Go templates + HTMX + Hyperscript + Tailwind CSS (CDN)
+- **Frontend:** Go templates + HTMX + Hyperscript + Tailwind CSS (compiled)
 - **AI:** OpenAI-compatible provider (Gemini, OpenAI, Ollama, etc.) for analysis, generation, and parsing
 - **Caching:** Badger embedded database with user-scoped keys
 - **Infrastructure:** Docker, GitHub Actions CI/CD

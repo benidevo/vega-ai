@@ -70,6 +70,13 @@ window.PDFGenerator = (function() {
     let yPos = margin;
     const lineHeight = 14;
 
+    function checkPageBreak(neededSpace = 20) {
+      if (yPos > pageHeight - margin - neededSpace) {
+        doc.addPage();
+        yPos = margin;
+      }
+    }
+
     try {
       doc.setFont(fontFamily, 'normal');
       doc.setFontSize(12);
@@ -149,10 +156,7 @@ window.PDFGenerator = (function() {
         doc.setTextColor(50, 50, 50);
         const summaryLines = doc.splitTextToSize(p.summary, contentWidth);
         summaryLines.forEach(line => {
-          if (yPos > pageHeight - margin - 20) {
-            doc.addPage();
-            yPos = margin;
-          }
+          checkPageBreak();
           doc.text(line, margin, yPos);
           yPos += 10 * 1.5;
         });
@@ -161,6 +165,7 @@ window.PDFGenerator = (function() {
     }
 
     if (cvData.skills && cvData.skills.length > 0) {
+      checkPageBreak(40);
       yPos += 8;
       doc.setFont(fontFamily, 'bold');
       doc.setFontSize(12);
@@ -179,10 +184,7 @@ window.PDFGenerator = (function() {
       const skillsText = cvData.skills.join(', ');
       const skillLines = doc.splitTextToSize(skillsText, contentWidth);
       skillLines.forEach(line => {
-        if (yPos > pageHeight - margin - 20) {
-          doc.addPage();
-          yPos = margin;
-        }
+        checkPageBreak();
         doc.text(line, margin, yPos);
         yPos += 10 * 1.5;
       });
@@ -190,6 +192,7 @@ window.PDFGenerator = (function() {
     }
 
     if (cvData.workExperience && cvData.workExperience.length > 0) {
+      checkPageBreak(40);
       yPos += 8;
       doc.setFont(fontFamily, 'bold');
       doc.setFontSize(12);
@@ -203,11 +206,12 @@ window.PDFGenerator = (function() {
       yPos += 12;
       
       cvData.workExperience.forEach((exp, index) => {
+        checkPageBreak(40);
         doc.setFont(fontFamily, 'bold');
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
         doc.text(exp.title || 'Position', margin, yPos);
-        
+
         if (exp.startDate || exp.endDate) {
           doc.setFont(fontFamily, 'normal');
           doc.setFontSize(10);
@@ -217,18 +221,19 @@ window.PDFGenerator = (function() {
           doc.text(dateText, pageWidth - margin - dateWidth, yPos);
         }
         yPos += lineHeight * 0.9;
-        
+
         if (exp.company) {
+          checkPageBreak();
           doc.setFont(fontFamily, 'normal');
           doc.setFontSize(10);
           doc.setTextColor(100, 100, 100);
-          
+
           if (exp.location) {
             doc.text(exp.company, margin, yPos);
             const companyWidth = doc.getTextWidth(exp.company);
-            
+
             doc.text(' – ', margin + companyWidth, yPos);
-            
+
             doc.setFont(fontFamily, 'italic');
             doc.text(exp.location, margin + companyWidth + doc.getTextWidth(' – '), yPos);
           } else {
@@ -236,26 +241,24 @@ window.PDFGenerator = (function() {
           }
           yPos += lineHeight * 0.9;
         }
-        
+
         if (exp.description) {
           yPos += 2;
           doc.setFont(fontFamily, 'normal');
           doc.setFontSize(10);
           doc.setTextColor(50, 50, 50);
-          
+
           const lines = exp.description.split('\n').filter(line => line.trim());
           lines.forEach(line => {
             const trimmedLine = line.trim();
             if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-') || trimmedLine.startsWith('*')) {
               const bulletText = trimmedLine.substring(1).trim();
               const wrappedLines = doc.splitTextToSize(bulletText, contentWidth - 15);
-              
-              doc.text('•', margin, yPos);
-              
+
               wrappedLines.forEach((wLine, idx) => {
-                if (yPos > pageHeight - margin - 20) {
-                  doc.addPage();
-                  yPos = margin;
+                checkPageBreak();
+                if (idx === 0) {
+                  doc.text('•', margin, yPos);
                 }
                 doc.text(wLine, margin + 10, yPos);
                 yPos += 10 * 1.5;
@@ -263,10 +266,7 @@ window.PDFGenerator = (function() {
             } else {
               const wrappedLines = doc.splitTextToSize(trimmedLine, contentWidth);
               wrappedLines.forEach(wLine => {
-                if (yPos > pageHeight - margin - 20) {
-                  doc.addPage();
-                  yPos = margin;
-                }
+                checkPageBreak();
                 doc.text(wLine, margin, yPos);
                 yPos += 10 * 1.5;
               });
@@ -282,27 +282,29 @@ window.PDFGenerator = (function() {
     }
 
     if (cvData.education && cvData.education.length > 0) {
+      checkPageBreak(40);
       yPos += 4;
       doc.setFont(fontFamily, 'bold');
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
       doc.text('EDUCATION', margin, yPos);
       yPos += 3;
-      
+
       doc.setDrawColor(220, 220, 220);
       doc.setLineWidth(0.5);
       doc.line(margin, yPos, pageWidth - margin, yPos);
       yPos += 12;
-      
+
       cvData.education.forEach((edu, index) => {
+        checkPageBreak(30);
         doc.setFont(fontFamily, 'bold');
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        const degreeText = edu.fieldOfStudy ? 
-          `${edu.degree || ''} in ${edu.fieldOfStudy}` : 
+        const degreeText = edu.fieldOfStudy ?
+          `${edu.degree || ''} in ${edu.fieldOfStudy}` :
           (edu.degree || 'Degree');
         doc.text(degreeText, margin, yPos);
-        
+
         if (edu.endDate) {
           doc.setFont(fontFamily, 'normal');
           doc.setFontSize(10);
@@ -311,15 +313,16 @@ window.PDFGenerator = (function() {
           doc.text(edu.endDate, pageWidth - margin - dateWidth, yPos);
         }
         yPos += lineHeight * 0.9;
-        
+
         if (edu.institution) {
+          checkPageBreak();
           doc.setFont(fontFamily, 'normal');
           doc.setFontSize(10);
           doc.setTextColor(100, 100, 100);
           doc.text(edu.institution, margin, yPos);
           yPos += lineHeight;
         }
-        
+
         if (index < cvData.education.length - 1) {
           yPos += 6;
         }
@@ -328,24 +331,26 @@ window.PDFGenerator = (function() {
     }
 
     if (cvData.certifications && cvData.certifications.length > 0) {
+      checkPageBreak(40);
       yPos += 4;
       doc.setFont(fontFamily, 'bold');
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
       doc.text('CERTIFICATIONS', margin, yPos);
       yPos += 3;
-      
+
       doc.setDrawColor(220, 220, 220);
       doc.setLineWidth(0.5);
       doc.line(margin, yPos, pageWidth - margin, yPos);
       yPos += 12;
-      
+
       cvData.certifications.forEach((cert, index) => {
+        checkPageBreak(30);
         doc.setFont(fontFamily, 'bold');
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
         doc.text(cert.name || 'Certification', margin, yPos);
-        
+
         if (cert.issueDate) {
           doc.setFont(fontFamily, 'normal');
           doc.setFontSize(10);
@@ -354,15 +359,16 @@ window.PDFGenerator = (function() {
           doc.text(cert.issueDate, pageWidth - margin - dateWidth, yPos);
         }
         yPos += 14;
-        
+
         if (cert.issuingOrg) {
+          checkPageBreak();
           doc.setFont(fontFamily, 'normal');
           doc.setFontSize(10);
           doc.setTextColor(60, 60, 60);
           doc.text(cert.issuingOrg, margin, yPos);
           yPos += 14;
         }
-        
+
         if (index < cvData.certifications.length - 1) {
           yPos += 6;
         }

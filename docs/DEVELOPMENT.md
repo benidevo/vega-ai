@@ -6,7 +6,7 @@ This guide covers development setup, testing, and contributing to Vega AI.
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [Go 1.24+](https://golang.org/) (for local development)
+- [Go 1.25+](https://golang.org/) (for local development)
 - AI provider key: [Gemini](https://aistudio.google.com/app/apikey) (free), [OpenAI](https://platform.openai.com/api-keys), or [Ollama](https://ollama.com) for fully local
 
 ## Development Setup
