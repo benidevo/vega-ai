@@ -81,7 +81,7 @@ func NewHomePageData(userID int, username string) *HomePageData {
 	return &HomePageData{
 		UserID:         userID,
 		Username:       username,
-		Title:          "Home",
+		Title:          "Dashboard",
 		Page:           "dashboard-home",
 		HasJobs:        false,
 		ShowOnboarding: true,

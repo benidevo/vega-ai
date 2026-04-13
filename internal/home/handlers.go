@@ -34,7 +34,6 @@ func (h *Handler) GetHomePage(c *gin.Context) {
 		username, _ := c.Get("username")
 
 		h.renderer.HTML(c, http.StatusOK, "landing/index.html", gin.H{
-			"title":    "Job tracker with resume matching",
 			"username": username,
 		})
 		return

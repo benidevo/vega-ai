@@ -11,8 +11,10 @@ Usage:
 Outputs (relative to project root):
     static/images/favicon-{16,32,48}x{16,32,48}.png
     static/images/favicon-192x192.png
-    static/images/apple-touch-icon.png  (180x180)
-    static/landing/assets/images/og-image.png  (1200x630)
+    static/images/apple-touch-icon.png           (180x180)
+    static/landing/assets/images/icon-512x512.png (512x512)
+
+Note: OG/Twitter card images are generated separately via screenshot-og.mjs
 """
 
 import os
@@ -36,7 +38,7 @@ ASSETS = [
     (SVG_DIR, "favicon-48x48.svg",    PNG_DIR, "favicon-48x48.png",   48,   48),
     (SVG_DIR, "apple-touch-icon.svg", PNG_DIR, "apple-touch-icon.png", 180, 180),
     (SVG_DIR, "icon-192x192.svg",     PNG_DIR, "favicon-192x192.png", 192, 192),
-    (SVG_DIR, "og-image.svg",         SVG_DIR, "og-image.png",        1200, 630),
+    (SVG_DIR, "icon-512x512.svg",     SVG_DIR, "icon-512x512.png",    512, 512),
 ]
 
 

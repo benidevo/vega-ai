@@ -360,7 +360,7 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 	jobsWithPagination, err := h.service.GetJobsWithPagination(c.Request.Context(), userID, filter)
 	if err != nil {
 		h.renderer.HTML(c, http.StatusInternalServerError, "layouts/base.html", gin.H{
-			"title":        "Dashboard",
+			"title":        "Jobs",
 			"page":         "dashboard",
 			"activeNav":    "jobs",
 			"pageTitle":    "Jobs",

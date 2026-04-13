@@ -13,6 +13,11 @@
       "type": "image/png"
     },
     {
+      "src": "/static/landing/assets/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
       "src": "/static/landing/assets/images/icon-512x512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml"
