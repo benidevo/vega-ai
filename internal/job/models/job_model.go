@@ -276,8 +276,9 @@ type PaginationInfo struct {
 }
 
 type JobsWithPagination struct {
-	Jobs       []*Job          `json:"jobs"`
-	Pagination *PaginationInfo `json:"pagination"`
+	Jobs           []*Job          `json:"jobs"`
+	Pagination     *PaginationInfo `json:"pagination"`
+	TotalJobsCount int             `json:"total_jobs_count"`
 }
 
 // CoverLetter represents a generated cover letter in the job domain.

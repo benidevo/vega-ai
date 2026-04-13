@@ -294,8 +294,17 @@ func (s *JobService) GetJobsWithPagination(ctx context.Context, userID int, filt
 	if err != nil {
 		s.log.Error().
 			Err(err).
-			Msg("Failed to get total job count")
+			Msg("Failed to get filtered job count")
 		return nil, err
+	}
+
+	// Get total job count for the user (without filters)
+	totalJobsCount, err := s.jobRepo.GetCount(ctx, userID, models.JobFilter{})
+	if err != nil {
+		s.log.Error().
+			Err(err).
+			Msg("Failed to get total job count")
+		totalJobsCount = -1 // sentinel: unknown, not zero — template treats non-zero as "has jobs"
 	}
 
 	currentPage := (filter.Offset / filter.Limit) + 1
@@ -311,13 +320,15 @@ func (s *JobService) GetJobsWithPagination(ctx context.Context, userID int, filt
 	}
 
 	result := &models.JobsWithPagination{
-		Jobs:       jobs,
-		Pagination: pagination,
+		Jobs:           jobs,
+		Pagination:     pagination,
+		TotalJobsCount: totalJobsCount,
 	}
 
 	s.log.Debug().
 		Int("count", len(jobs)).
 		Int("total_count", totalCount).
+		Int("total_jobs_count", totalJobsCount).
 		Int("current_page", currentPage).
 		Int("total_pages", totalPages).
 		Msg("Jobs with pagination retrieved successfully")

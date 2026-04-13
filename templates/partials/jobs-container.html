@@ -39,25 +39,34 @@
   {{else}}
       <div class="text-center py-12">
         {{if or (eq .statusFilter "active") (eq .statusFilter "")}}
-          {{template "partials/empty_state.html" (dict 
-            "Title" "No active jobs" 
-            "Description" "All your tracked jobs are rejected or marked as not interested."
-            "ActionText" "Add New Job"
-            "ActionLink" "/jobs/new"
-          )}}
-          <div class="mt-4 flex justify-center">
-            <button
-              hx-get="/jobs?status=all"
-              hx-target="#jobs-container"
-              hx-push-url="true"
-              _="on click set #status-filter.value to 'all'"
-              class="inline-flex items-center px-5 py-2 sm:px-4 sm:py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md shadow-sm transition-all duration-200 ease-in-out">
-              View All Jobs
-            </button>
-          </div>
+          {{if or (gt .totalJobsCount 0) (eq .totalJobsCount -1)}}
+            {{template "partials/empty_state.html" (dict
+              "Title" "No active jobs"
+              "Description" "All your tracked jobs are rejected or marked as not interested."
+              "ActionText" "Add New Job"
+              "ActionLink" "/jobs/new"
+            )}}
+            <div class="mt-4 flex justify-center">
+              <button
+                hx-get="/jobs?status=all"
+                hx-target="#jobs-container"
+                hx-push-url="true"
+                _="on click set #status-filter.value to 'all'"
+                class="inline-flex items-center px-5 py-2 sm:px-4 sm:py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md shadow-sm transition-all duration-200 ease-in-out">
+                View All Jobs
+              </button>
+            </div>
+          {{else}}
+            {{template "partials/empty_state.html" (dict
+              "Title" "No jobs yet"
+              "Description" "Start tracking your job applications"
+              "ActionText" "Add Job"
+              "ActionLink" "/jobs/new"
+            )}}
+          {{end}}
         {{else}}
-          {{template "partials/empty_state.html" (dict 
-            "Title" "No jobs yet" 
+          {{template "partials/empty_state.html" (dict
+            "Title" "No jobs yet"
             "Description" "Start tracking your job applications"
             "ActionText" "Add Job"
             "ActionLink" "/jobs/new"

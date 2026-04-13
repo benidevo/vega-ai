@@ -387,15 +387,16 @@ func (h *JobHandler) ListJobsPage(c *gin.Context) {
 	}
 
 	templateData := gin.H{
-		"title":        "Jobs",
-		"page":         "dashboard",
-		"activeNav":    "jobs",
-		"pageTitle":    "Jobs",
-		"jobs":         jobsWithPagination.Jobs,
-		"pagination":   jobsWithPagination.Pagination,
-		"statusFilter": statusParam,
-		"sortBy":       sortByParam,
-		"sortOrder":    sortOrderParam,
+		"title":          "Jobs",
+		"page":           "dashboard",
+		"activeNav":      "jobs",
+		"pageTitle":      "Jobs",
+		"jobs":           jobsWithPagination.Jobs,
+		"pagination":     jobsWithPagination.Pagination,
+		"totalJobsCount": jobsWithPagination.TotalJobsCount,
+		"statusFilter":   statusParam,
+		"sortBy":         sortByParam,
+		"sortOrder":      sortOrderParam,
 	}
 
 	// Check if this is an HTMX request

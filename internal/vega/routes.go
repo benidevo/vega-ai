@@ -3,6 +3,7 @@ package vega
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/benidevo/vega/internal/ai"
 	authapi "github.com/benidevo/vega/internal/api/auth"
@@ -145,7 +146,50 @@ func globalErrorHandler(renderer *render.HTMLRenderer) gin.HandlerFunc {
 				}
 				log.Error().Err(err).Msg("Recovered from panic")
 
-				renderer.Error(c, http.StatusInternalServerError, "Something Went Wrong")
+				// Try to render error page, fallback to minimal HTML if it fails (e.g. template issues)
+				defer func() {
+					if r2 := recover(); r2 != nil {
+						log.Error().Interface("panic", r2).Msg("Panic during error rendering")
+						if !c.Writer.Written() {
+							accept := c.GetHeader("Accept")
+							if strings.Contains(accept, "text/html") {
+								c.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(`
+									<!DOCTYPE html>
+									<html>
+									<head>
+										<title>Something Went Wrong</title>
+											<style>
+											body { font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif; background: #f9fafb; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: #111827; }
+											.card { background: white; padding: 3rem 2rem; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: 1px solid #f3f4f6; max-width: 28rem; text-align: center; }
+											.icon { color: #0d9488; margin-bottom: 1.5rem; display: inline-block; }
+											p { color: #4b5563; line-height: 1.6; margin-bottom: 2rem; font-size: 1.05rem; }
+											a { display: inline-block; background: #0d9488; color: white; padding: 0.75rem 2rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; transition: all 0.2s; }
+											a:hover { background: #0f766e; transform: translateY(-1px); }
+										</style>
+									</head>
+									<body>
+										<div class="card">
+											<div class="icon">
+												<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+												</svg>
+											</div>
+											<p style="font-size: 1.25rem; color: #111827; margin-bottom: 2rem;">Something went wrong. Please try again later.</p>
+											<a href="/">Go Home</a>
+										</div>
+									</body>
+									</html>
+								`))
+							} else {
+								c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+							}
+						}
+					}
+				}()
+
+				if !c.Writer.Written() {
+					renderer.Error(c, http.StatusInternalServerError, "Something Went Wrong")
+				}
 				c.Abort()
 			}
 		}()
