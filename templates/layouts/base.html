@@ -10,10 +10,10 @@
   <link rel="icon" type="image/png" sizes="48x48" href="/static/images/favicon-48x48.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="/static/images/favicon-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="/static/css/output.css" rel="stylesheet">
   <link href="/static/css/components.css" rel="stylesheet">
   <link href="/static/css/utilities.css" rel="stylesheet">
@@ -27,85 +27,19 @@
     });
   </script>
 </head>
-<body class="bg-slate-900 text-gray-100 font-sans">
-  {{if eq .page "dashboard"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "dashboard-content" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "job-new"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "job-new-content" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "job-details"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "job-details-content" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "match-history"}}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "match-history-content" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
+<body class="bg-gray-50 text-gray-900 font-sans antialiased">
+  {{if or (eq .page "dashboard") (eq .page "dashboard-home") (eq .page "job-new") (eq .page "job-details") (eq .page "match-history") (eq .page "settings-profile") (eq .page "settings-account") (eq .page "settings-quotas") (eq .page "documents")}}
+    {{template "dashboard-layout" .}}
   {{else if eq .page "404"}}
     {{template "404-content" .}}
   {{else if eq .page "500"}}
     {{template "500-content" .}}
-  {{else if eq .page "settings-home" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "settings-layout" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "settings-profile" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "settings-layout" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "settings-account" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "settings-layout" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "settings-search-preferences" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "settings-layout" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "settings-quotas" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "settings-layout" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
-  {{else if eq .page "documents" }}
-    <div class="min-h-screen bg-slate-900 flex flex-col">
-      <div class="flex-1">
-        {{template "documents-content" .}}
-      </div>
-      {{template "footer" .}}
-    </div>
+  {{else if eq .page "login"}}
+    {{template "login-content" .}}
   {{else}}
-    <div class="{{if eq .page "login"}}h-screen overflow-hidden{{else}}min-h-screen{{end}} flex {{if eq .page "home"}}flex-col{{end}} items-center justify-center relative overflow-hidden">
+    <div class="min-h-screen flex {{if eq .page "home"}}flex-col{{end}} items-center justify-center relative overflow-hidden">
 
-      <div class="absolute inset-0 z-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+      <div class="absolute inset-0 z-0 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50"></div>
 
       <div class="relative z-10 w-full {{if eq .page "home"}}flex flex-col{{else}}h-full{{end}}">
         {{if eq .page "home"}}
@@ -113,31 +47,8 @@
             {{template "home-content" .}}
           </div>
           {{template "footer" .}}
-        {{else if eq .page "login"}}
-          <div class="w-full h-full flex relative">
-            <div class="absolute inset-0 hidden lg:block">
-              <img src="/static/images/login/team-meeting.jpg" 
-                   alt="Diverse team in meeting" 
-                   class="w-full h-full object-cover">
-            </div>
-            <div class="hidden lg:block lg:w-1/2 relative">
-              <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/75 to-slate-900/70"></div>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="text-center px-8">
-                  <h2 class="text-5xl font-bold text-white mb-4">Land Your Dream Job</h2>
-                  <p class="text-xl text-white/90">Join other job seekers who use AI to optimize their job search</p>
-                </div>
-              </div>
-            </div>
-            <div class="w-full lg:w-1/2 flex items-center justify-center py-0 sm:py-8 px-0 sm:px-4 relative">
-              <div class="absolute inset-0 bg-slate-900 sm:bg-slate-900/95 backdrop-blur-sm"></div>
-              <div class="w-full h-full sm:h-auto relative z-10">
-                {{template "login-content" .}}
-              </div>
-            </div>
-          </div>
         {{else}}
-          <div class="z-10 text-white">Unknown page template</div>
+          <div class="z-10 text-gray-900">Unknown page template</div>
         {{end}}
       </div>
     </div>
@@ -184,10 +95,10 @@
 
       const baseClasses = 'px-3 sm:px-4 py-2 sm:py-3 rounded-lg shadow-2xl border pointer-events-auto animate-slide-in-right backdrop-blur-sm w-full sm:w-auto';
       const typeClasses = {
-        success: 'bg-emerald-900/80 border-emerald-700 text-emerald-100',
-        error: 'bg-red-900/80 border-red-700 text-red-100',
-        warning: 'bg-yellow-900/80 border-yellow-700 text-yellow-100',
-        info: 'bg-blue-900/80 border-blue-700 text-blue-100'
+        success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+        error: 'bg-red-50 border-red-200 text-red-800',
+        warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+        info: 'bg-blue-50 border-blue-200 text-blue-800'
       };
 
       toast.className = `${baseClasses} ${typeClasses[type] || typeClasses.info}`;
@@ -425,9 +336,6 @@
   <script src="/static/js/skills-management.js"></script>
   <script src="/static/js/cv-upload.js"></script>
   <script src="/static/js/profile-scroll.js"></script>
-  {{end}}
-  {{if eq .page "settings-search-preferences"}}
-  <script src="/static/js/skills-management.js"></script>
   {{end}}
   <div id="notification-container" class="fixed right-2 sm:right-4 bottom-4 left-2 sm:left-auto z-[9999] flex flex-col-reverse gap-2 pointer-events-none sm:max-w-sm">
   </div>

@@ -1,196 +1,222 @@
 {{define "home-content"}}
-<!-- User Dashboard (Note: "home" here refers to the dashboard, not landing page) -->
-<main id="main-content" class="w-full max-w-7xl z-10 relative px-6 sm:px-8 lg:px-12 py-8 lg:py-12" role="main">
-
-  <!-- Dashboard Header -->
-  <div class="mb-8">
-    <a href="/" class="group mb-4 inline-flex hover:text-primary transition-colors">
-      {{template "partials/logo_component.html" "md"}}
-    </a>
-    <h1 class="sr-only">Dashboard</h1>
-    <p class="text-gray-400 text-sm sm:text-base">Track applications, monitor progress, and manage your job search</p>
+<div class="max-w-7xl mx-auto space-y-6 md:space-y-8 animate-in fade-in duration-500">
+  <!-- Welcome Section -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Welcome back{{if .username}}, {{.username}}{{end}}</h2>
+      <p class="text-gray-500 mt-1">Here's what's happening with your job search.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/jobs/new" class="inline-flex items-center justify-center md:justify-start w-full md:w-auto px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+        Add New Job
+      </a>
+    </div>
   </div>
 
-  <!-- Quick Actions -->
-  <section class="mb-6 sm:mb-8" aria-labelledby="quick-actions-heading">
-    <h2 id="quick-actions-heading" class="text-lg sm:text-xl font-semibold text-white mb-4 font-heading">Quick Actions</h2>
-    <nav class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4" aria-label="Quick action navigation">
-      <a href="/jobs/new" class="bg-slate-800 hover:bg-slate-700 rounded-lg p-4 sm:p-5 border border-slate-700 hover:border-primary group min-h-[90px] sm:min-h-[100px] flex items-center">
-        <div class="flex items-center w-full">
-          <svg class="h-7 w-7 sm:h-8 sm:w-8 text-primary mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          <div class="min-w-0">
-            <h3 class="text-sm sm:text-base font-semibold text-white group-hover:text-primary">Create New Job</h3>
-            <p class="text-xs text-gray-300 mt-1">Start tracking a new opportunity</p>
+  <!-- Application Funnel (Pipeline) -->
+  <div class="grid grid-cols-1 gap-4">
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-6">Application Pipeline</h3>
+      <div class="grid grid-cols-4 gap-2 md:gap-0 relative">
+        <!-- Pipeline Connectors (Desktop) -->
+        <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0"></div>
+
+        <!-- Interested -->
+        <div class="relative z-10 flex flex-col items-center text-center px-4">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-blue-100">
+            <span class="text-base md:text-lg font-bold text-blue-600">{{if .stats}}{{.stats.Interested}}{{else}}0{{end}}</span>
           </div>
+          <span class="text-sm font-medium text-gray-900">Interested</span>
+          <span class="text-xs text-gray-500 mt-1">Found & tracking</span>
         </div>
-      </a>
 
-      <a href="/jobs" class="bg-slate-800 hover:bg-slate-700 rounded-lg p-4 sm:p-5 border border-slate-700 hover:border-primary group min-h-[90px] sm:min-h-[100px] flex items-center">
-        <div class="flex items-center w-full">
-          <svg class="h-7 w-7 sm:h-8 sm:w-8 text-primary mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          <div class="min-w-0">
-            <h3 class="text-sm sm:text-base font-semibold text-white group-hover:text-primary">View All Jobs</h3>
-            <p class="text-xs text-gray-300 mt-1">Manage your application pipeline</p>
+        <!-- Applied -->
+        <div class="relative z-10 flex flex-col items-center text-center px-4">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-teal-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-teal-100">
+            <span class="text-base md:text-lg font-bold text-teal-600">{{if .stats}}{{.stats.Applied}}{{else}}0{{end}}</span>
           </div>
+          <span class="text-sm font-medium text-gray-900">Applied</span>
+          <span class="text-xs text-gray-500 mt-1">Applications sent</span>
         </div>
-      </a>
-    </nav>
-  </section>
 
-  <!-- Quick Stats -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12" aria-label="Dashboard statistics">
-    <a href="/jobs" class="bg-slate-800 rounded-lg p-3 sm:p-4 lg:p-6 border border-slate-700 hover:bg-slate-700 hover:border-primary transition-colors group">
-      <div class="flex items-center justify-between">
-        <div class="min-w-0 flex-1">
-          <p class="text-gray-400 text-xs sm:text-sm mb-1 truncate">Jobs Found</p>
-          <p class="text-lg sm:text-xl lg:text-2xl font-bold text-white group-hover:text-primary transition-colors">{{if .stats}}{{.stats.TotalJobs}}{{else}}0{{end}}</p>
+        <!-- Interviewing -->
+        <div class="relative z-10 flex flex-col items-center text-center px-4">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-purple-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-purple-100">
+            <span class="text-base md:text-lg font-bold text-purple-600">{{if .stats}}{{.stats.Interviewing}}{{else}}0{{end}}</span>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Interviewing</span>
+          <span class="text-xs text-gray-500 mt-1">In the process</span>
         </div>
-        <svg class="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-primary opacity-50 flex-shrink-0 ml-2 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-    </a>
 
-    <a href="/jobs?status=interested" class="bg-slate-800 rounded-lg p-3 sm:p-4 lg:p-6 border border-slate-700 hover:bg-slate-700 hover:border-blue-500 transition-colors group" title="Jobs you're interested in but haven't applied to yet">
-      <div class="flex items-center justify-between">
-        <div class="min-w-0 flex-1">
-          <p class="text-gray-400 text-xs sm:text-sm mb-1 truncate">Interested</p>
-          <p class="text-lg sm:text-xl lg:text-2xl font-bold text-white group-hover:text-blue-500 transition-colors">{{if .stats}}{{.stats.Interested}}{{else}}0{{end}}</p>
-        </div>
-        <svg class="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-blue-500 opacity-50 flex-shrink-0 ml-2 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-        </svg>
-      </div>
-    </a>
-
-    <a href="/jobs?status=applied" class="bg-slate-800 rounded-lg p-3 sm:p-4 lg:p-6 border border-slate-700 hover:bg-slate-700 hover:border-secondary transition-colors group">
-      <div class="flex items-center justify-between">
-        <div class="min-w-0 flex-1">
-          <p class="text-gray-400 text-xs sm:text-sm mb-1 truncate">Applied</p>
-          <p class="text-lg sm:text-xl lg:text-2xl font-bold text-white group-hover:text-secondary transition-colors">{{if .stats}}{{.stats.Applied}}{{else}}0{{end}}</p>
-        </div>
-        <svg class="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-secondary opacity-50 flex-shrink-0 ml-2 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      </div>
-    </a>
-
-    <a href="/jobs?status=interviewing" class="bg-slate-800 rounded-lg p-3 sm:p-4 lg:p-6 border border-slate-700 hover:bg-slate-700 hover:border-green-500 transition-colors group">
-      <div class="flex items-center justify-between">
-        <div class="min-w-0 flex-1">
-          <p class="text-gray-400 text-xs sm:text-sm mb-1 truncate">Interviewing</p>
-          <p class="text-lg sm:text-xl lg:text-2xl font-bold text-white group-hover:text-green-500 transition-colors">{{if .stats}}{{.stats.Interviewing}}{{else}}0{{end}}</p>
-        </div>
-        <svg class="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-green-500 opacity-50 flex-shrink-0 ml-2 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      </div>
-    </a>
-  </section>
-
-  {{if .quotaStatus}}
-  <!-- Quota Usage Widget -->
-  <section class="mb-8 sm:mb-12" aria-labelledby="quota-heading">
-    <h2 id="quota-heading" class="text-lg sm:text-xl font-semibold text-white mb-4 font-heading">AI Analysis Quota</h2>
-    <div class="bg-slate-800 rounded-lg p-4 sm:p-6 border border-slate-700">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h3 class="text-base font-medium text-white">Monthly Job Analyses</h3>
-          {{if eq .quotaStatus.Limit -1}}
-            <p class="text-sm text-gray-400 mt-1">{{.quotaStatus.Used}} analyzed (Unlimited)</p>
-          {{else}}
-            <p class="text-sm text-gray-400 mt-1">{{cappedQuota .quotaStatus.Used .quotaStatus.Limit}} of {{.quotaStatus.Limit}} used</p>
-          {{end}}
-        </div>
-        <div class="text-right">
-          {{if eq .quotaStatus.Limit -1}}
-            <p class="text-2xl font-bold text-primary">∞</p>
-            <p class="text-xs text-gray-400">unlimited</p>
-          {{else}}
-            <p class="text-2xl font-bold {{if eq .quotaStatus.Remaining 0}}text-red-400{{else}}text-primary{{end}}">{{.quotaStatus.Remaining}}</p>
-            <p class="text-xs text-gray-400">remaining</p>
-          {{end}}
+        <!-- Offers -->
+        <div class="relative z-10 flex flex-col items-center text-center px-4">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-emerald-100">
+            <span class="text-base md:text-lg font-bold text-emerald-600">{{if .stats}}{{.stats.OfferReceived}}{{else}}0{{end}}</span>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Offers</span>
+          <span class="text-xs text-gray-500 mt-1">Ready to sign</span>
         </div>
       </div>
-
-      {{if ne .quotaStatus.Limit -1}}
-      <!-- Progress bar -->
-      <div class="w-full bg-gray-700 rounded-full h-3 mb-3">
-        <div class="{{quotaProgressClass .quotaStatus.Remaining}} rounded-full h-3 transition-all duration-300" style="width: {{.quotaStatus.Percentage}}%;"></div>
-      </div>
-
-      <div class="flex items-center justify-between text-xs text-gray-400">
-        <span>Resets on {{.quotaStatus.ResetDate.Format "Jan 2"}}</span>
-        <span class="text-gray-300">Re-analysis of existing jobs is always free</span>
-      </div>
-      {{else}}
-      <div class="text-xs text-gray-400">
-        <span class="text-gray-300">Admin users have unlimited access to all features</span>
-      </div>
-      {{end}}
     </div>
-  </section>
-  {{end}}
+  </div>
 
-  <!-- Recent Activity -->
-  <section aria-labelledby="recent-activity-heading">
-    <h2 id="recent-activity-heading" class="text-lg sm:text-xl font-semibold text-white mb-4 font-heading">Recent Activity</h2>
-    <div class="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-      {{if .showOnboarding}}
-      <!-- When there are no jobs -->
-      <div class="p-6 sm:p-8 text-center">
-        <div class="max-w-md mx-auto">
-          <svg class="h-12 w-12 sm:h-16 sm:w-16 text-gray-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-          </svg>
-          <h3 class="text-base sm:text-lg font-semibold text-gray-300 mb-2">No Jobs Tracked Yet</h3>
-          <p class="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6">Start tracking your job applications to unlock AI-powered insights, match scores, and tailored recommendations.</p>
-          <a href="/jobs/new" class="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium text-sm sm:text-base">
-            Add Job
+  <!-- Bento Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- AI Insights Card -->
+    <div class="lg:col-span-2 bg-gradient-to-br from-teal-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg overflow-hidden relative group">
+      <div class="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-500"></div>
+      <div class="relative z-10 h-full flex flex-col">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold">Match overview</h3>
+        </div>
+
+        <div class="flex-1 space-y-4">
+          {{if .TopMatches}}
+            <p class="text-teal-50 text-lg leading-relaxed">
+              You have <span class="font-bold text-white underline decoration-teal-300 underline-offset-4">{{len .TopMatches}} jobs</span> with a match score above 80%.
+            </p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              {{range .TopMatches}}
+                <a href="/jobs/{{.ID}}/details" class="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-full text-xs font-medium backdrop-blur-sm transition-colors">
+                  {{.MatchScore}}% Match @ {{.Company}}
+                </a>
+              {{end}}
+            </div>
+          {{else if .hasJobs}}
+            <p class="text-teal-50 text-lg leading-relaxed">
+              Run an analysis on your tracked jobs to see match scores and where to focus your application.
+            </p>
+            <div class="mt-4">
+              <a href="/jobs" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-semibold backdrop-blur-sm transition-colors">
+                Start AI Analysis
+              </a>
+            </div>
+          {{else}}
+            <p class="text-teal-50 text-lg leading-relaxed">
+              Complete your profile and add a job to see your first match score.
+            </p>
+          {{end}}
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-white/10">
+          <a href="/jobs" class="inline-flex items-center text-sm font-semibold hover:gap-2 transition-all">
+            View match details
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </a>
         </div>
       </div>
-      {{else}}
-      <!-- When there are jobs - show last 3 job cards -->
-      <div class="p-4 sm:p-6">
-        <div class="space-y-2 sm:space-y-3">
+    </div>
+
+    <!-- Quota Card -->
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col justify-between">
+      <div>
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Analysis Quota</h3>
+        {{if .quotaStatus}}
+          <div class="flex items-end gap-2 mb-2">
+            <span class="text-3xl font-bold text-gray-900">{{if eq .quotaStatus.Limit -1}}∞{{else}}{{.quotaStatus.Remaining}}{{end}}</span>
+            <span class="text-gray-500 text-sm mb-1.5">analyses left</span>
+          </div>
+          {{if ne .quotaStatus.Limit -1}}
+            <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
+              <div class="bg-teal-600 h-2 rounded-full transition-all duration-500" style="width: {{.quotaStatus.Percentage}}%"></div>
+            </div>
+            <p class="text-xs text-gray-500">Resets on {{.quotaStatus.ResetDate.Format "Jan 02, 2006"}}</p>
+          {{else}}
+            <p class="text-xs text-gray-500">You have unlimited analyses as an admin.</p>
+          {{end}}
+        {{else}}
+          <p class="text-sm text-gray-500">Log in to track your analysis usage.</p>
+        {{end}}
+      </div>
+      <a href="/settings/quotas" class="mt-6 text-sm font-semibold text-teal-600 hover:text-teal-700 flex items-center">
+        Manage quota
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+
+    <!-- Recent Activity / Next Steps -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Next Steps</h3>
+        <a href="/jobs" class="text-xs font-semibold text-teal-600 hover:text-teal-700">View all jobs</a>
+      </div>
+      <div class="divide-y divide-gray-100">
+        {{if .recentJobs}}
           {{range .recentJobs}}
-          <a href="/jobs/{{.ID}}/details" class="block p-3 sm:p-4 bg-slate-700 rounded hover:bg-slate-600 transition-colors">
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <h4 class="font-semibold text-white text-sm sm:text-base truncate" title="{{.Title}}">{{.Title}}</h4>
-                <div class="text-xs sm:text-sm text-gray-400 mt-1 flex items-center gap-2">
-                  <span class="truncate max-w-[120px] sm:max-w-[200px]" title="{{.Company}}">{{.Company}}</span>
-                  {{if .Location}}
-                  <span class="flex-shrink-0">•</span>
-                  <span class="truncate max-w-[80px] sm:max-w-[150px]" title="{{.Location}}">{{.Location}}</span>
-                  {{end}}
+            <div class="p-6 hover:bg-gray-50 transition-colors group">
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center flex-shrink-0 text-gray-400 group-hover:bg-teal-50 group-hover:border-teal-100 group-hover:text-teal-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <h4 class="text-sm font-bold text-gray-900 truncate">{{.Title}}</h4>
+                    <p class="text-xs text-gray-500 mt-0.5 truncate">{{.Company}} • {{.StatusText}}</p>
+                  </div>
+                </div>
+                <div class="flex-shrink-0">
+                  <a href="/jobs/{{.ID}}/details" class="inline-flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors">
+                    Take action
+                  </a>
                 </div>
               </div>
-              <div class="flex-shrink-0">
-                {{if eq .Status 0}}
-                <span class="px-2 sm:px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full whitespace-nowrap">{{.StatusText}}</span>
-                {{else if eq .Status 1}}
-                <span class="px-2 sm:px-3 py-1 bg-primary/20 text-primary text-xs font-medium rounded-full whitespace-nowrap">{{.StatusText}}</span>
-                {{else if eq .Status 2}}
-                <span class="px-2 sm:px-3 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full whitespace-nowrap">{{.StatusText}}</span>
-                {{else if eq .Status 3}}
-                <span class="px-2 sm:px-3 py-1 bg-secondary/20 text-secondary text-xs font-medium rounded-full whitespace-nowrap">{{.StatusText}}</span>
-                {{else}}
-                <span class="px-2 sm:px-3 py-1 bg-gray-500/20 text-gray-400 text-xs font-medium rounded-full whitespace-nowrap">{{.StatusText}}</span>
-                {{end}}
-              </div>
             </div>
-          </a>
           {{end}}
-        </div>
+        {{else}}
+          <div class="p-12 text-center">
+            <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-100 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h4 class="text-sm font-bold text-gray-900 mb-1 text-balance">No jobs tracked yet</h4>
+            <p class="text-xs text-gray-500 max-w-[200px] mx-auto">Add a job to see how well you match and what to focus on.</p>
+          </div>
+        {{end}}
       </div>
-      {{end}}
     </div>
-  </section>
-</main>
+
+    <!-- Onboarding Checklist -->
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-6">Quick Start Guide</h3>
+      <ul class="space-y-6">
+        <li class="flex gap-4">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center text-xs font-bold border border-gray-200">1</div>
+          <div>
+            <h4 class="text-sm font-bold text-gray-900">Complete Profile</h4>
+            <p class="text-xs text-gray-500 mt-1">Add your skills and experience for better matching.</p>
+            <a href="/settings/profile" class="text-xs font-semibold text-teal-600 hover:text-teal-700 mt-2 inline-block">Go to profile</a>
+          </div>
+        </li>
+        <li class="flex gap-4">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center text-xs font-bold border border-gray-200">2</div>
+          <div>
+            <h4 class="text-sm font-bold text-gray-900">Add First Job</h4>
+            <p class="text-xs text-gray-500 mt-1">Paste a job description you're interested in.</p>
+            <a href="/jobs/new" class="text-xs font-semibold text-teal-600 hover:text-teal-700 mt-2 inline-block">Add job</a>
+          </div>
+        </li>
+        <li class="flex gap-4">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center text-xs font-bold border border-gray-200">3</div>
+          <div>
+            <h4 class="text-sm font-bold text-gray-900">Run Analysis</h4>
+            <p class="text-xs text-gray-500 mt-1">Get match scores and tailored resume points.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
 {{end}}
+

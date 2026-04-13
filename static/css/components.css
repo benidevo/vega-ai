@@ -161,9 +161,9 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px var(--color-slate-700) inset !important;
-  -webkit-text-fill-color: white !important;
-  border-color: var(--color-slate-600) !important;
+  -webkit-box-shadow: 0 0 0 30px #f9fafb inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  border-color: #d1d5db !important;
 }
 
 /* ==========================================================================
@@ -366,14 +366,16 @@ html {
    Skills Tag Component
    ========================================================================== */
 .skill-tag {
-  padding: 2px 4px !important;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
-@media (max-width: 768px) {
-  .skill-tag {
-    padding: 1px 3px !important;
-    font-size: 0.6875rem !important;
-  }
+/* The × remove button inside a skill tag must not inherit the 44px min-height
+   touch target rule — its tap area comes from the tag element itself. */
+.skill-tag button {
+  min-height: unset !important;
+  min-width: unset !important;
+  height: auto !important;
 }
 
 /* ==========================================================================

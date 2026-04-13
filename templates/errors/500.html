@@ -1,7 +1,7 @@
 {{define "500-content"}}
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-12 relative overflow-hidden">
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 relative overflow-hidden">
 
-  <div class="z-10 max-w-md w-full bg-slate-800 rounded-xl shadow-2xl overflow-hidden">
+  <div class="z-10 max-w-md w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
     <div class="px-6 py-10 text-center">
       <!-- Error Icon -->
       <div class="inline-flex items-center justify-center w-20 h-20 mb-6">
@@ -12,16 +12,14 @@
 
       <!-- Error message -->
       <div class="mb-8">
-        <h1 class="text-7xl font-bold text-white mb-2 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">500</h1>
-        <h2 class="text-2xl font-semibold text-white mb-4">Server Error</h2>
-        <p class="text-gray-300">
-          Something went wrong on our end. We're working to fix it.
+        <p class="text-xl text-gray-900">
+          Something went wrong. Please try again later.
         </p>
       </div>
 
       <!-- Action button -->
       <div>
-        <a href="/jobs" class="inline-block px-6 py-2.5 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-300 flex items-center justify-center">
+        <a href="/jobs" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-300">
           Go Home
         </a>
       </div>

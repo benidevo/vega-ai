@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 {{template "landing/partials/head.html" (dict
-  "PageTitle" "Smart Job Search Assistant • Track Applications & Match Jobs"
-  "PageDescription" "Vega AI is a free job search assistant with smart job matching. Track applications, get instant match scores, and generate tailored resumes. Available as cloud or local mode."
+  "PageTitle" "Job tracker with resume matching"
+  "PageDescription" "Track job applications, get a match score against each job description, and generate a tailored resume. Free — run it yourself with Docker or use the cloud version."
   "CanonicalURL" "https://vega.benidevo.com/"
-  "OGTitle" "Smart Job Search Assistant"
-  "OGDescription" "Track applications, get instant match scores, and generate tailored resumes. Free with cloud and local mode options."
-  "TwitterTitle" "Smart Job Search Assistant"
-  "TwitterDescription" "Track applications, get instant match scores, and generate tailored resumes. Free with cloud and local mode options."
+  "OGTitle" "Track your job search — Vega AI"
+  "OGDescription" "Track job applications, get a match score against each job description, and generate a tailored resume."
+  "TwitterTitle" "Track your job search — Vega AI"
+  "TwitterDescription" "Track job applications, get a match score against each job description, and generate a tailored resume."
   "StructuredData" `{
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -30,15 +30,10 @@
       "Cloud and local mode options",
       "Free"
     ],
-    "softwareVersion": "1.0",
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "127"
-    }
+    "softwareVersion": "1.0"
   }`
 )}}
-<body class="bg-slate-900 text-gray-100 font-sans page-fade-in overflow-x-hidden">
+<body class="bg-gray-50 text-gray-900 font-sans page-fade-in overflow-x-hidden">
 
   {{template "landing/partials/navigation.html" .}}
 

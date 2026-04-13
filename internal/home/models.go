@@ -12,6 +12,7 @@ type HomePageData struct {
 	Username       string          `json:"username"`
 	Stats          JobStatsSummary `json:"stats"`
 	RecentJobs     []JobSummary    `json:"recent_jobs"`
+	TopMatches     []JobSummary    `json:"top_matches"`
 	HasJobs        bool            `json:"has_jobs"`
 	ShowOnboarding bool            `json:"show_onboarding"`
 	Title          string          `json:"title"`
@@ -46,10 +47,16 @@ type JobSummary struct {
 	Location   string `json:"location"`
 	Status     int    `json:"status"`
 	StatusText string `json:"status_text"`
+	MatchScore int    `json:"match_score"`
 }
 
 // ToJobSummary converts a models.Job to JobSummary for homepage display
 func ToJobSummary(job *models.Job) JobSummary {
+	matchScore := 0
+	if job.MatchScore != nil {
+		matchScore = *job.MatchScore
+	}
+
 	return JobSummary{
 		ID:         job.ID,
 		Title:      job.Title,
@@ -57,6 +64,7 @@ func ToJobSummary(job *models.Job) JobSummary {
 		Location:   job.Location,
 		Status:     int(job.Status),
 		StatusText: job.Status.String(),
+		MatchScore: matchScore,
 	}
 }
 
@@ -73,8 +81,8 @@ func NewHomePageData(userID int, username string) *HomePageData {
 	return &HomePageData{
 		UserID:         userID,
 		Username:       username,
-		Title:          "Home",
-		Page:           "home",
+		Title:          "Dashboard",
+		Page:           "dashboard-home",
 		HasJobs:        false,
 		ShowOnboarding: true,
 		Stats: JobStatsSummary{

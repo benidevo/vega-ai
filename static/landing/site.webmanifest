@@ -4,7 +4,7 @@
   "description": "Track applications, get instant match scores, and generate tailored resumes.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#ffffff",
   "theme_color": "#0D9488",
   "icons": [
     {
@@ -13,9 +13,14 @@
       "type": "image/png"
     },
     {
-      "src": "/static/images/favicon-192x192.png",
+      "src": "/static/landing/assets/images/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/static/landing/assets/images/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
     }
   ]
 }

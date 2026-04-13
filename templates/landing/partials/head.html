@@ -12,18 +12,18 @@
   {{if .CanonicalURL}}<link rel="canonical" href="{{.CanonicalURL}}">{{end}}
   
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="{{if .OGTitle}}{{.OGTitle}}{{else}}{{.PageTitle}}{{end}} • Vega AI">
+  <meta property="og:title" content="{{if .OGTitle}}{{.OGTitle}}{{else}}{{.PageTitle}} • Vega AI{{end}}">
   <meta property="og:description" content="{{if .OGDescription}}{{.OGDescription}}{{else}}{{.PageDescription}}{{end}}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{if .OGURL}}{{.OGURL}}{{else}}https://vega.benidevo.com/{{end}}">
-  <meta property="og:image" content="https://vega.benidevo.com/assets/images/og-image.png">
+  <meta property="og:image" content="https://vega.benidevo.com/static/landing/assets/images/og-image.png">
   <meta property="og:site_name" content="Vega AI">
   
   <!-- Social Card Meta Tags (Twitter/X) -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{{if .TwitterTitle}}{{.TwitterTitle}}{{else}}{{.PageTitle}}{{end}} • Vega AI">
+  <meta name="twitter:title" content="{{if .TwitterTitle}}{{.TwitterTitle}}{{else}}{{.PageTitle}} • Vega AI{{end}}">
   <meta name="twitter:description" content="{{if .TwitterDescription}}{{.TwitterDescription}}{{else}}{{.PageDescription}}{{end}}">
-  <meta name="twitter:image" content="https://vega.benidevo.com/assets/images/twitter-card.png">
+  <meta name="twitter:image" content="https://vega.benidevo.com/static/landing/assets/images/twitter-card.png">
   
   <!-- Additional Meta Tags -->
   <meta name="theme-color" content="#0D9488">
@@ -31,7 +31,7 @@
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/static/images/favicon-32x32.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/static/landing/assets/images/apple-touch-icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
   <link rel="icon" type="image/svg+xml" sizes="32x32" href="/static/landing/assets/images/favicon-32x32.svg">
   <link rel="icon" type="image/svg+xml" sizes="16x16" href="/static/landing/assets/images/favicon-16x16.svg">
   <link rel="manifest" href="/static/landing/site.webmanifest">
@@ -43,10 +43,26 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            primary: '#0D9488',
+            'primary-dark': '#0B7A70',
+          }
+        }
+      }
+    }
+  </script>
   
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/static/landing/assets/css/styles.css">

@@ -7,14 +7,17 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      'sans': ['DM Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-      'heading': ['Space Grotesk', 'DM Sans', 'ui-sans-serif', 'system-ui', 'sans-serif']
+      'sans': ['Plus Jakarta Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      'heading': ['Plus Jakarta Sans', 'sans-serif']
     },
     extend: {
       colors: {
         primary: '#0D9488',
         'primary-dark': '#0B7A70',
         secondary: '#F59E0B',
+      },
+      boxShadow: {
+        'soft': '0 2px 10px rgba(0, 0, 0, 0.05)',
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem' }],
@@ -44,5 +47,15 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      addUtilities({
+        '.perspective-1000': { perspective: '1000px' },
+        '.rotate-y-\\[-10deg\\]': { transform: 'rotateY(-10deg)' },
+        '.rotate-x-\\[5deg\\]': { transform: 'rotateX(5deg)' },
+        '.rotate-y-0': { transform: 'rotateY(0)' },
+        '.rotate-x-0': { transform: 'rotateX(0)' },
+      })
+    }
+  ],
 }

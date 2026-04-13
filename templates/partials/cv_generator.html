@@ -1,17 +1,14 @@
-<div class="bg-slate-800 rounded-none md:rounded-xl shadow-lg mb-6">
-  <div class="px-4 md:px-6 py-4 md:py-5 border-b border-slate-700">
-    <h3 class="text-lg md:text-xl font-semibold text-white flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
+<div class="bg-white rounded-none md:rounded-xl shadow-lg mb-6">
+  <div class="px-4 md:px-6 py-4 md:py-5 border-b border-gray-200">
+    <h3 class="text-lg md:text-xl font-semibold text-gray-900 flex items-center">
       Resume
     </h3>
   </div>
   <div class="p-4 md:p-6 space-y-4 md:space-y-6">
-    <div class="bg-slate-700 bg-opacity-60 rounded-lg p-4 md:p-5">
+    <div class="bg-white bg-opacity-60 rounded-lg p-4 md:p-5">
       <div class="flex flex-col md:flex-row md:justify-end md:items-center gap-3 md:gap-4 mb-4">
-        <div class="flex gap-2 w-full md:w-auto">
-          <button class="flex-1 md:flex-none px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-md transition-colors"
+        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+          <button class="flex-1 md:flex-none px-3 py-2 bg-gray-50 hover:bg-white text-gray-900 text-sm rounded-md transition-colors"
                   onclick="saveResumeToDocuments()">
             Save
           </button>
@@ -28,18 +25,18 @@
         For best results, view on desktop
       </p>
 
-      <div class="bg-blue-900 bg-opacity-20 border border-blue-700 rounded-lg p-3 mb-4 text-xs">
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-xs">
         <div class="flex items-start space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <div class="text-blue-200">
-            <div class="font-medium mb-1">Editing Tips:</div>
-            <ul class="space-y-1 text-blue-300">
+          <div class="text-gray-600">
+            <div class="font-medium mb-1">How to edit</div>
+            <ul class="space-y-1 text-gray-500">
               <li>• Click any section to edit text directly</li>
-              <li>• Press <kbd class="px-1 py-0.5 bg-blue-800 rounded text-xs">Enter</kbd> for new line</li>
-              <li>• Use the <span class="px-2 py-0.5 bg-primary rounded text-xs">Bullet</span> button to add bullet points in work experience</li>
-              <li>• Use the 🗑️ button to delete sections</li>
+              <li>• Press Enter for new line</li>
+              <li>• Use the Bullet button to add bullet points in work experience</li>
+              <li>• Use the delete button to remove a section</li>
               <li>• Changes appear in your downloaded PDF</li>
             </ul>
           </div>
@@ -178,7 +175,7 @@
                   onclick="saveMobileEdit()">
             Save
           </button>
-          <button class="flex-1 py-3 px-4 bg-slate-600 hover:bg-slate-700 text-white rounded-md font-medium"
+          <button class="flex-1 py-3 px-4 bg-gray-50 hover:bg-white text-gray-900 rounded-md font-medium"
                   onclick="cancelMobileEdit()">
             Cancel
           </button>
@@ -186,21 +183,21 @@
       </div>
     </div>
 
-    <div class="bg-slate-700 bg-opacity-60 rounded-lg p-3 md:p-4">
-      <h5 class="text-xs md:text-sm font-medium text-gray-300 mb-2">Generated for</h5>
-      <p class="text-white text-sm md:text-base">{{.GeneratedCV.JobTitle}}</p>
-      <p class="text-gray-400 text-xs md:text-sm mt-1">{{.GeneratedCV.GeneratedAt.Format "Jan 2, 2006 at 3:04 PM"}}</p>
+    <div class="bg-white bg-opacity-60 rounded-lg p-3 md:p-4">
+      <h5 class="text-xs md:text-sm font-medium text-gray-600 mb-2">Generated for</h5>
+      <p class="text-gray-900 text-sm md:text-base">{{.GeneratedCV.JobTitle}}</p>
+      <p class="text-gray-500 text-xs md:text-sm mt-1">{{.GeneratedCV.GeneratedAt.Format "Jan 2, 2006 at 3:04 PM"}}</p>
     </div>
 
-    <div class="bg-blue-900 bg-opacity-30 border border-blue-800 rounded-lg p-4 md:p-5">
-      <h4 class="text-base md:text-lg font-medium text-blue-400 mb-2">Next Steps</h4>
-      <p class="text-gray-300 mb-3 text-sm md:text-base">Your Resume has been generated and tailored to the job. Review it carefully and make any necessary edits before downloading.</p>
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-5">
+      <h4 class="text-base font-semibold text-gray-900 mb-2">Next Steps</h4>
+      <p class="text-gray-600 mb-3 text-sm md:text-base">Your Resume has been generated and tailored to the job. Review it carefully and make any necessary edits before downloading.</p>
       <div class="flex flex-col md:flex-row gap-2">
         <button class="hidden md:block px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md text-sm transition-colors"
                 onclick="editResume()">
           Edit
         </button>
-        <button class="w-full md:w-auto px-4 py-3 md:py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-md text-sm transition-colors"
+        <button class="w-full md:w-auto px-4 py-3 md:py-2 bg-gray-50 hover:bg-white text-gray-900 rounded-md text-sm transition-colors"
                 onclick="scrollToAIActions()">
           Back to Top
         </button>
@@ -214,20 +211,20 @@
 <div id="add-section-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[70] flex items-center justify-center hidden"
      _="on keydown[key=='Escape'] from window add .hidden to me
         on click if event.target.id == 'add-section-modal' add .hidden to me">
-  <div class="bg-slate-800 rounded-lg shadow-lg p-6 max-w-md w-full mx-4 border border-slate-700">
-    <h3 class="text-xl font-semibold text-white mb-4">Add New Section</h3>
-    <p class="text-gray-300 mb-4">Select a section type to add to your Resume:</p>
+  <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4 border border-gray-200">
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">Add New Section</h3>
+    <p class="text-gray-600 mb-4">Select a section type to add to your Resume:</p>
     <div class="space-y-2">
-      <button onclick="addCustomSection('Certifications'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">Certifications</button>
-      <button onclick="addCustomSection('Projects'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">Projects</button>
-      <button onclick="addCustomSection('Publications'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">Publications</button>
-      <button onclick="addCustomSection('Languages'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">Languages</button>
-      <button onclick="addCustomSection('Awards'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">Awards</button>
-      <button onclick="addCustomSection('Volunteer Experience'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">Volunteer Experience</button>
-      <button onclick="addCustomSection('References'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">References</button>
+      <button onclick="addCustomSection('Certifications'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">Certifications</button>
+      <button onclick="addCustomSection('Projects'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">Projects</button>
+      <button onclick="addCustomSection('Publications'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">Publications</button>
+      <button onclick="addCustomSection('Languages'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">Languages</button>
+      <button onclick="addCustomSection('Awards'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">Awards</button>
+      <button onclick="addCustomSection('Volunteer Experience'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">Volunteer Experience</button>
+      <button onclick="addCustomSection('References'); hideAddSectionModal();" class="w-full text-left px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">References</button>
     </div>
     <div class="mt-4 flex justify-end">
-      <button onclick="hideAddSectionModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors">Cancel</button>
+      <button onclick="hideAddSectionModal()" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-900 rounded-md transition-colors">Cancel</button>
     </div>
   </div>
 </div>
@@ -589,28 +586,28 @@ window.addCustomSection = function(sectionTitle) {
 
   const flexContainer = document.createElement('div');
   flexContainer.className = 'flex justify-between items-center mb-2';
-  
+
   const heading = document.createElement('h3');
   heading.className = 'text-sm md:text-base font-semibold text-gray-900 border-b border-gray-300 pb-0.5 flex-grow';
   heading.contentEditable = 'true';
   heading.textContent = sectionTitle;
-  
+
   const deleteBtn = document.createElement('button');
   deleteBtn.className = 'ml-2 text-red-500 hover:text-red-700 text-xs';
   deleteBtn.onclick = function() { deleteSection(this); };
-  
+
   deleteBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
   </svg>`;
-  
+
   flexContainer.appendChild(heading);
   flexContainer.appendChild(deleteBtn);
-  
+
   const contentDiv = document.createElement('div');
   contentDiv.contentEditable = 'true';
   contentDiv.className = 'text-xs md:text-sm text-gray-700';
   contentDiv.textContent = 'Click here to add content...';
-  
+
   newSection.appendChild(flexContainer);
   newSection.appendChild(contentDiv);
 

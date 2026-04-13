@@ -33,18 +33,25 @@
 */}}
 
 {{/* Define variant-specific styles */}}
-{{$bgColor := "bg-slate-600"}}
-{{$hoverColor := "hover:bg-slate-700"}}
-{{$focusColor := "focus:ring-slate-500"}}
+{{$bgColor := "bg-white"}}
+{{$hoverColor := "hover:bg-gray-50"}}
+{{$focusColor := "focus:ring-teal-500"}}
+{{$textColor := "text-gray-700"}}
+{{$borderClass := "border border-gray-300"}}
+{{$shadowClass := "shadow-sm"}}
 
 {{if eq .variant "primary"}}
-  {{$bgColor = "bg-primary"}}
-  {{$hoverColor = "hover:bg-primary-dark"}}
-  {{$focusColor = "focus:ring-primary"}}
+  {{$bgColor = "bg-teal-600"}}
+  {{$hoverColor = "hover:bg-teal-700"}}
+  {{$focusColor = "focus:ring-teal-500"}}
+  {{$textColor = "text-white"}}
+  {{$borderClass = "border border-transparent"}}
 {{else if eq .variant "danger"}}
-  {{$bgColor = "bg-red-600"}}
-  {{$hoverColor = "hover:bg-red-700"}}
+  {{$bgColor = "bg-red-500"}}
+  {{$hoverColor = "hover:bg-red-600"}}
   {{$focusColor = "focus:ring-red-500"}}
+  {{$textColor = "text-white"}}
+  {{$borderClass = "border border-transparent"}}
 {{end}}
 
 {{/* Define size-specific styles */}}
@@ -65,7 +72,7 @@
 <button
   {{if .type}}type="{{.type}}"{{else}}type="button"{{end}}
   {{if .id}}id="{{.id}}"{{end}}
-  class="{{$bgColor}} {{$hoverColor}} text-white {{$focusColor}} {{$sizeClasses}} {{$baseClasses}}{{if $stateClasses}} {{$stateClasses}}{{end}}{{if .class}} {{.class}}{{end}}"
+  class="{{$bgColor}} {{$hoverColor}} {{$textColor}} {{$focusColor}} {{$borderClass}} {{$shadowClass}} {{$sizeClasses}} {{$baseClasses}}{{if $stateClasses}} {{$stateClasses}}{{end}}{{if .class}} {{.class}}{{end}}"
   {{if .disabled}}disabled{{end}}
   {{if .ariaLabel}}aria-label="{{.ariaLabel}}"{{end}}
   {{if .ariaDescribedby}}aria-describedby="{{.ariaDescribedby}}"{{end}}

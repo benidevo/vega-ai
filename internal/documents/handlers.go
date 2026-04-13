@@ -86,8 +86,7 @@ func (h *DocumentHandler) GetDocumentsHub(c *gin.Context) {
 	data := gin.H{
 		"page":             "documents",
 		"activeNav":        "documents",
-		"title":            "My Documents",
-		"PageTitle":        "My Documents",
+		"title":            "Documents",
 		"ActiveTab":        tab,
 		"Documents":        documents,
 		"TotalDocuments":   total,

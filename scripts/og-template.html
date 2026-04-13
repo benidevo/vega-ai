@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OG Image Template — Vega AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            primary: '#0D9488',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Lock canvas to exactly 1200x630 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1200px; height: 630px; overflow: hidden; }
+    body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: #f8fafc; }
+  </style>
+</head>
+<body>
+
+<!-- ===== 1200 × 630 OG CANVAS ===== -->
+<div style="width:1200px; height:630px; position:relative; background:#f8fafc; overflow:hidden; display:flex; align-items:center; padding:0 64px; gap:72px;">
+
+  <!-- Soft background blobs (mirrors landing page hero) -->
+  <div style="position:absolute; top:-80px; right:-80px; width:360px; height:360px; border-radius:50%; background:#ccfbf1; filter:blur(80px); opacity:0.55;"></div>
+  <div style="position:absolute; top:120px; left:-40px; width:280px; height:280px; border-radius:50%; background:#dbeafe; filter:blur(80px); opacity:0.55;"></div>
+  <div style="position:absolute; bottom:-80px; left:40%; width:360px; height:360px; border-radius:50%; background:#fefce8; filter:blur:80px; opacity:0.45;"></div>
+
+  <!-- ===== LEFT: Brand + Copy ===== -->
+  <div style="flex:0 0 auto; width:380px; z-index:10;">
+
+    <!-- Logo mark -->
+    <div style="display:flex; align-items:center; margin-bottom:32px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="12" y1="3" x2="4" y2="20" stroke="#0D9488" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="12" y1="3" x2="20" y2="20" stroke="#0D9488" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="12" cy="3" r="2" fill="#0D9488"/>
+        <circle cx="4" cy="20" r="1.5" fill="#0D9488"/>
+        <circle cx="20" cy="20" r="1.5" fill="#0D9488"/>
+      </svg>
+      <span style="margin-left:10px; font-size:22px; font-weight:600; color:#111827; letter-spacing:-0.3px;">
+        vega <span style="font-weight:400; color:#0D9488;">ai</span>
+      </span>
+    </div>
+
+    <!-- Headline -->
+    <h1 style="font-size:36px; font-weight:800; color:#111827; line-height:1.2; letter-spacing:-0.5px; margin-bottom:16px;">
+      Never lose track of a job application again
+    </h1>
+
+    <!-- Subtext -->
+    <p style="font-size:16px; color:#6b7280; line-height:1.6; margin-bottom:28px;">
+      Track applications. Get match scores. Generate tailored resumes.
+    </p>
+
+    <!-- CTA buttons -->
+    <div style="display:flex; gap:12px;">
+      <div style="display:inline-flex; align-items:center; padding:12px 28px; background:#0D9488; color:white; border-radius:8px; font-size:15px; font-weight:600;">
+        Get Started
+      </div>
+      <div style="display:inline-flex; align-items:center; padding:12px 28px; background:white; color:#374151; border-radius:8px; font-size:15px; font-weight:600; border:1px solid #e5e7eb;">
+        Learn More
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT: Dashboard Mockup (mirrors hero HTML exactly) ===== -->
+  <div style="flex:1; z-index:10; display:flex; align-items:center; justify-content:center;">
+    <div style="width:100%; max-width:580px; border-radius:12px; overflow:hidden; border:1px solid rgba(229,231,235,0.7); background:white; box-shadow:0 25px 60px -12px rgba(0,0,0,0.18);">
+
+      <!-- Browser chrome -->
+      <div style="background:#f3f4f6; padding:10px 16px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #e5e7eb;">
+        <div style="display:flex; gap:6px;">
+          <div style="width:11px; height:11px; border-radius:50%; background:#f87171;"></div>
+          <div style="width:11px; height:11px; border-radius:50%; background:#fbbf24;"></div>
+          <div style="width:11px; height:11px; border-radius:50%; background:#4ade80;"></div>
+        </div>
+        <div style="margin-left:12px; flex:1; background:white; border-radius:6px; height:22px; border:1px solid #e5e7eb; display:flex; align-items:center; padding:0 10px; gap:6px;">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span style="font-size:11px; color:#9ca3af;">vega.benidevo.com/dashboard</span>
+        </div>
+      </div>
+
+      <!-- Dashboard content -->
+      <div style="padding:20px; background:#f9fafb;">
+
+        <!-- Bento stats grid -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+
+          <!-- Total Applications (spans 2 cols) -->
+          <div style="grid-column:1 / -1; background:white; padding:14px 16px; border-radius:8px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <p style="font-size:10px; color:#6b7280; text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Total Applications</p>
+              <p style="font-size:26px; font-weight:800; color:#111827; line-height:1;">42</p>
+            </div>
+            <!-- Mini bar chart -->
+            <div style="width:56px; height:28px; background:#f0fdf4; border-radius:4px; display:flex; align-items:flex-end; overflow:hidden; padding:3px 4px; gap:3px;">
+              <div style="flex:1; background:#99f6e4; border-radius:2px 2px 0 0; height:30%;"></div>
+              <div style="flex:1; background:#2dd4bf; border-radius:2px 2px 0 0; height:55%;"></div>
+              <div style="flex:1; background:#14b8a6; border-radius:2px 2px 0 0; height:75%;"></div>
+              <div style="flex:1; background:#0d9488; border-radius:2px 2px 0 0; height:100%;"></div>
+            </div>
+          </div>
+
+          <!-- Interviews -->
+          <div style="background:white; padding:14px 16px; border-radius:8px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <p style="font-size:10px; color:#6b7280; text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Interviews</p>
+            <p style="font-size:22px; font-weight:800; color:#111827;">7</p>
+          </div>
+
+          <!-- Offers -->
+          <div style="background:white; padding:14px 16px; border-radius:8px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <p style="font-size:10px; color:#6b7280; text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Offers</p>
+            <p style="font-size:22px; font-weight:800; color:#111827;">2</p>
+          </div>
+        </div>
+
+        <!-- Job cards -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+
+          <!-- Senior Software Engineer -->
+          <div style="background:white; padding:12px 14px; border-radius:8px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:36px; height:36px; border-radius:6px; background:#eff6ff; display:flex; align-items:center; justify-content:center; font-weight:700; color:#2563eb; font-size:14px;">G</div>
+              <div>
+                <p style="font-size:13px; font-weight:600; color:#111827; margin-bottom:2px;">Senior Software Engineer</p>
+                <p style="font-size:11px; color:#9ca3af;">Google • San Francisco, CA</p>
+              </div>
+            </div>
+            <span style="padding:4px 10px; background:#f0fdf4; color:#15803d; font-size:11px; font-weight:600; border-radius:20px; border:1px solid #bbf7d0; white-space:nowrap;">92% Match</span>
+          </div>
+
+          <!-- Backend Developer -->
+          <div style="background:white; padding:12px 14px; border-radius:8px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:36px; height:36px; border-radius:6px; background:#faf5ff; display:flex; align-items:center; justify-content:center; font-weight:700; color:#7c3aed; font-size:14px;">S</div>
+              <div>
+                <p style="font-size:13px; font-weight:600; color:#111827; margin-bottom:2px;">Backend Developer</p>
+                <p style="font-size:11px; color:#9ca3af;">Stripe • Remote</p>
+              </div>
+            </div>
+            <span style="padding:4px 10px; background:#fefce8; color:#a16207; font-size:11px; font-weight:600; border-radius:20px; border:1px solid #fde68a; white-space:nowrap;">85% Match</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating "Ready" chip (mirrors hero) -->
+    <div style="position:absolute; right:72px; top:50%; transform:translateY(-80px); background:white; padding:10px 14px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); border:1px solid #f1f5f9; display:flex; align-items:center; gap:10px;">
+      <div style="width:30px; height:30px; border-radius:50%; background:#ccfbf1; display:flex; align-items:center; justify-content:center;">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#0D9488" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <div>
+        <p style="font-size:12px; font-weight:700; color:#111827; line-height:1.2;">Ready</p>
+        <p style="font-size:11px; color:#9ca3af;">Just now</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

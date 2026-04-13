@@ -1,19 +1,19 @@
 {{define "documents/partials/document_card.html"}}
-<div class="bg-slate-700 rounded-lg shadow-lg border border-slate-600 hover:border-slate-500 transition-all duration-200 group relative" 
+<div class="bg-white rounded-lg shadow-lg border border-gray-300 hover:border-gray-300 transition-all duration-200 group relative" 
      id="document-{{.ID}}">
   <div class="p-4">
     <div class="flex items-start justify-between gap-3 mb-3">
       <div class="flex-1 min-w-0">
-        <h3 class="font-semibold text-white group-hover:text-primary transition-colors truncate">
+        <h3 class="font-semibold text-gray-900 group-hover:text-primary transition-colors truncate">
           {{.JobTitle | html}}
         </h3>
-        <p class="text-sm text-gray-400 truncate">{{.CompanyName | html}}</p>
+        <p class="text-sm text-gray-500 truncate">{{.CompanyName | html}}</p>
       </div>
       
       <div class="relative flex-shrink-0">
         <button type="button"
                 onclick="toggleDropdown('{{.ID}}')"
-                class="p-2 rounded-md text-gray-300 hover:text-white hover:bg-slate-600 transition-colors"
+                class="p-2 rounded-md text-gray-600 hover:text-white hover:bg-gray-50 transition-colors"
                 aria-label="Document actions"
                 aria-expanded="false"
                 aria-haspopup="true">
@@ -23,14 +23,14 @@
         </button>
         
         <div id="dropdown-{{.ID}}"
-             class="hidden absolute right-0 top-8 w-48 bg-slate-800 rounded-md shadow-xl border border-slate-600 z-30"
+             class="hidden absolute right-0 top-8 w-48 bg-white rounded-md shadow-xl border border-gray-300 z-30"
              role="menu"
              aria-orientation="vertical"
              aria-labelledby="document-menu-button-{{.ID}}">
           <a href="/jobs/{{.JobID}}/details" 
              role="menuitem"
              onclick="toggleDropdown('{{.ID}}')"
-             class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors rounded-t-md">
+             class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-white hover:text-white transition-colors rounded-t-md">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
@@ -40,17 +40,17 @@
           <button type="button"
                   onclick="toggleDropdown('{{.ID}}'); downloadDocument({{.ID}}, '{{.DocumentType}}')"
                   role="menuitem"
-                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors w-full text-left">
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-white hover:text-white transition-colors w-full text-left">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Download
           </button>
           
-          <hr class="border-slate-600 my-1" role="separator">
+          <hr class="border-gray-300 my-1" role="separator">
           
           <button type="button"
-                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors w-full text-left rounded-b-md"
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-white hover:text-red-300 transition-colors w-full text-left rounded-b-md"
                   role="menuitem"
                   onclick="toggleDropdown('{{.ID}}')"
                   _="on click 
@@ -69,14 +69,14 @@
     <div class="flex items-center justify-between text-xs">
       <div class="flex items-center gap-2">
         {{if eq .DocumentType "cover_letter"}}
-        <span class="flex items-center gap-1.5 text-gray-400">
+        <span class="flex items-center gap-1.5 text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
           <span>Cover Letter</span>
         </span>
         {{else}}
-        <span class="flex items-center gap-1.5 text-gray-400">
+        <span class="flex items-center gap-1.5 text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
@@ -85,8 +85,7 @@
         {{end}}
         
         {{if eq .JobStatus "interested"}}
-        <span class="px-1.5 py-0.5 text-xs font-medium bg-blue-900 bg-opacity-30 text-blue-400 rounded">Interested</span>
-        {{else if eq .JobStatus "applied"}}
+        <span class="px-1.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded">Interested</span>        {{else if eq .JobStatus "applied"}}
         <span class="px-1.5 py-0.5 text-xs font-medium bg-green-900 bg-opacity-30 text-green-400 rounded">Applied</span>
         {{else if eq .JobStatus "interviewing"}}
         <span class="px-1.5 py-0.5 text-xs font-medium bg-yellow-900 bg-opacity-30 text-yellow-400 rounded">Interview</span>

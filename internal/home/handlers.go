@@ -34,7 +34,6 @@ func (h *Handler) GetHomePage(c *gin.Context) {
 		username, _ := c.Get("username")
 
 		h.renderer.HTML(c, http.StatusOK, "landing/index.html", gin.H{
-			"title":    "Vega AI-Powered Job Search Assistant",
 			"username": username,
 		})
 		return
@@ -48,12 +47,16 @@ func (h *Handler) GetHomePage(c *gin.Context) {
 		h.renderer.HTML(c, http.StatusOK, "layouts/base.html", gin.H{
 			"title":              emptyHomeData.Title,
 			"page":               emptyHomeData.Page,
+			"activeNav":          "dashboard",
+			"pageTitle":          "Dashboard",
 			"googleOAuthEnabled": h.cfg.GoogleOAuthEnabled,
 			"isCloudMode":        h.cfg.IsCloudMode,
 			"showOnboarding":     emptyHomeData.ShowOnboarding,
 			"stats":              emptyHomeData.Stats,
 			"recentJobs":         emptyHomeData.RecentJobs,
+			"TopMatches":         emptyHomeData.TopMatches,
 			"hasJobs":            emptyHomeData.HasJobs,
+			"quotaStatus":        emptyHomeData.QuotaStatus,
 		})
 		return
 	}
@@ -85,8 +88,10 @@ func (h *Handler) GetHomePage(c *gin.Context) {
 		"page":           homeData.Page,
 		"activeNav":      "dashboard",
 		"pageTitle":      "Dashboard",
+		"username":       usernameStr,
 		"stats":          homeData.Stats,
 		"recentJobs":     homeData.RecentJobs,
+		"TopMatches":     homeData.TopMatches,
 		"hasJobs":        homeData.HasJobs,
 		"showOnboarding": homeData.ShowOnboarding,
 		"quotaStatus":    homeData.QuotaStatus,

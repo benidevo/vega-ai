@@ -41,6 +41,7 @@ type JobRepository interface {
 	// User-specific methods
 	GetStatsByUserID(ctx context.Context, userID int) (*models.JobStats, error)
 	GetRecentJobsByUserID(ctx context.Context, userID int, limit int) ([]*models.Job, error)
+	GetTopMatchesByUserID(ctx context.Context, userID int, limit int) ([]*models.Job, error)
 	GetJobStatsByStatus(ctx context.Context, userID int) (map[models.JobStatus]int, error)
 
 	// Quota-related methods

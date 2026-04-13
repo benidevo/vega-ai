@@ -1,0 +1,9 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" fill="white"/>
+  <!-- Constellation: top-center apex, two base nodes forming upward V -->
+  <line x1="24" y1="11" x2="10" y2="37" stroke="#0D9488" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24" y1="11" x2="38" y2="37" stroke="#0D9488" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="24" cy="11" r="3" fill="#0D9488"/>
+  <circle cx="10" cy="37" r="2.25" fill="#0D9488"/>
+  <circle cx="38" cy="37" r="2.25" fill="#0D9488"/>
+</svg>

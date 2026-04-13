@@ -104,6 +104,7 @@ func TestJobService(t *testing.T) {
 			}
 			mockRepo.On("GetAll", ctx, testUserID, statusFilter).Return(jobs, nil)
 			mockRepo.On("GetCount", ctx, testUserID, statusFilter).Return(2, nil)
+			mockRepo.On("GetCount", ctx, testUserID, models.JobFilter{}).Return(2, nil)
 
 			service := NewJobService(mockRepo, nil, nil, nil, cfg)
 			result, err := service.GetJobsWithPagination(ctx, testUserID, statusFilter)
@@ -121,6 +122,7 @@ func TestJobService(t *testing.T) {
 			}
 			mockRepo.On("GetAll", ctx, testUserID, companyFilter).Return(jobs, nil)
 			mockRepo.On("GetCount", ctx, testUserID, companyFilter).Return(2, nil)
+			mockRepo.On("GetCount", ctx, testUserID, models.JobFilter{}).Return(2, nil)
 
 			service := NewJobService(mockRepo, nil, nil, nil, cfg)
 			result, err := service.GetJobsWithPagination(ctx, testUserID, companyFilter)
@@ -138,6 +140,7 @@ func TestJobService(t *testing.T) {
 			}
 			mockRepo.On("GetAll", ctx, testUserID, typeFilter).Return(jobs, nil)
 			mockRepo.On("GetCount", ctx, testUserID, typeFilter).Return(2, nil)
+			mockRepo.On("GetCount", ctx, testUserID, models.JobFilter{}).Return(2, nil)
 
 			service := NewJobService(mockRepo, nil, nil, nil, cfg)
 			result, err := service.GetJobsWithPagination(ctx, testUserID, typeFilter)
@@ -158,6 +161,7 @@ func TestJobService(t *testing.T) {
 			}
 			mockRepo.On("GetAll", ctx, testUserID, complexFilter).Return(jobs[:1], nil)
 			mockRepo.On("GetCount", ctx, testUserID, complexFilter).Return(1, nil)
+			mockRepo.On("GetCount", ctx, testUserID, models.JobFilter{}).Return(2, nil)
 
 			service := NewJobService(mockRepo, nil, nil, nil, cfg)
 			result, err := service.GetJobsWithPagination(ctx, testUserID, complexFilter)
