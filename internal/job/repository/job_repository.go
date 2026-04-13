@@ -872,7 +872,7 @@ func (r *SQLiteJobRepository) GetRecentJobsByUserID(ctx context.Context, userID 
 
 // GetTopMatchesByUserID returns jobs with the highest match scores for a specific user.
 func (r *SQLiteJobRepository) GetTopMatchesByUserID(ctx context.Context, userID int, limit int) ([]*models.Job, error) {
-	if limit <= 0 {
+	if limit <= 0 || limit > 50 {
 		limit = 10
 	}
 

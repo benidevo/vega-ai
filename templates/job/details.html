@@ -74,7 +74,7 @@
           <div id="header-response" role="status" aria-live="polite" aria-atomic="true"></div>
         </div>
       </div>
-      <div id="match-score-badge" class="px-3 md:px-4 py-1.5 {{matchColors .job.MatchScore}} rounded-full text-xs md:text-sm font-medium whitespace-nowrap">
+      <div id="match-score-badge" class="px-3 md:px-4 py-1.5 mt-2 sm:mt-0 self-start {{matchColors .job.MatchScore}} rounded-full text-xs md:text-sm font-medium whitespace-nowrap">
         {{.job.GetMatchScoreString}}
       </div>
     </div>
@@ -110,7 +110,7 @@
             </button>
           </div>
 
-          <div id="skills-display" class="flex flex-wrap gap-2" role="list" aria-label="Required skills">
+          <div id="skills-display" class="flex flex-wrap items-start gap-2" role="list" aria-label="Required skills">
             {{range .job.RequiredSkills}}
             <span class="px-3 py-1.5 bg-white rounded-md text-sm text-primary" role="listitem">{{. | html}}</span>
             {{else}}

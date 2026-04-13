@@ -7,7 +7,7 @@
       <p class="text-gray-500 mt-1">Here's what's happening with your job search.</p>
     </div>
     <div class="flex items-center gap-3">
-      <a href="/jobs/new" class="inline-flex items-center px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+      <a href="/jobs/new" class="inline-flex items-center justify-center md:justify-start w-full md:w-auto px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
         Add New Job
       </a>
     </div>
@@ -17,14 +17,14 @@
   <div class="grid grid-cols-1 gap-4">
     <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
       <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-6">Application Pipeline</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 relative">
+      <div class="grid grid-cols-4 gap-2 md:gap-0 relative">
         <!-- Pipeline Connectors (Desktop) -->
         <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0"></div>
 
         <!-- Interested -->
         <div class="relative z-10 flex flex-col items-center text-center px-4">
-          <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-blue-100">
-            <span class="text-lg font-bold text-blue-600">{{if .stats}}{{.stats.Interested}}{{else}}0{{end}}</span>
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-blue-100">
+            <span class="text-base md:text-lg font-bold text-blue-600">{{if .stats}}{{.stats.Interested}}{{else}}0{{end}}</span>
           </div>
           <span class="text-sm font-medium text-gray-900">Interested</span>
           <span class="text-xs text-gray-500 mt-1">Found & tracking</span>
@@ -32,8 +32,8 @@
 
         <!-- Applied -->
         <div class="relative z-10 flex flex-col items-center text-center px-4">
-          <div class="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-teal-100">
-            <span class="text-lg font-bold text-teal-600">{{if .stats}}{{.stats.Applied}}{{else}}0{{end}}</span>
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-teal-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-teal-100">
+            <span class="text-base md:text-lg font-bold text-teal-600">{{if .stats}}{{.stats.Applied}}{{else}}0{{end}}</span>
           </div>
           <span class="text-sm font-medium text-gray-900">Applied</span>
           <span class="text-xs text-gray-500 mt-1">Applications sent</span>
@@ -41,8 +41,8 @@
 
         <!-- Interviewing -->
         <div class="relative z-10 flex flex-col items-center text-center px-4">
-          <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-purple-100">
-            <span class="text-lg font-bold text-purple-600">{{if .stats}}{{.stats.Interviewing}}{{else}}0{{end}}</span>
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-purple-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-purple-100">
+            <span class="text-base md:text-lg font-bold text-purple-600">{{if .stats}}{{.stats.Interviewing}}{{else}}0{{end}}</span>
           </div>
           <span class="text-sm font-medium text-gray-900">Interviewing</span>
           <span class="text-xs text-gray-500 mt-1">In the process</span>
@@ -50,8 +50,8 @@
 
         <!-- Offers -->
         <div class="relative z-10 flex flex-col items-center text-center px-4">
-          <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-emerald-100">
-            <span class="text-lg font-bold text-emerald-600">{{if .stats}}{{.stats.OfferReceived}}{{else}}0{{end}}</span>
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-50 flex items-center justify-center mb-3 border-4 border-white shadow-sm ring-1 ring-emerald-100">
+            <span class="text-base md:text-lg font-bold text-emerald-600">{{if .stats}}{{.stats.OfferReceived}}{{else}}0{{end}}</span>
           </div>
           <span class="text-sm font-medium text-gray-900">Offers</span>
           <span class="text-xs text-gray-500 mt-1">Ready to sign</span>
@@ -103,7 +103,7 @@
           {{end}}
         </div>
 
-        <div class="mt-8 pt-4 border-t border-white/10">
+        <div class="mt-4 pt-3 border-t border-white/10">
           <a href="/jobs" class="inline-flex items-center text-sm font-semibold hover:gap-2 transition-all">
             View match details
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,7 +166,7 @@
                   </div>
                 </div>
                 <div class="flex-shrink-0">
-                  <a href="/jobs/{{.ID}}/details" class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors">
+                  <a href="/jobs/{{.ID}}/details" class="inline-flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors">
                     Take action
                   </a>
                 </div>

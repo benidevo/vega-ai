@@ -366,14 +366,16 @@ html {
    Skills Tag Component
    ========================================================================== */
 .skill-tag {
-  padding: 2px 4px !important;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
-@media (max-width: 768px) {
-  .skill-tag {
-    padding: 1px 3px !important;
-    font-size: 0.6875rem !important;
-  }
+/* The × remove button inside a skill tag must not inherit the 44px min-height
+   touch target rule — its tap area comes from the tag element itself. */
+.skill-tag button {
+  min-height: unset !important;
+  min-width: unset !important;
+  height: auto !important;
 }
 
 /* ==========================================================================
