@@ -78,7 +78,7 @@
         <div class="flex-1 space-y-4">
           {{if .TopMatches}}
             <p class="text-teal-50 text-lg leading-relaxed">
-              You have <span class="font-bold text-white underline decoration-teal-300 underline-offset-4">{{len .TopMatches}} jobs</span> with a match score above 80%.
+              You have <span class="font-bold text-white underline decoration-teal-300 underline-offset-4">{{len .TopMatches}} {{if eq (len .TopMatches) 1}}job{{else}}jobs{{end}}</span> with a match score above 80%.
             </p>
             <div class="flex flex-wrap gap-2 mt-4">
               {{range .TopMatches}}
@@ -121,7 +121,7 @@
         {{if .quotaStatus}}
           <div class="flex items-end gap-2 mb-2">
             <span class="text-3xl font-bold text-gray-900">{{if eq .quotaStatus.Limit -1}}∞{{else}}{{.quotaStatus.Remaining}}{{end}}</span>
-            <span class="text-gray-500 text-sm mb-1.5">analyses left</span>
+            <span class="text-gray-500 text-sm mb-1.5">{{if eq .quotaStatus.Remaining 1}}analysis{{else}}analyses{{end}} left</span>
           </div>
           {{if ne .quotaStatus.Limit -1}}
             <div class="w-full bg-gray-100 rounded-full h-2 mb-4">

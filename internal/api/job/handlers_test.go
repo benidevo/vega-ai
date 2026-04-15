@@ -198,7 +198,7 @@ func TestJobAPIHandler_CreateJob(t *testing.T) {
 				var response map[string]string
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Contains(t, response["error"], "Invalid request format:")
+				assert.Contains(t, response["error"], "title is required")
 			},
 		},
 		{
@@ -337,9 +337,4 @@ func TestJobAPIHandler_GetQuotaStatus(t *testing.T) {
 			mockService.AssertExpectations(t)
 		})
 	}
-}
-
-// Helper function for tests
-func intPtr(i int) *int {
-	return &i
 }

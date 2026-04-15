@@ -76,8 +76,8 @@ func NewSettings() Settings {
 	isCloudMode := getEnv("CLOUD_MODE", "false") == "true"
 	aiProvider := getEnv("AI_PROVIDER", "gemini")
 
-	accessTokenExpiry := 60 * time.Minute
-	refreshTokenExpiry := 72 * time.Hour
+	accessTokenExpiry := 24 * time.Hour
+	refreshTokenExpiry := 168 * time.Hour
 	dbMaxOpenConns := 10
 	dbMaxIdleConns := 5
 	dbConnMaxLifetime := 5 * time.Minute

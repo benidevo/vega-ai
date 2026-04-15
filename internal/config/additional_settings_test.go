@@ -36,8 +36,8 @@ func TestNewSettings(t *testing.T) {
 				assert.False(t, s.IsDevelopment)
 				assert.False(t, s.IsTest)
 				assert.False(t, s.IsCloudMode)
-				assert.Equal(t, 60*time.Minute, s.AccessTokenExpiry)
-				assert.Equal(t, 72*time.Hour, s.RefreshTokenExpiry)
+				assert.Equal(t, 24*time.Hour, s.AccessTokenExpiry)
+				assert.Equal(t, 168*time.Hour, s.RefreshTokenExpiry)
 				assert.Equal(t, 10, s.DBMaxOpenConns)
 				assert.Equal(t, 256, s.CacheMaxMemoryMB)
 			},
@@ -115,7 +115,7 @@ func TestNewSettings(t *testing.T) {
 				os.Setenv("CACHE_MAX_MEMORY_MB", "not-a-number")
 			},
 			validate: func(t *testing.T, s Settings) {
-				assert.Equal(t, 60*time.Minute, s.AccessTokenExpiry)
+				assert.Equal(t, 24*time.Hour, s.AccessTokenExpiry)
 				assert.Equal(t, 256, s.CacheMaxMemoryMB)
 			},
 		},

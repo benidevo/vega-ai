@@ -1,13 +1,17 @@
 package job
 
 import (
+	"fmt"
 	"net/http"
+	"reflect"
+	"strings"
 
 	apimodels "github.com/benidevo/vega/internal/api/job/models"
 	ctxutil "github.com/benidevo/vega/internal/common/context"
 	"github.com/benidevo/vega/internal/job/models"
 	quotamodels "github.com/benidevo/vega/internal/quota/models"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 // JobAPIHandler handles job-related API requests
@@ -40,7 +44,7 @@ func (h *JobAPIHandler) CreateJob(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.jobService.LogError(err)
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request format: " + err.Error(),
+			"error": h.formatValidationError(err),
 		})
 		return
 	}
@@ -74,6 +78,13 @@ func (h *JobAPIHandler) CreateJob(c *gin.Context) {
 	)
 
 	if err != nil {
+		if _, ok := err.(validator.ValidationErrors); ok {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": h.formatValidationError(err),
+			})
+			return
+		}
+
 		switch err {
 		case models.ErrJobTitleRequired,
 			models.ErrJobDescriptionRequired,
@@ -166,4 +177,40 @@ func (h *JobAPIHandler) GetQuotaStatus(c *gin.Context) {
 		}(),
 		"reset_date": quotaStatus.ResetDate.Format("2006-01-02"),
 	})
+}
+
+func (h *JobAPIHandler) formatValidationError(err error) string {
+	if ve, ok := err.(validator.ValidationErrors); ok {
+		if len(ve) > 0 {
+			e := ve[0]
+			field := h.getJsonTag(e.Field())
+			switch e.Tag() {
+			case "required":
+				return fmt.Sprintf("%s is required", field)
+			case "url":
+				return fmt.Sprintf("%s must be a valid URL", field)
+			case "min":
+				return fmt.Sprintf("%s is too short", field)
+			case "max":
+				return fmt.Sprintf("%s is too long", field)
+			default:
+				return fmt.Sprintf("%s is invalid", field)
+			}
+		}
+	}
+	return "Invalid request format: " + err.Error()
+}
+
+func (h *JobAPIHandler) getJsonTag(fieldName string) string {
+	t := reflect.TypeFor[apimodels.CreateJobRequest]()
+	field, found := t.FieldByName(fieldName)
+	if !found {
+		return fieldName
+	}
+	tag := field.Tag.Get("json")
+	if tag == "" || tag == "-" {
+		return fieldName
+	}
+	// Handle cases like "title,omitempty"
+	return strings.Split(tag, ",")[0]
 }
