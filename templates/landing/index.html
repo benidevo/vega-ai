@@ -3,11 +3,11 @@
 <html lang="en" dir="ltr">
 {{template "landing/partials/head.html" (dict
   "PageTitle" "Job tracker with resume matching"
-  "PageDescription" "Track job applications, get a match score against each job description, and generate a tailored resume. Free — run it yourself with Docker or use the cloud version."
+  "PageDescription" "Track job applications, get a match score against each job description, and generate a tailored resume. Run it yourself with Docker or use the cloud version."
   "CanonicalURL" "https://vega.benidevo.com/"
-  "OGTitle" "Track your job search — Vega AI"
+  "OGTitle" "Track your job search • Vega AI"
   "OGDescription" "Track job applications, get a match score against each job description, and generate a tailored resume."
-  "TwitterTitle" "Track your job search — Vega AI"
+  "TwitterTitle" "Track your job search • Vega AI"
   "TwitterDescription" "Track job applications, get a match score against each job description, and generate a tailored resume."
   "StructuredData" `{
     "@context": "https://schema.org",
@@ -65,10 +65,10 @@
         const originalText = button.textContent;
         button.textContent = 'Copied!';
         button.classList.add('bg-primary');
-        
+
         // Announce to screen readers
         document.getElementById('copy-notification').textContent = 'Copied to clipboard';
-        
+
         setTimeout(() => {
           button.textContent = originalText;
           button.classList.remove('bg-primary');

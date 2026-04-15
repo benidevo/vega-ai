@@ -119,7 +119,7 @@ type Job struct {
 	UserID          int        `json:"user_id" db:"user_id" sql:"not null;index" validate:"required"`
 	Title           string     `json:"title" db:"title" sql:"type:text;not null;index" validate:"required,min=1,max=255"`
 	Description     string     `json:"description" db:"description" sql:"type:text;not null" validate:"required,min=1"`
-	Location        string     `json:"location" db:"location" sql:"type:text" validate:"max=255"`
+	Location        string     `json:"location" db:"location" sql:"type:text" validate:"omitempty,max=255"`
 	JobType         JobType    `json:"job_type" db:"job_type" sql:"type:integer;not null;default:0" validate:"min=0,max=6"`
 	SourceURL       string     `json:"source_url" db:"source_url" sql:"type:text;index" validate:"omitempty,url"`
 	RequiredSkills  []string   `json:"required_skills" db:"required_skills" sql:"type:text" validate:"max=50,dive,max=100"` // Stored as JSON
@@ -127,7 +127,7 @@ type Job struct {
 	Company         Company    `json:"company" sql:"-" validate:"required"` // Not stored directly, company_id is used instead
 	Status          JobStatus  `json:"status" db:"status" sql:"type:integer;not null;default:0;index" validate:"min=0,max=5"`
 	MatchScore      *int       `json:"match_score,omitempty" db:"match_score" sql:"type:integer;index" validate:"omitempty,min=0,max=100"`
-	Notes           string     `json:"notes,omitempty" db:"notes" sql:"type:text" validate:"max=5000"`
+	Notes           string     `json:"notes,omitempty" db:"notes" sql:"type:text" validate:"omitempty,max=5000"`
 	CreatedAt       time.Time  `json:"created_at" db:"created_at" sql:"type:timestamp;not null;default:current_timestamp"`
 	UpdatedAt       time.Time  `json:"updated_at" db:"updated_at" sql:"type:timestamp;not null;default:current_timestamp"`
 	FirstAnalyzedAt *time.Time `json:"first_analyzed_at,omitempty" db:"first_analyzed_at" sql:"type:timestamp"`
