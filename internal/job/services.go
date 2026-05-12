@@ -406,6 +406,12 @@ func (s *JobService) DeleteJob(ctx context.Context, userID int, id int) error {
 		return err
 	}
 
+	// Capture document IDs before the cascade so per-doc caches can be cleared.
+	var docIDs []int
+	if s.documentService != nil {
+		docIDs = s.documentService.LookupDocumentIDsForJob(ctx, userID, id)
+	}
+
 	err = s.jobRepo.Delete(ctx, userID, id)
 	if err != nil {
 		s.log.Error().
@@ -413,6 +419,10 @@ func (s *JobService) DeleteJob(ctx context.Context, userID int, id int) error {
 			Err(err).
 			Msg("Failed to delete job")
 		return err
+	}
+
+	if s.documentService != nil {
+		s.documentService.InvalidateCachesForDeletedJob(ctx, userID, id, docIDs)
 	}
 
 	s.log.Info().

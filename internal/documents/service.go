@@ -306,6 +306,46 @@ func (s *DocumentService) GetDocumentMetrics(ctx context.Context, userID int) (*
 	return metrics, nil
 }
 
+// LookupDocumentIDsForJob returns the IDs of every document attached to jobID,
+// bypassing the cache. Intended to be called before a job is deleted so the
+// per-doc cache entries can be invalidated after the FK cascade removes the
+// rows themselves.
+func (s *DocumentService) LookupDocumentIDsForJob(ctx context.Context, userID, jobID int) []int {
+	docs, err := s.repo.GetDocumentsByJob(ctx, userID, jobID)
+	if err != nil {
+		s.log.Warn().
+			Err(err).
+			Str("user_ref", fmt.Sprintf("user_%d", userID)).
+			Int("job_id", jobID).
+			Msg("Failed to look up document IDs before job deletion; per-doc caches may remain stale until TTL")
+		return nil
+	}
+	if len(docs) == 0 {
+		return nil
+	}
+	ids := make([]int, len(docs))
+	for i, d := range docs {
+		ids[i] = d.ID
+	}
+	return ids
+}
+
+// InvalidateCachesForDeletedJob clears every document cache affected by the
+// deletion of jobID. docIDs must be collected before the parent job delete
+// fires (see LookupDocumentIDsForJob) because the FK cascade removes the
+// underlying rows.
+func (s *DocumentService) InvalidateCachesForDeletedJob(ctx context.Context, userID, jobID int, docIDs []int) {
+	if s.cache == nil {
+		return
+	}
+	_ = s.cache.DeletePattern(ctx, fmt.Sprintf("user:%d:docs:*", userID))
+	_ = s.cache.Delete(ctx, fmt.Sprintf("user:%d:metrics", userID))
+	_ = s.cache.Delete(ctx, fmt.Sprintf("job:%d:docs", jobID))
+	for _, id := range docIDs {
+		_ = s.cache.Delete(ctx, fmt.Sprintf("doc:%d", id))
+	}
+}
+
 func (s *DocumentService) GetDocumentsByJob(ctx context.Context, userID, jobID int) ([]*models.Document, error) {
 	userRef := fmt.Sprintf("user_%d", userID)
 
