@@ -81,6 +81,7 @@
     </nav>
   </div>
 
+  {{if .username}}
   <!-- Logout Button -->
   <div class="px-2 mt-4 md:mt-8">
     <form action="/auth/logout" method="POST">
@@ -95,6 +96,7 @@
       </button>
     </form>
   </div>
+  {{end}}
 </div>
 {{end}}
 

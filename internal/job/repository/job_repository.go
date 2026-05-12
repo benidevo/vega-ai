@@ -629,6 +629,7 @@ func (r *SQLiteJobRepository) Update(ctx context.Context, userID int, job *model
 
 	job.Company = *company
 
+	r.invalidateCachePattern(ctx, fmt.Sprintf("top-matches:u%d:*", userID))
 	r.invalidateCache(ctx,
 		fmt.Sprintf("job:u%d:id%d", userID, job.ID),
 		fmt.Sprintf("stats:u%d:summary", userID),
@@ -701,8 +702,11 @@ func (r *SQLiteJobRepository) Delete(ctx context.Context, userID int, id int) er
 		return models.ErrJobNotFound
 	}
 
+	r.invalidateCachePattern(ctx, fmt.Sprintf("top-matches:u%d:*", userID))
+	r.invalidateCachePattern(ctx, fmt.Sprintf("match:u%d:recent:*", userID))
 	r.invalidateCache(ctx,
 		fmt.Sprintf("job:u%d:id%d", userID, id),
+		fmt.Sprintf("match:u%d:job%d:history", userID, id),
 		fmt.Sprintf("stats:u%d:summary", userID),
 		fmt.Sprintf("stats:u%d:by-status", userID),
 	)

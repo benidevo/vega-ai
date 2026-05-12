@@ -31,7 +31,6 @@ type Config struct {
 	DefaultHighlightMsg string
 	DefaultFeedbackMsg  string
 
-	MaxOutputTokens   int
 	Temperature       float32
 	TopP              float32
 	SystemInstruction string
@@ -67,9 +66,8 @@ func NewConfig(cfg *config.Settings) *Config {
 		DefaultHighlightMsg: "No specific highlights identified",
 		DefaultFeedbackMsg:  "Unable to provide detailed feedback at this time.",
 
-		MaxOutputTokens: 6000,
-		Temperature:     0.4,
-		TopP:            0.9,
+		Temperature: 0.4,
+		TopP:        0.9,
 		SystemInstruction: "You are a professional career advisor and expert writer. Always provide helpful, accurate, and constructive feedback. " +
 			"IMPORTANT: For job matching, use experience-based evaluation - candidates with 2+ years experience should be evaluated primarily on work history and practical skills, with education as secondary. " +
 			"Entry-level candidates (<2 years) should be evaluated with education carrying more weight. " +
