@@ -34,5 +34,6 @@ vega
 
 node_modules/
 static/css/output.css
+dist/site/
 
 .idea

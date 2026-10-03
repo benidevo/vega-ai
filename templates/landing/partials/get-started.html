@@ -10,72 +10,16 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="text-center mb-8 sm:mb-12 md:mb-16 fade-in-up">
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold font-heading mb-3 tracking-tight">
-          Choose how to use Vega AI
+          Self-host Vega AI
         </h2>
         <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-          Get started with our cloud mode or run it privately on your own computer
+          Run Vega AI on your own computer or server, and configure the AI provider you want to use.
         </p>
       </div>
 
-      <!-- Two Options Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto">
-        <!-- Cloud Mode Card -->
-        <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 hover:border-teal-500 transition-all duration-300 flex flex-col">
-          <div class="text-center mb-4">
-            <div class="bg-teal-600/20 rounded-full p-3 w-12 h-12 flex items-center justify-center mx-auto mb-3">
-              <svg class="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold mb-2">Cloud Mode</h3>
-            <p class="text-gray-600 text-sm">Ready to use, no setup required</p>
-          </div>
-
-          <ul class="space-y-2 mb-4 flex-grow">
-            <li class="flex items-start">
-              <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-600 text-sm">Zero setup, works in your browser</span>
-            </li>
-            <li class="flex items-start">
-              <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-600 text-sm">10 AI analyses per month</span>
-            </li>
-            <li class="flex items-start">
-              <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-600 text-sm">Unlimited job captures</span>
-            </li>
-            <li class="flex items-start">
-              <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-600 text-sm">Automatic updates</span>
-            </li>
-            <li class="flex items-start">
-              <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-600 text-sm">Sign in with Google</span>
-            </li>
-            <li class="flex items-start">
-              <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-600 text-sm">Data secured in the cloud</span>
-            </li>
-          </ul>
-
-          <a href="/auth/login" class="block w-full bg-teal-600 hover:bg-teal-600-dark text-white px-4 py-2.5 rounded-lg font-medium text-center transition-all">
-            Login
-          </a>
-        </div>
-
-        <!-- Local Mode Card -->
+      <!-- Self-hosted option -->
+      <div class="grid grid-cols-1 gap-6 mb-12 max-w-3xl mx-auto">
+        <!-- Self-hosted Card -->
         <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 hover:border-teal-500 transition-all duration-300 flex flex-col">
           <div class="text-center mb-4">
             <div class="bg-teal-600/20 rounded-full p-3 w-12 h-12 flex items-center justify-center mx-auto mb-3">
@@ -83,8 +27,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold mb-2">Local Mode</h3>
-            <p class="text-gray-600 text-sm">Run on your own computer</p>
+            <h3 class="text-xl font-bold mb-2">Self-hosted</h3>
+            <p class="text-gray-600 text-sm">Run it on your own computer or server</p>
           </div>
 
           <ul class="space-y-2 mb-4 flex-grow">
@@ -92,7 +36,7 @@
               <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-600 text-sm">100% private, data stays on your computer</span>
+              <span class="text-gray-600 text-sm">Choose where the app runs and where its data is stored</span>
             </li>
             <li class="flex items-start">
               <svg class="h-5 w-5 text-teal-600 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,11 +64,11 @@
         </div>
       </div>
 
-      <!-- Local Mode Instructions (Hidden by default) -->
+      <!-- Self-hosted Setup Instructions (Hidden by default) -->
       <div id="local-mode-instructions" class="hidden">
         <div class="bg-white/50 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
-          <h3 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-center">Local Mode Setup Instructions</h3>
-          <p class="text-gray-600 text-sm sm:text-base text-center mb-4 sm:mb-6">Follow these simple steps to run Vega AI on your computer</p>
+          <h3 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-center">Self-hosted Setup Instructions</h3>
+          <p class="text-gray-600 text-sm sm:text-base text-center mb-4 sm:mb-6">Follow these steps to run Vega AI on your own computer or server</p>
         </div>
 
         <!-- Quick Setup Guide -->
@@ -214,8 +158,8 @@
                 <div class="space-y-3">
                   <div id="extension-download-section">
                     <p class="text-sm text-gray-600 mb-2 font-semibold">Direct Download:</p>
-                    <a href="/extension/download" class="inline-block bg-teal-600 hover:bg-teal-600-dark text-gray-900 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors text-center" rel="noopener">
-                      Download Extension
+                    <a href="https://github.com/benidevo/vega-ai-extension/releases/latest" target="_blank" class="inline-block bg-teal-600 hover:bg-teal-600-dark text-gray-900 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors text-center" rel="noopener">
+                      Download Latest Release
                     </a>
 
                     {{/* Link to view all releases */}}

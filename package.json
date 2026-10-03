@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "npm run build:css -- --watch",
     "build": "npm run build:css -- --minify",
-    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css"
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css",
+    "build:site": "go run ./cmd/build-site"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.27",

@@ -7,8 +7,6 @@
 
 Vega AI is a self-hostable job search assistant. Track applications, generate tailored CVs and cover letters, get AI-powered job match scores, and capture jobs from LinkedIn via a browser extension.
 
-Cloud instance: [vega.benidevo.com](https://vega.benidevo.com)
-
 ## Self-Hosted Quick Start
 
 Requires Docker and an API key for any OpenAI-compatible provider (or a local Ollama instance).
@@ -17,16 +15,16 @@ Requires Docker and an API key for any OpenAI-compatible provider (or a local Ol
 
 Vega AI works with any OpenAI-compatible provider. Pick one:
 
-| Provider | Cost | Privacy | Setup |
+| Provider | Processing | Setup |
 |---|---|---|---|
-| **Gemini** (default) | Free tier available | Cloud | [Get API key](https://aistudio.google.com/app/apikey) |
-| **OpenAI** | Paid | Cloud | [Get API key](https://platform.openai.com/api-keys) |
-| **Ollama** | Free | 100% local | [Install Ollama](https://ollama.com) |
-| **LM Studio** | Free | 100% local | [Install LM Studio](https://lmstudio.ai) |
+| **Gemini** (default) | Google AI service | [Get API key](https://aistudio.google.com/app/apikey) |
+| **OpenAI** | OpenAI service | [Get API key](https://platform.openai.com/api-keys) |
+| **Ollama** | Runs on a machine you choose | [Install Ollama](https://ollama.com) |
+| **LM Studio** | Runs on a machine you choose | [Install LM Studio](https://lmstudio.ai) |
 
 ### 2. Create Configuration
 
-**Gemini (quickest cloud start):**
+**Gemini (quickest setup):**
 
 ```bash
 mkdir vega-ai && cd vega-ai
@@ -95,8 +93,7 @@ docker run --pull always -d \
 - **CV parsing**: Upload a CV to auto-populate your profile
 - **Job tracking**: Manage applications with customizable statuses
 - **Browser extension**: Capture jobs from LinkedIn and other boards in one click
-- **Self-hosted**: All data stays on your machine; no third-party storage
-- **Cloud mode**: Hosted instance with per-user AI usage quotas
+- **Self-hosted**: You control where the app runs and where its data is stored. AI requests go to the provider you configure.
 
 ## Browser Extension
 
