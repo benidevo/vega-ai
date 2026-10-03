@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	commonrender "github.com/benidevo/vega/internal/common/render"
 	"html/template"
 	"io/fs"
 	"os"
@@ -20,7 +21,10 @@ func main() {
 }
 
 func build() error {
-	tmpl := template.New("site").Funcs(template.FuncMap{"dict": dict})
+	tmpl := template.New("site").Funcs(template.FuncMap{
+		"dict":   dict,
+		"jsonLD": commonrender.JSONLD,
+	})
 	if err := filepath.WalkDir("templates/landing", func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err

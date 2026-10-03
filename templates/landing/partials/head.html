@@ -70,7 +70,7 @@
   {{if .StructuredData}}
   <!-- Structured Data -->
   <script type="application/ld+json">
-  {{.StructuredData}}
+  {{.StructuredData | jsonLD}}
   </script>
   {{end}}
 </head>
