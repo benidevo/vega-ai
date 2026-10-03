@@ -15,7 +15,6 @@ import (
 	"github.com/benidevo/vega/internal/home"
 	"github.com/benidevo/vega/internal/job"
 	localmiddleware "github.com/benidevo/vega/internal/middleware"
-	"github.com/benidevo/vega/internal/pages"
 	"github.com/benidevo/vega/internal/quota"
 	"github.com/benidevo/vega/internal/settings"
 	"github.com/gin-gonic/gin"
@@ -118,12 +117,6 @@ func SetupRoutes(a *App) {
 	jobAPIGroup := a.router.Group("/api/jobs")
 	jobAPIGroup.Use(authHandler.APIAuthMiddleware())
 	jobapi.RegisterRoutes(jobAPIGroup, jobAPIHandler)
-
-	pagesHandler := pages.NewHandler(&a.config)
-	if a.config.IsCloudMode {
-		a.router.GET("/privacy", pagesHandler.GetPrivacyPage)
-		a.router.GET("/extension/download", pagesHandler.GetExtensionDownload)
-	}
 
 	a.router.NoRoute(func(c *gin.Context) {
 		a.renderer.Error(c, http.StatusNotFound, "Page Not Found")
