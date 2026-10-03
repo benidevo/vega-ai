@@ -297,7 +297,7 @@ GET    /health             # Health check
 
 ### Overview
 
-The quota system manages usage limits for AI-powered features in cloud mode:
+The quota system manages usage limits for AI-powered features when `CLOUD_MODE` is enabled. This setting supports multi-user deployments operated by users; it does not indicate a Vega-operated hosted service.
 
 - **AI Analysis Quota:** Monthly limit for new job analyses (10/month)
 - **Job Search Tracking:** Tracks job searches but no limits enforced
@@ -497,7 +497,7 @@ Services are initialized in dependency order:
 
 - **Dependency Injection**: Services receive dependencies through constructors
 - **Graceful Degradation**: AI service failure doesn't crash the app
-- **Mode-Based Configuration**: Cloud vs self-hosted behavior differences
+- **Mode-Based Configuration**: `CLOUD_MODE` controls authentication and quota behavior for an operator's own deployment; the default mode is intended for a single self-hosted user
 - **Middleware Composition**: Flexible security and auth middleware
 - **Clean Shutdown**: Proper resource cleanup on termination
 

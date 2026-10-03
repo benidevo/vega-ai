@@ -161,6 +161,7 @@ See [docs/DOCKER_SWARM.md](docs/DOCKER_SWARM.md) for detailed instructions.
 ### Advanced Configuration
 
 - **Docker Secrets**: Use `_FILE` environment variables for secure configuration. See [Docker Swarm deployment](docs/DOCKER_SWARM.md#method-3-using-docker-secrets-recommended-for-production).
+- **VPS deployment**: Run your own multi-user instance with Google sign-in using the [self-hosted VPS guide](docs/DEPLOYMENT_GUIDE.md).
 - **Development Setup**: Custom ports, SSL, external databases. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## Development

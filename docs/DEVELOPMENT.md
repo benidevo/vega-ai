@@ -310,7 +310,9 @@ make logs
 docker compose logs -f vega-ai
 ```
 
-## Cloud Mode Deployment
+## Multi-User (`CLOUD_MODE`) Deployment
+
+`CLOUD_MODE` enables Google sign-in and multi-user behavior for an instance you operate. It is a deployment setting, not a Vega-provided hosted service. You control the instance, its user accounts and data, and the AI provider configured for it.
 
 ### Overview
 
@@ -332,21 +334,9 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 GOOGLE_CLIENT_REDIRECT_URL=https://yourdomain.com/auth/google/callback
 ```
 
-### Building Cloud Images
+### Running Cloud Mode
 
-#### Manual Build
-
-```bash
-# Via GitHub Actions
-# Go to Actions → "Build and Push Cloud Docker Image"
-# Click "Run workflow" and choose tag
-
-# Via git tags
-git tag v1.0.0-cloud
-git push origin v1.0.0-cloud
-```
-
-#### Running Cloud Mode
+Use the regular Vega AI image and enable cloud mode through its environment. To build an image from this checkout, use `docker build -f docker/prod/Dockerfile -t vega-ai .`.
 
 ```bash
 docker run -d \
@@ -379,7 +369,7 @@ CLOUD_MODE=true go test ./...
 
 #### Overview
 
-Vega AI implements a quota system to manage resource usage in cloud deployments:
+Vega AI includes quota behavior for instances running in cloud mode. Each instance operator controls the deployment and can adjust quota settings in its database:
 
 - **AI Analysis**: 10 analyses per month (per user)
 - **Job Search**: Unlimited (tracking only, no limits enforced)
