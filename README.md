@@ -15,12 +15,12 @@ Requires Docker and an API key for any OpenAI-compatible provider (or a local Ol
 
 Vega AI works with any OpenAI-compatible provider. Pick one:
 
-| Provider | Processing | Setup |
+| Provider | Cost | Where your data goes | Setup |
 |---|---|---|---|
-| **Gemini** (default) | Google AI service | [Get API key](https://aistudio.google.com/app/apikey) |
-| **OpenAI** | OpenAI service | [Get API key](https://platform.openai.com/api-keys) |
-| **Ollama** | Runs on a machine you choose | [Install Ollama](https://ollama.com) |
-| **LM Studio** | Runs on a machine you choose | [Install LM Studio](https://lmstudio.ai) |
+| **Gemini** (default) | Free tier, check provider | Sent to Google | [Get API key](https://aistudio.google.com/app/apikey) |
+| **OpenAI** | Check provider | Sent to OpenAI | [Get API key](https://platform.openai.com/api-keys) |
+| **Ollama** | Free | Stays on your machine when run locally | [Install Ollama](https://ollama.com) |
+| **LM Studio** | Free | Stays on your machine when run locally | [Install LM Studio](https://lmstudio.ai) |
 
 ### 2. Create Configuration
 

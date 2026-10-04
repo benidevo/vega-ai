@@ -297,7 +297,7 @@ GET    /health             # Health check
 
 ### Overview
 
-The quota system manages usage limits for AI-powered features when `CLOUD_MODE` is enabled. This setting supports multi-user deployments operated by users; it does not indicate a Vega-operated hosted service.
+The quota system manages usage limits for AI-powered features when `CLOUD_MODE` is enabled.
 
 - **AI Analysis Quota:** Monthly limit for new job analyses (10/month)
 - **Job Search Tracking:** Tracks job searches but no limits enforced
@@ -395,7 +395,7 @@ docker run -p 8765:8765 \
   -e GOOGLE_CLIENT_SECRET=xxx \
   -e TOKEN_SECRET=xxx \
   -e AI_KEY=xxx \
-  ghcr.io/benidevo/vega-ai:cloud-latest
+  ghcr.io/benidevo/vega-ai:latest
 ```
 
 ## Code Organization Best Practices

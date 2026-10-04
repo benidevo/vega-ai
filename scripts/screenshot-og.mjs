@@ -37,14 +37,11 @@ async function capture() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   const ogPath = path.join(OUT_DIR, "og-image.png");
-  const twitterPath = path.join(OUT_DIR, "twitter-card.png");
 
   await page.screenshot({ path: ogPath, type: "png", clip: { x: 0, y: 0, width: OG_W, height: OG_H } });
-  fs.copyFileSync(ogPath, twitterPath);
   await browser.close();
 
   console.log(`✓ og-image.png     → ${ogPath}`);
-  console.log(`✓ twitter-card.png → ${twitterPath}`);
 }
 
 capture().catch((err) => {

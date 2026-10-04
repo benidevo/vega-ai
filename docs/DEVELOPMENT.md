@@ -310,9 +310,19 @@ make logs
 docker compose logs -f vega-ai
 ```
 
+## Landing Site
+
+The landing and privacy pages are built to static files and served from Cloudflare Workers, separately from the app.
+
+```bash
+npm run build:site   # run from the repo root; writes dist/site
+```
+
+Deploy by running the "Deploy Site" workflow from the GitHub Actions tab. It builds `dist/site` and publishes it with `wrangler deploy` (config in `wrangler.jsonc`).
+
 ## Multi-User (`CLOUD_MODE`) Deployment
 
-`CLOUD_MODE` enables Google sign-in and multi-user behavior for an instance you operate. It is a deployment setting, not a Vega-provided hosted service. You control the instance, its user accounts and data, and the AI provider configured for it.
+`CLOUD_MODE` enables Google sign-in and multi-user behavior.
 
 ### Overview
 
