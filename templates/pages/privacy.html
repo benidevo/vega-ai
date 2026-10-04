@@ -37,25 +37,29 @@
         <h1 class="text-3xl font-heading font-bold text-gray-900 mb-4">Privacy Policy</h1>
 
         <p class="text-sm text-gray-500 mb-8">
-          <strong>Last updated:</strong> October 3, 2026
+          <strong>Last updated:</strong> October 4, 2026
         </p>
 
         <div class="prose prose-lg max-w-none">
           <p class="text-gray-600 leading-relaxed mb-6">
-            Vega AI is self-hosted software. This public website provides product information; it does not host a Vega AI application or provide app accounts or sign-in. When you run Vega AI, the person or organization operating that instance controls its deployment, data storage, access, and retention.
+            Vega AI is self-hosted software. We don't run a Vega AI service, and this website has no accounts or sign-in. This page covers the website, the browser extension, and what to expect when you run Vega AI yourself.
           </p>
 
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">The self-hosted application</h2>
+          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">This website</h2>
 
-          <p class="text-gray-600 mb-6">
-            Data you enter into an instance is handled by that instance and its operator. The operator chooses where the app runs, who can access it, and how its data is backed up or deleted. Contact the operator of the instance you use with questions about its data practices.
+          <p class="text-gray-600 mb-4">
+            The site is static. It has no accounts, analytics, or ads, and sets no cookies of its own. Your browser still makes requests to the services below when you load a page, and they may log them under their own privacy policies:
           </p>
 
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Information that gets collected</h2>
+          <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-6">
+            <li><strong class="text-gray-900">Cloudflare:</strong> hosts the site and sees standard request data such as your IP address.</li>
+            <li><strong class="text-gray-900">Google Fonts:</strong> serves the fonts.</li>
+            <li><strong class="text-gray-900">Tailwind CDN:</strong> serves a CSS script.</li>
+          </ul>
 
-          <h3 class="text-xl font-heading font-semibold text-gray-900 mt-6 mb-3">When you use the browser extension</h3>
+          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">The browser extension</h2>
 
-          <p class="text-gray-600 mb-4">When you click the capture button on a LinkedIn job page, the extension collects the job information below and sends it to the Vega AI instance you configured:</p>
+          <p class="text-gray-600 mb-4">When you click the capture button on a LinkedIn job page, the extension reads the job details and sends them to the Vega AI server address you set up:</p>
 
           <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-4">
             <li>Job title and company name</li>
@@ -65,92 +69,55 @@
             <li>Any notes you add before saving</li>
           </ul>
 
-          <p class="text-gray-600 mb-6">The extension stores the credentials or authentication token needed to connect to your instance in your browser.</p>
-
-          <h3 class="text-xl font-heading font-semibold text-gray-900 mt-6 mb-3">When you use the web application</h3>
-
-          <p class="text-gray-600 mb-4">Your instance stores the information you add directly or send through the extension. Depending on how the operator configured it, this may include:</p>
-
-          <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-6">
-            <li>Your account details, such as username and email address</li>
-            <li>Your profile information (skills, experience, education)</li>
-            <li>Application tracking data (which jobs you've applied to, interview dates, etc.)</li>
-            <li>Notes and status updates you add to jobs</li>
-          </ul>
-
-          <h3 class="text-xl font-heading font-semibold text-gray-900 mt-6 mb-3">Technical stuff</h3>
-
-          <p class="text-gray-600 mb-6">
-            When you use an AI feature, the instance sends the relevant job and profile information to the AI provider configured by its operator. The provider's own data practices apply to those requests.
+          <p class="text-gray-600 mb-4">
+            This data goes only to your server. Nothing is sent to Vega AI or its maintainers. The extension has no analytics or error reporting, and we don't show ads or sell data.
           </p>
 
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">How the instance uses information</h2>
-
-          <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-6">
-            <li><strong class="text-gray-900">Job tracking:</strong> Store and organize your job applications</li>
-            <li><strong class="text-gray-900">AI matching:</strong> Calculate how well jobs match your profile when you request an analysis</li>
-            <li><strong class="text-gray-900">Document generation:</strong> Create tailored cover letters and resumes</li>
-            <li><strong class="text-gray-900">Authentication:</strong> Keep you signed in across the extension and web app</li>
-          </ul>
-
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Your control</h2>
-
-          <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-6">
-            <li><strong class="text-gray-900">Choose an instance:</strong> Select an operator and deployment you trust, or run your own</li>
-            <li><strong class="text-gray-900">Manage your data:</strong> Ask your instance operator how to export or delete your data</li>
-            <li><strong class="text-gray-900">Control AI usage:</strong> Use AI features only when needed, or configure a local model</li>
-          </ul>
-
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Security</h2>
-
-          <p class="text-gray-600 mb-6">
-            Instance operators are responsible for securing their deployment, including network access, encryption in transit, accounts, backups, and stored data. The extension keeps its connection credentials in your browser; protect access to that browser profile.
+          <p class="text-gray-600 mb-4">
+            The extension stores your server address and the token it uses to sign in in your browser. Protect access to that browser profile.
           </p>
 
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Data location</h2>
+          <p class="text-gray-600 mb-6">
+            Two other requests happen: the extension checks GitHub for new releases, and it loads a font from Google Fonts.
+          </p>
 
-          <p class="text-gray-600 mb-6">The instance operator chooses where the application and its data are hosted. If AI features are used, information sent for processing goes to the AI provider configured for that instance.</p>
+          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Running Vega AI yourself</h2>
+
+          <p class="text-gray-600 mb-4">
+            Your data stays on the machine where you run Vega AI. You decide where it is hosted, who can access it, how it is backed up, and when it is deleted. You are also responsible for securing it, including network access, accounts, and backups.
+          </p>
+
+          <p class="text-gray-600 mb-4">
+            The one exception is AI features. When you use one, Vega AI sends the relevant job and profile text to the AI provider you configured, and that provider's privacy policy applies. If you configure a local model, nothing leaves your machine.
+          </p>
+
+          <p class="text-gray-600 mb-6">
+            If you use a Vega AI server that someone else runs, that operator controls your data. Ask them how to export or delete it.
+          </p>
 
           <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Open source</h2>
 
           <p class="text-gray-600 mb-6">
-            Both the browser extension and web application are open source under the AGPL-3.0 license. You can inspect the code, contribute improvements, or modify it for your own use. The source code is available on GitHub.
+            Both the browser extension and web application are open source under the AGPL-3.0 license. You can read the code on GitHub to check any claim on this page.
           </p>
-
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Third-party services</h2>
-
-          <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-6">
-            <li><strong class="text-gray-900">Public-site assets:</strong> The landing and privacy pages request fonts from Google Fonts and a Tailwind CSS script from its CDN. Those providers receive requests from your browser and may process request data under their own privacy policies.</li>
-            <li><strong class="text-gray-900">Configured AI provider:</strong> Receives information needed for an AI feature when you use it; the provider is selected by the instance operator.</li>
-          </ul>
-
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Intended use</h2>
-
-          <p class="text-gray-600 mb-6">Vega AI is designed for people organizing a job search. Instance operators are responsible for setting requirements for people who use their deployment.</p>
 
           <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Changes</h2>
 
           <p class="text-gray-600 mb-6">
-            This policy may be updated, and changes will be posted on this page. Check with your instance operator for changes to that instance's data practices.
+            If this policy changes, the new version will be posted here with an updated date.
           </p>
 
           <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Questions</h2>
 
-          <p class="text-gray-600 mb-6">
-            If you have questions about privacy or how your data gets handled, email
+          <p class="text-gray-600">
+            Email
             <a href="mailto:vega@benidevo.com" class="text-teal-400 hover:text-teal-300 underline">
               vega@benidevo.com
             </a>
-            or check out the code on
+            or open an issue on
             <a href="https://github.com/benidevo/vega-ai" class="text-teal-400 hover:text-teal-300 underline" target="_blank" rel="noopener">
               GitHub
             </a>.
-          </p>
-
-          <h2 class="text-2xl font-heading font-semibold text-gray-900 mt-8 mb-4">Your rights</h2>
-
-          <p class="text-gray-600">
-            For data access, correction, export, or deletion requests, contact the operator of the instance that holds your information.
           </p>
         </div>
       </div>
