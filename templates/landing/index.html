@@ -3,23 +3,24 @@
 <html lang="en" dir="ltr">
 {{template "landing/partials/head.html" (dict
   "PageTitle" "Job tracker with resume matching"
-  "PageDescription" "Track job applications, get a match score against each job description, and generate a tailored resume. Run it yourself with Docker or use the cloud version."
+  "PageDescription" "Track job applications, get match scores, and generate tailored resumes with Vega AI, a self-hosted job search assistant. Choose an AI provider or run a local model."
   "CanonicalURL" "https://vega.benidevo.com/"
   "OGTitle" "Track your job search • Vega AI"
-  "OGDescription" "Track job applications, get a match score against each job description, and generate a tailored resume."
+  "OGDescription" "A self-hosted job search assistant for tracking applications, matching jobs, and generating tailored resumes. Choose an AI provider or run a local model."
   "TwitterTitle" "Track your job search • Vega AI"
-  "TwitterDescription" "Track job applications, get a match score against each job description, and generate a tailored resume."
+  "TwitterDescription" "A self-hosted job search assistant for tracking applications, matching jobs, and generating tailored resumes. Choose an AI provider or run a local model."
   "StructuredData" `{
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "Vega AI",
     "applicationCategory": "BusinessApplication",
-    "description": "Free job search assistant with smart matching, application tracking, and resume generation",
+    "description": "Self-hosted job search assistant with smart matching, application tracking, and resume generation. Choose an AI provider or run a local model.",
     "operatingSystem": "Windows, macOS, Linux",
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "USD"
+      "priceCurrency": "USD",
+      "description": "The software is free; hosting and AI provider costs may apply."
     },
     "featureList": [
       "Job application tracking",
@@ -27,10 +28,9 @@
       "Resume generation",
       "Cover letter generation",
       "Browser extension",
-      "Cloud and local mode options",
-      "Free"
-    ],
-    "softwareVersion": "1.0"
+      "Self-hosted deployment",
+      "Open source"
+    ]
   }`
 )}}
 <body class="bg-gray-50 text-gray-900 font-sans page-fade-in overflow-x-hidden">

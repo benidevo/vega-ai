@@ -1,6 +1,6 @@
-# Vega AI Production Deployment Guide
+# Vega AI Self-Hosted VPS Deployment Guide
 
-This guide covers setting up a fresh Hetzner Cloud VM to run Vega AI in production.
+This guide shows how to run your own Vega AI instance on a Hetzner Cloud VM. The server, user accounts, data, AI provider, and ongoing operation are under your control; this is not a Vega-operated hosted service. It uses `CLOUD_MODE` for Google sign-in and multi-user access on your instance.
 
 ## Prerequisites
 

@@ -12,14 +12,11 @@
 
         <!-- Desktop Navigation -->
         <div class="hidden lg:flex items-center space-x-6 nav-links">
-          {{if .username}}
-          <a href="/dashboard" class="text-gray-600 !text-gray-600 hover:text-primary transition-colors duration-200 font-medium text-sm">Dashboard</a>
-          {{end}}
           <a href="#features" class="text-gray-600 !text-gray-600 hover:text-primary transition-colors duration-200 font-medium text-sm">Features</a>
           <a href="#get-started" class="text-gray-600 !text-gray-600 hover:text-primary transition-colors duration-200 font-medium text-sm">Get Started</a>
           <a href="#faq" class="text-gray-600 !text-gray-600 hover:text-primary transition-colors duration-200 font-medium text-sm">FAQ</a>
           <a href="https://github.com/benidevo/vega-ai/issues" class="text-gray-600 !text-gray-600 hover:text-primary transition-colors duration-200 font-medium text-sm" target="_blank" rel="noopener">Feedback</a>
-          <a href="https://github.com/benidevo/vega" class="text-gray-600 !text-gray-600 hover:text-primary transition-colors duration-200 font-medium flex items-center text-sm" target="_blank" rel="noopener">
+          <a href="https://github.com/benidevo/vega-ai" class="text-gray-600 !text-gray-600 hover:text-primary transition-colors duration-200 font-medium flex items-center text-sm" target="_blank" rel="noopener">
             <span>GitHub</span>
             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -29,15 +26,9 @@
 
         <!-- CTA and Mobile Menu Button -->
         <div class="flex items-center space-x-3 nav-links">
-          {{if .username}}
-          <a href="/dashboard" class="hidden sm:inline-flex bg-primary hover:bg-primary-dark text-white px-4 sm:px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 transform hover:scale-105 btn-primary items-center">
-            <span class="relative z-10 !text-white">Go to Dashboard</span>
+          <a href="https://github.com/benidevo/vega-ai#self-hosted-quick-start" class="hidden sm:inline-flex bg-primary hover:bg-primary-dark text-white px-4 sm:px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 transform hover:scale-105 btn-primary items-center" target="_blank" rel="noopener">
+            <span class="relative z-10 !text-white">Quick Start</span>
           </a>
-          {{else}}
-          <a href="#get-started" class="hidden sm:inline-flex bg-primary hover:bg-primary-dark text-white px-4 sm:px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 transform hover:scale-105 btn-primary items-center">
-            <span class="relative z-10 !text-white">Get Started</span>
-          </a>
-          {{end}}
 
           <!-- Mobile menu button -->
           <button id="mobile-menu-button" class="lg:hidden p-2 rounded-md hover:bg-white transition-colors tap-target text-gray-600">
@@ -68,14 +59,11 @@
 
       <nav class="flex-1 overflow-y-auto">
         <div class="px-4 py-4 space-y-1">
-          {{if .username}}
-          <a href="/dashboard" class="block px-4 py-2.5 text-sm font-medium !text-gray-600 hover:text-white hover:bg-white/50 rounded-lg transition-all">Dashboard</a>
-          {{end}}
           <a href="#features" class="block px-4 py-2.5 text-sm font-medium !text-gray-600 hover:text-white hover:bg-white/50 rounded-lg transition-all">Features</a>
           <a href="#get-started" class="block px-4 py-2.5 text-sm font-medium !text-gray-600 hover:text-white hover:bg-white/50 rounded-lg transition-all">Get Started</a>
           <a href="#faq" class="block px-4 py-2.5 text-sm font-medium !text-gray-600 hover:text-white hover:bg-white/50 rounded-lg transition-all">FAQ</a>
           <a href="https://github.com/benidevo/vega-ai/issues" class="block px-4 py-2.5 text-sm font-medium !text-gray-600 hover:text-white hover:bg-white/50 rounded-lg transition-all" target="_blank" rel="noopener">Feedback</a>
-          <a href="https://github.com/benidevo/vega" class="block px-4 py-2.5 text-sm font-medium !text-gray-600 hover:text-white hover:bg-white/50 rounded-lg transition-all" target="_blank" rel="noopener">
+          <a href="https://github.com/benidevo/vega-ai" class="block px-4 py-2.5 text-sm font-medium !text-gray-600 hover:text-white hover:bg-white/50 rounded-lg transition-all" target="_blank" rel="noopener">
             GitHub
             <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -85,15 +73,9 @@
       </nav>
 
       <div class="p-4 border-t border-gray-200">
-        {{if .username}}
-        <a href="/dashboard" class="block w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-medium text-center transition-all">
-          Go to Dashboard
+        <a href="https://github.com/benidevo/vega-ai#self-hosted-quick-start" class="block w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-medium text-center transition-all" target="_blank" rel="noopener">
+          Self-hosting Quick Start
         </a>
-        {{else}}
-        <a href="#get-started" class="block w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-medium text-center transition-all">
-          Get Started
-        </a>
-        {{end}}
       </div>
     </div>
   </div>

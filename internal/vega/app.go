@@ -258,6 +258,7 @@ func (a *App) runMigrations() error {
 // templateFuncMap returns a map of custom template functions
 func templateFuncMap() template.FuncMap {
 	return template.FuncMap{
+		"jsonLD": render.JSONLD,
 		"safeHTML": func(s string) template.HTML {
 			return template.HTML(s)
 		},

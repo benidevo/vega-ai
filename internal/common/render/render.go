@@ -1,11 +1,26 @@
 package render
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"html/template"
 	"time"
 
 	"github.com/benidevo/vega/internal/config"
 	"github.com/gin-gonic/gin"
 )
+
+// JSONLD returns validated JSON for a JSON-LD script element.
+func JSONLD(value string) (template.JS, error) {
+	if !json.Valid([]byte(value)) {
+		return "", fmt.Errorf("invalid JSON-LD")
+	}
+
+	var escaped bytes.Buffer
+	json.HTMLEscape(&escaped, []byte(value))
+	return template.JS(escaped.String()), nil
+}
 
 // HTMLRenderer provides common rendering functionality for all handlers
 type HTMLRenderer struct {

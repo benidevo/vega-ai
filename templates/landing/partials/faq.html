@@ -16,13 +16,13 @@
           <!-- FAQ 1 -->
           <details class="bg-white rounded-lg border border-gray-200 group shadow-sm">
             <summary class="flex items-center justify-between p-4 sm:p-6 cursor-pointer list-none">
-              <h3 class="text-base sm:text-lg font-semibold text-gray-900 pr-4">Which version should I choose?</h3>
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 pr-4">How do I get started?</h3>
               <svg class="h-5 w-5 text-teal-600 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
             <div class="px-4 sm:px-6 pb-4 sm:pb-6">
-              <p class="text-gray-600 text-sm sm:text-base">Use the <strong>cloud mode</strong> if you want instant access with no setup. Use <strong>local mode</strong> if you want unlimited AI analyses and complete privacy. Both are free, just different approaches.</p>
+              <p class="text-gray-600 text-sm sm:text-base">Run Vega AI with Docker on a computer or server you control, then configure an AI provider or local model. See the <a href="https://github.com/benidevo/vega-ai#self-hosted-quick-start" class="text-teal-600 hover:text-teal-700" target="_blank" rel="noopener">self-hosted quick start</a>.</p>
             </div>
           </details>
 
@@ -42,13 +42,13 @@
           <!-- FAQ 3 -->
           <details class="bg-white rounded-lg border border-gray-200 group shadow-sm">
             <summary class="flex items-center justify-between p-4 sm:p-6 cursor-pointer list-none">
-              <h3 class="text-base sm:text-lg font-semibold text-gray-900 pr-4">Can I use the browser extension with the cloud mode?</h3>
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 pr-4">Can I use the browser extension with my instance?</h3>
               <svg class="h-5 w-5 text-teal-600 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
             <div class="px-4 sm:px-6 pb-4 sm:pb-6">
-              <p class="text-gray-600 text-sm sm:text-base">Yes! The browser extension works with both cloud and local modes. <strong>Cloud mode:</strong> Set your extension password in Account Settings and use your Google email to login. <strong>Self-hosted mode:</strong> Use your regular username and password. It saves jobs from LinkedIn with one click. Support for Glassdoor and Indeed coming soon. Compatible with Chrome and Edge browsers. <a href="/extension/download" rel="noopener" class="text-teal-600 hover:text-teal-700 underline">Download the extension</a>.</p>
+              <p class="text-gray-600 text-sm sm:text-base">Yes. Connect the extension to your self-hosted Vega AI instance and sign in with an account on that instance. It saves jobs from LinkedIn with one click and works with Chrome and Edge. <a href="https://github.com/benidevo/vega-ai-extension/releases/latest/download/vega-ai-job-capture-extension.zip" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-700 underline">Download the latest release</a> or <a href="https://github.com/benidevo/vega-ai-extension/releases" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-700 underline">browse all releases</a>.</p>
             </div>
           </details>
 
@@ -63,11 +63,11 @@
             <div class="px-4 sm:px-6 pb-4 sm:pb-6">
               <p class="text-gray-600 text-sm sm:text-base mb-3">Vega AI works with any OpenAI-compatible provider. You can use:</p>
               <ul class="space-y-2 text-gray-600 text-sm sm:text-base mb-3">
-                <li><strong class="text-gray-900">Gemini</strong> (default): free tier available, get a key from <a href="https://aistudio.google.com/app/apikey" class="text-teal-600 hover:text-teal-700" target="_blank" rel="noopener">Google AI Studio</a>. Set <code class="bg-gray-100 px-1 rounded text-xs">AI_KEY=your-key</code>.</li>
+                <li><strong class="text-gray-900">Gemini</strong> (default): get an API key from <a href="https://aistudio.google.com/app/apikey" class="text-teal-600 hover:text-teal-700" target="_blank" rel="noopener">Google AI Studio</a>. Set <code class="bg-gray-100 px-1 rounded text-xs">AI_KEY=your-key</code>.</li>
                 <li><strong class="text-gray-900">OpenAI</strong>: GPT-4o, GPT-4o-mini, and others. Set <code class="bg-gray-100 px-1 rounded text-xs">AI_PROVIDER=openai</code> and <code class="bg-gray-100 px-1 rounded text-xs">AI_KEY=sk-...</code>.</li>
-                <li><strong class="text-gray-900">Ollama (fully local, no API key)</strong>: run models like Llama 3.2, Qwen 2.5, or Mistral on your own hardware. Set <code class="bg-gray-100 px-1 rounded text-xs">AI_BASE_URL=http://host.docker.internal:11434/v1</code> and <code class="bg-gray-100 px-1 rounded text-xs">AI_KEY=ollama</code>.</li>
+                <li><strong class="text-gray-900">Ollama (local)</strong>: run a model on your own hardware. Set <code class="bg-gray-100 px-1 rounded text-xs">AI_BASE_URL=http://host.docker.internal:11434/v1</code> and <code class="bg-gray-100 px-1 rounded text-xs">AI_KEY=ollama</code>.</li>
               </ul>
-              <p class="text-gray-500 text-xs">Any instruct-tuned model from 2025 onwards works reliably. Newer models work too. Models under ~3B parameters may produce inconsistent output.</p>
+              <p class="text-gray-500 text-xs">The configured model must support JSON mode. Smaller models may produce inconsistent results.</p>
             </div>
           </details>
 
@@ -80,7 +80,7 @@
               </svg>
             </summary>
             <div class="px-4 sm:px-6 pb-4 sm:pb-6">
-              <p class="text-gray-600 text-sm sm:text-base">With <strong>local mode</strong>, your data never leaves your computer. With the <strong>cloud mode</strong>, your data is secured and encrypted, but stored on our servers. Choose based on your privacy needs.</p>
+              <p class="text-gray-600 text-sm sm:text-base">Your instance operator controls where Vega AI runs and where its app data is stored. If you use AI features, the request goes to the AI provider configured for that instance.</p>
             </div>
           </details>
 
@@ -93,20 +93,20 @@
               </svg>
             </summary>
             <div class="px-4 sm:px-6 pb-4 sm:pb-6">
-              <p class="text-gray-600 text-sm sm:text-base">The Vega AI community is active on GitHub. You can <a href="https://github.com/benidevo/vega/issues" class="text-teal-600 hover:text-teal-700" target="_blank" rel="noopener">open issues</a>, ask questions, or contribute improvements. Since it's open source, you can also modify it to fit your specific needs.</p>
+              <p class="text-gray-600 text-sm sm:text-base">The Vega AI community is active on GitHub. You can <a href="https://github.com/benidevo/vega-ai/issues" class="text-teal-600 hover:text-teal-700" target="_blank" rel="noopener">open issues</a>, ask questions, or contribute improvements. Since it's open source, you can also modify it to fit your specific needs.</p>
             </div>
           </details>
 
           <!-- FAQ 8 -->
           <details class="bg-white rounded-lg border border-gray-200 group shadow-sm">
             <summary class="flex items-center justify-between p-4 sm:p-6 cursor-pointer list-none">
-              <h3 class="text-base sm:text-lg font-semibold text-gray-900 pr-4">What are the limits on the free cloud mode?</h3>
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 pr-4">What does it cost to use Vega AI?</h3>
               <svg class="h-5 w-5 text-teal-600 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
             <div class="px-4 sm:px-6 pb-4 sm:pb-6">
-              <p class="text-gray-600 text-sm sm:text-base">The cloud mode is free with unlimited job captures and 10 AI analyses per month. For unlimited AI analyses, try the local mode.</p>
+              <p class="text-gray-600 text-sm sm:text-base">Vega AI software is free and open source. You provide the computer or server that runs it and configure an AI provider; hosting or provider costs may apply. A local model can avoid per-request provider fees.</p>
             </div>
           </details>
 

@@ -26,20 +26,8 @@ func NewHandler(cfg *config.Settings, service *Service) *Handler {
 	}
 }
 
-// GetHomePage renders the home page template with dynamic user data.
-// Note: Despite the name, this renders the dashboard (templates/home/index.html), not the landing page.
+// GetHomePage renders the dashboard with dynamic user data.
 func (h *Handler) GetHomePage(c *gin.Context) {
-	// In cloud mode, show landing page only for "/" route
-	if h.cfg.IsCloudMode && c.Request.URL.Path == "/" {
-		username, _ := c.Get("username")
-
-		h.renderer.HTML(c, http.StatusOK, "landing/index.html", gin.H{
-			"username": username,
-		})
-		return
-	}
-
-	// In self-hosted mode, show dashboard
 	userIDValue, exists := c.Get("userID")
 	if !exists {
 		// Show dashboard with onboarding for non-authenticated users

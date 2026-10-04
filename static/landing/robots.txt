@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /assets/js/
-Disallow: /assets/css/
 
 Sitemap: https://vega.benidevo.com/sitemap.xml
